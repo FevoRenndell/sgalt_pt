@@ -1,0 +1,61 @@
+version: '3.8'  # Versión de esquema de Docker Compose. 3.8 es ampliamente compatible y moderna.
+
+services:  # Aquí se definen todos los contenedores del proyecto.
+
+  ### 🟢 BACKEND SERVICE ###
+  backend:
+    build: ./backend  # Construye la imagen desde el Dockerfile en ./backend
+    container_name: sgalt-backend  # Nombre personalizado del contenedor
+    ports:
+      - "3000:3000"  # Expone el puerto 3000 del contenedor al 3000 del host
+    depends_on:
+      - db  # Este servicio espera que 'db' (PostgreSQL) esté iniciado
+    environment:
+      - PORT=3000  # Puerto en el que corre el backend dentro del contenedor
+      - DB_HOST=db  # Nombre del servicio (host) de PostgreSQL en esta red
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=sgalt
+    volumes:
+      - ./backend:/app  # Sincroniza los archivos del backend al contenedor
+    networks:
+      - sgalt-network  # Lo conecta a una red interna personalizada
+
+  ### 🔵 FRONTEND SERVICE ###
+  frontend:
+    build: ./frontend  # Construye la imagen desde el Dockerfile en ./frontend
+    container_name: sgalt-frontend
+    ports:
+      - "5173:5173"  # Vite usa el puerto 5173 por defecto
+    volumes:
+      - ./frontend:/app  # Sincroniza archivos locales con el contenedor
+      - /app/node_modules
+    depends_on:
+      - backend  # Espera que el backend esté arriba
+    networks:
+      - sgalt-network
+
+  ### 🟣 POSTGRES DATABASE SERVICE ###
+  db:
+    image: postgres:16  # Usa una imagen oficial de PostgreSQL 16
+    container_name: sgalt-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sgalt
+    ports:
+      - "5432:5432"  # Expone la base de datos localmente (opcional)
+    volumes:
+      - db_data:/var/lib/postgresql/data  # Persiste los datos aunque reinicies el contenedor
+    networks:
+      - sgalt-network
+
+# Define la red interna personalizada para que todos los servicios se comuniquen entre sí
+networks:
+  sgalt-network:
+    driver: bridge
+
+# Define un volumen persistente para la base de datos
+volumes:
+  db_data:
