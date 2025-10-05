@@ -1,11 +1,11 @@
-// Importa el servicio que contiene la lógica del mensaje de respuesta
-const pingService = require('../services/pingService');
+// Importamos la función getPingMessage desde el servicio
+import { getPingMessage } from '../services/pingService.js';
 
-// Define y exporta la función 'ping' que será usada como manejador de la ruta GET /ping
-exports.ping = (req, res) => {
-    // Obtiene un mensaje desde el servicio
-    const message = pingService.getPingMessage();
+// Definimos la función ping que será usada como manejador de la ruta GET /ping
+export const ping = (req, res) => {
+  // Obtenemos un mensaje desde el servicio
+  const message = getPingMessage();
 
-    // Devuelve una respuesta JSON con el mensaje
-    res.json({ message });
+  // Devolvemos una respuesta JSON con el mensaje
+  res.json({ message });
 };

@@ -1,5 +1,3 @@
-version: '3.8'  # Versión de esquema de Docker Compose. 3.8 es ampliamente compatible y moderna.
-
 services:  # Aquí se definen todos los contenedores del proyecto.
 
   ### 🟢 BACKEND SERVICE ###
