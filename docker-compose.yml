@@ -1,5 +1,7 @@
 services:  # Aquí se definen todos los contenedores del proyecto.
 
+
+
   ### 🟢 BACKEND SERVICE ###
   backend:
     build: ./backend  # Construye la imagen desde el Dockerfile en ./backend
@@ -20,6 +22,8 @@ services:  # Aquí se definen todos los contenedores del proyecto.
     networks:
       - sgalt-network  # Lo conecta a una red interna personalizada
 
+
+
   ### 🔵 FRONTEND SERVICE ###
   frontend:
     build: ./frontend  # Construye la imagen desde el Dockerfile en ./frontend
@@ -34,6 +38,8 @@ services:  # Aquí se definen todos los contenedores del proyecto.
     networks:
       - sgalt-network
 
+
+
   ### 🟣 POSTGRES DATABASE SERVICE ###
   db:
     image: postgres:16  # Usa una imagen oficial de PostgreSQL 16
@@ -46,8 +52,11 @@ services:  # Aquí se definen todos los contenedores del proyecto.
       - "5432:5432"  # Expone la base de datos localmente (opcional)
     volumes:
       - db_data:/var/lib/postgresql/data  # Persiste los datos aunque reinicies el contenedor
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  # 👈 ejecuta este script al crear la DB
     networks:
       - sgalt-network
+
+
 
 # Define la red interna personalizada para que todos los servicios se comuniquen entre sí
 networks:
