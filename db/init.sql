@@ -2,6 +2,12 @@
 -- La función gen_random_uuid() proviene de esta extensión.
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- ================================================================
+-- CONFIGURACIÓN DE ZONA HORARIA LOCAL
+-- ================================================================
+-- Aplica automáticamente a cualquier base de datos donde se ejecute este script.
+SET TIMEZONE TO 'America/Santiago';
+
 -- Creación de la tabla principal de usuarios del sistema.
 CREATE TABLE IF NOT EXISTS users (
   -- Identificador numérico autoincremental único para cada usuario.
