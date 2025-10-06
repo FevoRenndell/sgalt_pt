@@ -48,6 +48,7 @@ services:  # Aquí se definen todos los contenedores del proyecto.
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: sgalt
+      TZ: America/Santiago  # Configura la zona horaria
     ports:
       - "5432:5432"  # Expone la base de datos localmente (opcional)
     volumes:
