@@ -1,907 +1,742 @@
--- ================================================================
--- Activamos la extensión 'pgcrypto' (si no existe) para poder generar UUIDs.
--- La función gen_random_uuid() proviene de esta extensión.
--- ================================================================
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
--- ================================================================
+-- =========================================================
+-- SGALT - Esquema base (PostgreSQL)
+-- Fecha: YYYY-MM-DD
+-- =========================================================
 
+-- Opcional las funciones crypto/uuid
+-- CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+BEGIN;
 
--- ################################################################
--- ################################################################
--- ################################################################
+-- =========================================================
+-- Tablas maestras: regiones, ciudades, comunas, roles
+-- (Catálogos jerárquicos para ubicar obras/solicitudes y
+--  controlar perfiles de usuario)
+-- Relaciones clave:
+--   regions(1) ──< cities(*) ──< communes(*)
+--   roles es independiente y se referenciará desde users.role_id
+-- =========================================================
 
-
-
--- ================================================================
--- CONFIGURACIÓN DE ZONA HORARIA LOCAL
--- ================================================================
--- Aplica automáticamente a cualquier base de datos donde se ejecute este script.
-SET TIMEZONE TO 'America/Santiago';
--- ================================================================
-
-
-
--- ################################################################
--- ################################################################
--- ################################################################
-
-
-
--- ================================================================
--- TABLA DE USUARIOS DEL SISTEMA SGALT
--- ================================================================
-CREATE TABLE IF NOT EXISTS users (
-  -- Identificador numérico autoincremental único para cada usuario.
-  id BIGSERIAL PRIMARY KEY,
-
-  -- Identificador universal único (UUID) generado automáticamente.
-  -- Se usa para operaciones donde no se debe exponer el ID incremental.
-  uuid UUID DEFAULT gen_random_uuid() UNIQUE,
-
-  -- Nombre del usuario.
-  first_name VARCHAR(100) NOT NULL,
-
-  -- Primer apellido (obligatorio).
-  last_name_1 VARCHAR(100) NOT NULL,
-
-  -- Segundo apellido (opcional).
-  last_name_2 VARCHAR(100),
-
-  -- Iniciales del usuario (por ejemplo: "C.R.R.").
-  initials VARCHAR(10),
-
-  -- Cargo o puesto que ocupa dentro de la organización.
-  position VARCHAR(100),
-
-  -- URL a la imagen de la firma digital (por ejemplo: imagen .png o .jpg almacenada en S3 u Object Storage).
-  signature_url TEXT,
-
-  -- URL al avatar o foto del usuario.
-  avatar_url TEXT,
-
-  -- Correo electrónico único del usuario, también se usa como nombre de usuario para autenticación.
-  email VARCHAR(255) UNIQUE NOT NULL,
-
-  -- Contraseña del usuario almacenada de forma segura con hash (por ejemplo, bcrypt).
-  password_hash VARCHAR(255) NOT NULL,
-
-  -- Número de teléfono (puede incluir código de país).
-  phone_number VARCHAR(20),
-
-  -- Indica si el usuario tiene privilegios administrativos dentro del sistema.
-  is_admin BOOLEAN DEFAULT FALSE,
-
-  -- Indica si el usuario está activo (TRUE = puede acceder, FALSE = cuenta deshabilitada).
-  is_active BOOLEAN DEFAULT TRUE,
-
-  -- Fecha y hora del último inicio de sesión exitoso.
-  last_login_at TIMESTAMPTZ,
-
-  -- Fecha y hora en la que el usuario solicitó restablecer su contraseña.
-  password_reset_requested_at TIMESTAMPTZ,
-
-  -- Fecha y hora en la que se creó el registro del usuario.
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-
-  -- ID del usuario que creó este registro.
-  created_by BIGINT,
-
-  -- Fecha y hora de la última actualización del registro.
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-
-  -- ID del usuario que realizó la última actualización del registro.
-  updated_by BIGINT,
-
-  -- Fecha y hora de eliminación lógica (soft delete). NULL significa que el usuario sigue activo.
-  deleted_at TIMESTAMPTZ,
-
-  -- ID del usuario que marcó el registro como eliminado (soft delete)
-  deleted_by BIGINT
+-- Crea la tabla de regiones administrativas del país (nivel 1)
+CREATE TABLE IF NOT EXISTS regions (            -- Si no existe, la crea; evita error en re-ejecuciones
+  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK entera autoincremental moderna (IDENTITY)
+  name          VARCHAR(100) NOT NULL,          -- Nombre de la región; obligatorio
+  created_at    TIMESTAMP DEFAULT NOW(),        -- Marca de creación con valor por defecto actual
+  updated_at    TIMESTAMP DEFAULT NOW()         -- Marca de última actualización (se actualizará vía trigger)
 );
--- ================================================================
 
--- ================================================================
--- COMENTARIOS DESCRIPTIVOS EN LAS COLUMNAS (PERSISTEN EN EL MOTOR)
--- ================================================================
-COMMENT ON TABLE users IS 'Tabla que almacena todos los usuarios registrados en el sistema SGALT. Incluye información personal, de autenticación, privilegios y auditoría.';
+-- Índice único por nombre en minúsculas para evitar duplicados "Región X" vs "región x"
+CREATE UNIQUE INDEX IF NOT EXISTS ux_regions_name ON regions (LOWER(name));
+-- ^ El uso de LOWER garantiza unicidad case-insensitive.
 
-COMMENT ON COLUMN users.id IS 'Identificador numérico autoincremental único para cada usuario.';
-COMMENT ON COLUMN users.uuid IS 'UUID generado automáticamente para evitar exposición del ID incremental.';
-COMMENT ON COLUMN users.first_name IS 'Nombre del usuario.';
-COMMENT ON COLUMN users.last_name_1 IS 'Primer apellido del usuario (obligatorio).';
-COMMENT ON COLUMN users.last_name_2 IS 'Segundo apellido del usuario (opcional).';
-COMMENT ON COLUMN users.initials IS 'Iniciales del usuario (por ejemplo: C.R.R.).';
-COMMENT ON COLUMN users.position IS 'Cargo o puesto del usuario dentro de la organización.';
-COMMENT ON COLUMN users.signature_url IS 'URL de la firma digital (PNG) del usuario.';
-COMMENT ON COLUMN users.avatar_url IS 'URL de la foto o avatar del usuario.';
-COMMENT ON COLUMN users.email IS 'Correo electrónico único, usado como nombre de usuario para autenticación.';
-COMMENT ON COLUMN users.password_hash IS 'Hash de la contraseña (por ejemplo, generado con bcrypt).';
-COMMENT ON COLUMN users.phone_number IS 'Número de teléfono asociado al usuario.';
-COMMENT ON COLUMN users.is_admin IS 'Indica si el usuario tiene privilegios administrativos.';
-COMMENT ON COLUMN users.is_active IS 'Indica si la cuenta del usuario está activa (TRUE = puede acceder).';
-COMMENT ON COLUMN users.last_login_at IS 'Fecha y hora del último inicio de sesión exitoso.';
-COMMENT ON COLUMN users.password_reset_requested_at IS 'Fecha y hora de la última solicitud de restablecimiento de contraseña.';
-COMMENT ON COLUMN users.created_at IS 'Fecha y hora de creación del registro del usuario.';
-COMMENT ON COLUMN users.created_by IS 'ID del usuario que creó este registro. Permite rastrear quién dio de alta al usuario.';
-COMMENT ON COLUMN users.updated_at IS 'Fecha y hora de la última actualización del registro.';
-COMMENT ON COLUMN users.updated_by IS 'ID del usuario que realizó la última actualización del registro. Se actualiza automáticamente desde el backend.';
-COMMENT ON COLUMN users.deleted_at IS 'Fecha y hora de eliminación lógica del usuario (NULL = activo).';
-COMMENT ON COLUMN users.deleted_by IS 'ID del usuario que marcó este registro como eliminado (soft delete). Permite identificar quién ejecutó la baja.';
--- ================================================================
-
--- ================================================================
--- Fin de la creación de tabla.
--- Esta estructura permite un control completo sobre la gestión de usuarios:
---   - Soporta autenticación segura (email + password_hash).
---   - Permite auditoría (timestamps).
---   - Facilita futuras integraciones (firma, avatar, roles, etc.).
--- ================================================================
-
--- ================================================================
--- RELACIONES AUTO-REFERENCIALES PARA AUDITORÍA DE AUTORÍA Y MODIFICACIONES
--- ================================================================
--- Estas claves foráneas garantizan que los campos created_by, updated_by y deleted_by
--- siempre apunten a usuarios válidos existentes dentro de la misma tabla 'users'.
-ALTER TABLE users
-  ADD CONSTRAINT fk_users_created_by
-    FOREIGN KEY (created_by) REFERENCES users (id)
-    ON UPDATE CASCADE
-    ON DELETE SET NULL,
-  ADD CONSTRAINT fk_users_updated_by
-    FOREIGN KEY (updated_by) REFERENCES users (id)
-    ON UPDATE CASCADE
-    ON DELETE SET NULL,
-  ADD CONSTRAINT fk_users_deleted_by
-    FOREIGN KEY (deleted_by) REFERENCES users (id)
-    ON UPDATE CASCADE
-    ON DELETE SET NULL;
--- ================================================================
-
--- ================================================================
--- NOTA:
--- Se utiliza ON DELETE SET NULL para evitar eliminaciones en cascada,
--- conservando la trazabilidad de registros incluso si el usuario original
--- que creó o modificó un registro fue eliminado del sistema.
--- ================================================================
-
--- ================================================================
--- TABLA DE AUDITORÍA PARA 'users'
--- ================================================================
-CREATE TABLE IF NOT EXISTS users_audit (
-  id BIGSERIAL PRIMARY KEY,                  -- Identificador único del registro de auditoría
-  user_id BIGINT NOT NULL,                   -- ID del usuario afectado
-  action VARCHAR(10) NOT NULL,               -- Acción realizada: INSERT, UPDATE o DELETE
-  changed_by BIGINT,                         -- ID del usuario que ejecutó la acción (si está disponible)
-  changed_at TIMESTAMPTZ DEFAULT NOW(),      -- Fecha y hora en que ocurrió la acción
-  old_data JSONB,                            -- Datos anteriores al cambio (para UPDATE/DELETE)
-  new_data JSONB,                            -- Datos nuevos (para INSERT/UPDATE)
-  changed_fields JSONB,                      -- Campos que fueron modificados (solo para UPDATE)
-  CONSTRAINT fk_users_audit_user
-    FOREIGN KEY (user_id) REFERENCES users (id)
-    ON DELETE CASCADE
+-- Crea la tabla de ciudades (nivel 2), hija de regions
+CREATE TABLE IF NOT EXISTS cities (             -- Catálogo de ciudades
+  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK autoincremental
+  name          VARCHAR(100) NOT NULL,          -- Nombre de la ciudad; obligatorio
+  region_id     INTEGER NOT NULL,               -- FK a regions.id; cada ciudad pertenece a una región
+  created_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp creación
+  updated_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp actualización
+  CONSTRAINT fk_cities_region                    -- Nombre explícito para la FK (buenas prácticas)
+    FOREIGN KEY (region_id)                     -- Columna local que referencia
+    REFERENCES regions(id)                      -- Tabla/columna remota
+    ON UPDATE CASCADE ON DELETE RESTRICT        -- Si cambia id de región se propaga; no permite borrar región con ciudades
 );
--- ================================================================
 
--- ================================================================
--- FUNCIÓN DE AUDITORÍA OPTIMIZADA PARA LA TABLA 'users'
--- ================================================================
--- Esta versión ignora cambios en columnas de auditoría como:
--- updated_at, updated_by, created_at, created_by, deleted_at, deleted_by.
--- Esto evita generar registros triviales en 'changed_fields' cuando el único
--- cambio proviene de los propios mecanismos de control.
-CREATE OR REPLACE FUNCTION fn_audit_users()
-RETURNS TRIGGER AS $$
-DECLARE
-  diffs JSONB := '{}';
-  column_name TEXT;
-BEGIN
-  -- 🔹 Evento de INSERCIÓN
-  IF (TG_OP = 'INSERT') THEN
-    INSERT INTO users_audit (user_id, action, changed_by, new_data)
-    VALUES (
-      NEW.id,
-      TG_OP,
-      NEW.created_by,
-      to_jsonb(NEW)
-    );
-    RETURN NEW;
-  END IF;
+-- Índice único compuesto (region_id + nombre normalizado)
+-- Evita tener dos "Santiago" en la MISMA región, pero permite "Santiago" en otra región si aplica
+CREATE UNIQUE INDEX IF NOT EXISTS ux_cities_region_name ON cities (region_id, LOWER(name));
 
-  -- 🔹 Evento de ACTUALIZACIÓN
-  IF (TG_OP = 'UPDATE') THEN
-    -- Detectar qué columnas fueron modificadas (ignorando campos de auditoría)
-    FOR column_name IN
-      SELECT column_name
-      FROM information_schema.columns
-      WHERE table_name = 'users'
-        AND column_name NOT IN (
-          'updated_at', 'updated_by',
-          'created_at', 'created_by',
-          'deleted_at', 'deleted_by'
-        )
-    LOOP
-      IF (OLD.*)::jsonb ->> column_name IS DISTINCT FROM (NEW.*)::jsonb ->> column_name THEN
-        diffs := jsonb_set(
-          diffs,
-          ARRAY[column_name],
-          jsonb_build_object(
-            'old', (OLD.*)::jsonb -> column_name,
-            'new', (NEW.*)::jsonb -> column_name
-          )
-        );
-      END IF;
-    END LOOP;
+-- Crea la tabla de comunas (nivel 3), hija de cities
+CREATE TABLE IF NOT EXISTS communes (           -- Catálogo de comunas/localidades
+  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK autoincremental
+  name          VARCHAR(100) NOT NULL,          -- Nombre de la comuna; obligatorio
+  city_id       INTEGER NOT NULL,               -- FK a cities.id; cada comuna pertenece a una ciudad
+  created_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp creación
+  updated_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp actualización
+  CONSTRAINT fk_communes_city                   -- Nombre explícito para la FK
+    FOREIGN KEY (city_id)                       -- Columna local
+    REFERENCES cities(id)                       -- Tabla/columna remota
+    ON UPDATE CASCADE ON DELETE RESTRICT        -- No permite borrar ciudad si tiene comunas; actualiza en cascada cambios de id
+);
 
-    -- Solo registrar si realmente hay cambios relevantes
-    IF jsonb_typeof(diffs) = 'object' AND jsonb_array_length(jsonb_object_keys(diffs)::jsonb[]) IS NULL THEN
-      -- No hay cambios relevantes, no se inserta registro
-      RETURN NEW;
-    END IF;
+-- Índice único compuesto (city_id + nombre normalizado)
+-- Evita duplicar "Providencia" dentro de la misma ciudad
+CREATE UNIQUE INDEX IF NOT EXISTS ux_communes_city_name ON communes (city_id, LOWER(name));
 
-    INSERT INTO users_audit (user_id, action, changed_by, old_data, new_data, changed_fields)
-    VALUES (
-      NEW.id,
-      TG_OP,
-      NEW.updated_by,
-      to_jsonb(OLD),
-      to_jsonb(NEW),
-      diffs
-    );
-    RETURN NEW;
-  END IF;
+-- Catálogo de roles de usuario (perfiles/permisos lógicos)
+-- NOTA: No depende de otras tablas; será referenciado por users.role_id
+CREATE TABLE IF NOT EXISTS roles (              -- Tabla de roles
+  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK autoincremental
+  description   VARCHAR(100) NOT NULL,          -- Nombre/etiqueta del rol (p. ej. 'Administrador', 'Vendedor')
+  created_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp creación
+  updated_at    TIMESTAMP DEFAULT NOW()         -- Timestamp actualización
+);
 
-  -- 🔹 Evento de ELIMINACIÓN
-  IF (TG_OP = 'DELETE') THEN
-    INSERT INTO users_audit (user_id, action, changed_by, old_data)
-    VALUES (
-      OLD.id,
-      TG_OP,
-      OLD.deleted_by,
-      to_jsonb(OLD)
-    );
-    RETURN OLD;
-  END IF;
-
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
--- ================================================================
-
--- ================================================================
--- TRIGGER DE AUDITORÍA PARA 'users'
--- ================================================================
-CREATE TRIGGER trg_audit_users
-AFTER INSERT OR UPDATE OR DELETE
-ON users
-FOR EACH ROW
-EXECUTE FUNCTION fn_audit_users();
--- ================================================================
+-- Índice único case-insensitive para no repetir descripciones de rol con diferente casing
+CREATE UNIQUE INDEX IF NOT EXISTS ux_roles_description ON roles (LOWER(description));
 
 
 
--- ################################################################
--- ################################################################
--- ################################################################
+-- =========================================================
+-- Tabla: users
+-- =========================================================
+-- Esta tabla almacena la información de las personas que acceden al sistema SGALT,
+-- ya sean administradores, técnicos, secretarias, vendedores u otros perfiles definidos
+-- en la tabla 'roles'.
+-- Cada usuario tiene un correo único que sirve como credencial principal de inicio de sesión.
+-- =========================================================
 
+CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabla solo si no existe
+  id             INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
+  -- Identificador único autoincremental para cada usuario.
+  -- Se utiliza como clave primaria (PK) y como referencia en otras tablas (por ejemplo: quotations.user_id).
 
+  first_name     VARCHAR(100) NOT NULL,  
+  -- Primer nombre del usuario (obligatorio).
+  -- Se recomienda usar solo el primer nombre para evitar redundancia.
 
--- ================================================================
--- TABLA DE ÁREAS DE SERVICIO (CATEGORIZACIÓN DE ENSAYOS)
--- ================================================================
-CREATE TABLE IF NOT EXISTS service_areas (
-  -- Identificador numérico autoincremental único para cada área.
-  id BIGSERIAL PRIMARY KEY,
+  last_name_1    VARCHAR(100) NOT NULL,  
+  -- Primer apellido del usuario (obligatorio).
+  -- Forma parte del nombre completo que puede mostrarse en la interfaz o informes.
 
-  -- Identificador universal único (UUID) generado automáticamente.
-  uuid UUID DEFAULT gen_random_uuid() UNIQUE,
+  last_name_2    VARCHAR(100),  
+  -- Segundo apellido del usuario (opcional).
+  -- No todos los usuarios tienen un segundo apellido, por lo que se permite NULL.
 
-  -- Nombre del área o disciplina técnica (ej.: Mecánica de Suelos, Hormigón, etc.).
-  name VARCHAR(150) NOT NULL,
+  email          VARCHAR(255) NOT NULL,  
+  -- Correo electrónico del usuario, utilizado para autenticación.
+  -- Tiene restricción de unicidad más abajo (sin distinguir mayúsculas/minúsculas).
 
-  -- Código de acreditación asignado (ej.: LE603).
-  accreditation_code VARCHAR(50),
+  password_hash  VARCHAR(255) NOT NULL,  
+  -- Hash de la contraseña en formato encriptado (por ejemplo con bcrypt).
+  -- No se almacenan contraseñas en texto plano por motivos de seguridad.
 
-  -- URL al documento PDF de acreditación.
-  accreditation_document_url TEXT,
+  role_id        INTEGER,  
+  -- Clave foránea hacia 'roles.id'.
+  -- Define el rol o perfil del usuario dentro del sistema (Administrador, Vendedor, Técnico, etc.).
+  -- Puede ser NULL si el usuario aún no tiene un rol asignado.
 
-  -- Norma o estándar de acreditación (ej.: NCh-ISO/IEC 17025:2017).
-  standard VARCHAR(100),
+  is_active      BOOLEAN DEFAULT TRUE,  
+  -- Indica si la cuenta del usuario está activa (TRUE) o deshabilitada (FALSE).
+  -- Se usa para bloquear temporalmente usuarios sin eliminarlos.
 
-  -- Fecha de la primera obtención de la acreditación.
-  first_accreditation_date DATE,
-
-  -- Fecha de inicio de la vigencia actual.
-  valid_from DATE,
-
-  -- Fecha de término de la vigencia actual.
-  valid_until DATE,
-
-  -- Fecha de la última auditoría.
-  last_audit_date DATE,
-
+  created_at     TIMESTAMP DEFAULT NOW(),  
   -- Fecha y hora de creación del registro.
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  -- Se completa automáticamente cuando se inserta el usuario.
 
-  -- ID del usuario que creó el registro.
-  created_by BIGINT,
+  updated_at     TIMESTAMP DEFAULT NOW(),  
+  -- Fecha y hora de la última actualización.
+  -- Se actualiza automáticamente mediante el trigger global `set_updated_at`.
 
+  CONSTRAINT fk_users_role
+    FOREIGN KEY (role_id)
+    REFERENCES roles(id)
+    ON UPDATE CASCADE ON DELETE SET NULL  
+  -- Clave foránea hacia 'roles.id':
+  --   - Si se actualiza el ID en la tabla 'roles', el cambio se propaga (CASCADE).
+  --   - Si se elimina un rol, el campo 'role_id' del usuario afectado pasa a NULL,
+  --     evitando la eliminación del usuario (SET NULL).
+);  
+-- Fin definición de tabla 'users'
+
+-- =========================================================
+-- Índices complementarios
+-- =========================================================
+CREATE INDEX IF NOT EXISTS ix_users_role_id ON users(role_id);
+-- Índice simple para mejorar el rendimiento de las consultas por 'role_id',
+-- por ejemplo, cuando se listan todos los usuarios de un rol específico.
+
+-- Unicidad case-insensitive del email
+CREATE UNIQUE INDEX IF NOT EXISTS ux_users_email ON users (LOWER(email));
+-- Restricción de unicidad sobre el campo 'email' sin distinguir mayúsculas/minúsculas.
+-- Evita duplicar correos con variaciones como 'Usuario@...' y 'usuario@...'.
+
+
+
+-- =========================================================
+-- Tabla: clients
+-- =========================================================
+-- Esta tabla almacena los datos de las empresas o personas
+-- que contratan los servicios del laboratorio (clientes).
+-- Cada cliente puede tener múltiples solicitudes de cotización
+-- y cotizaciones asociadas en otras tablas (quotation_request y quotations).
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS clients (                      -- Crea la tabla si no existe
+  id                INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  -- Identificador único autoincremental (clave primaria).
+  -- Este valor es interno y no se muestra al cliente.
+  -- Otras tablas (como quotation_request) usarán este campo como FK (client_id).
+
+  company_rut       VARCHAR(20)  NOT NULL,
+  -- Rol Único Tributario (RUT) o identificación fiscal del cliente.
+  -- Es obligatorio y debe ser único dentro de la base de datos.
+  -- Permite identificar de manera inequívoca a cada empresa o persona jurídica.
+
+  company_name      VARCHAR(255) NOT NULL,
+  -- Razón social o nombre de la empresa del cliente.
+  -- También obligatorio; se usa para mostrar el nombre en las cotizaciones.
+
+  contact_name      VARCHAR(255),
+  -- Nombre del contacto principal del cliente (persona natural).
+  -- Puede ser un encargado de adquisiciones, ingeniería o administración.
+  -- No es obligatorio.
+
+  contact_email     VARCHAR(255),
+  -- Correo electrónico del contacto principal.
+  -- No se marca como NOT NULL para permitir registrar clientes sin contacto definido aún.
+  -- Se recomienda validar formato en el backend antes de insertar o actualizar.
+
+  contact_phone     VARCHAR(50),
+  -- Teléfono del contacto principal (celular o fijo).
+  -- Campo libre para incluir formatos como "+56 9 1234 5678" o "22 345 6789".
+
+  service_description TEXT,
+  -- Campo descriptivo que permite anotar observaciones generales
+  -- sobre los servicios que solicita o contrata el cliente.
+  -- Por ejemplo: “Ensayos de compactación y resistencia de hormigón”.
+  -- No es obligatorio, y se usa como información de referencia.
+
+  created_at        TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora en que se registró el cliente.
+  -- Se asigna automáticamente al insertar un nuevo registro.
+
+  updated_at        TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora de la última actualización del registro.
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  -- Este campo se actualiza automáticamente mediante el trigger global `set_updated_at`.
 
-  -- ID del usuario que realizó la última actualización.
-  updated_by BIGINT,
-
-  -- Fecha y hora de eliminación lógica (soft delete).
-  deleted_at TIMESTAMPTZ,
-
-  -- ID del usuario que marcó el registro como eliminado.
-  deleted_by BIGINT
+  CONSTRAINT ux_clients_rut UNIQUE (company_rut)
+  -- Restricción de unicidad para evitar clientes duplicados con el mismo RUT.
+  -- PostgreSQL no distingue mayúsculas/minúsculas en VARCHAR,
+  -- pero aquí se asume que el formato de RUT será siempre normalizado (ejemplo: “76.123.456-7”).
 );
--- ================================================================
+-- Fin definición tabla clients
 
--- ================================================================
--- COMENTARIOS DESCRIPTIVOS DE LA TABLA 'service_areas'
--- ================================================================
-COMMENT ON TABLE service_areas IS 'Contiene las áreas de servicio del laboratorio, incluyendo información de acreditación, vigencia y auditoría.';
-
-COMMENT ON COLUMN service_areas.id IS 'Identificador numérico autoincremental único para cada área.';
-COMMENT ON COLUMN service_areas.uuid IS 'Identificador universal único (UUID) generado automáticamente.';
-COMMENT ON COLUMN service_areas.name IS 'Nombre del área o disciplina técnica (ej.: Mecánica de Suelos, Hormigón, etc.).';
-COMMENT ON COLUMN service_areas.accreditation_code IS 'Código de acreditación asignado (ej.: LE603).';
-COMMENT ON COLUMN service_areas.accreditation_document_url IS 'URL del documento PDF que contiene la acreditación.';
-COMMENT ON COLUMN service_areas.standard IS 'Norma de acreditación (ej.: NCh-ISO/IEC 17025:2017).';
-COMMENT ON COLUMN service_areas.first_accreditation_date IS 'Fecha en que se obtuvo por primera vez la acreditación.';
-COMMENT ON COLUMN service_areas.valid_from IS 'Fecha de inicio de vigencia de la acreditación.';
-COMMENT ON COLUMN service_areas.valid_until IS 'Fecha de término de vigencia de la acreditación.';
-COMMENT ON COLUMN service_areas.last_audit_date IS 'Fecha en que se realizó la última auditoría del área.';
-COMMENT ON COLUMN service_areas.created_at IS 'Fecha y hora de creación del registro.';
-COMMENT ON COLUMN service_areas.created_by IS 'ID del usuario que creó el registro.';
-COMMENT ON COLUMN service_areas.updated_at IS 'Fecha y hora de la última actualización del registro.';
-COMMENT ON COLUMN service_areas.updated_by IS 'ID del usuario que actualizó el registro.';
-COMMENT ON COLUMN service_areas.deleted_at IS 'Fecha y hora de eliminación lógica (soft delete).';
-COMMENT ON COLUMN service_areas.deleted_by IS 'ID del usuario que marcó el registro como eliminado (soft delete).';
--- ================================================================
-
--- ================================================================
--- RELACIONES CON LA TABLA 'users'
--- ================================================================
-ALTER TABLE service_areas
-  ADD CONSTRAINT fk_service_areas_created_by
-    FOREIGN KEY (created_by) REFERENCES users (id)
-    ON UPDATE CASCADE ON DELETE SET NULL,
-  ADD CONSTRAINT fk_service_areas_updated_by
-    FOREIGN KEY (updated_by) REFERENCES users (id)
-    ON UPDATE CASCADE ON DELETE SET NULL,
-  ADD CONSTRAINT fk_service_areas_deleted_by
-    FOREIGN KEY (deleted_by) REFERENCES users (id)
-    ON UPDATE CASCADE ON DELETE SET NULL;
--- ================================================================
-
--- ================================================================
--- NOTA:
--- Esta tabla está preparada para integrarse con la tabla 'services'
--- mediante el campo 'area_id', permitiendo organizar los ensayos
--- por área técnica (ej.: Suelos, Asfaltos, Hormigones, etc.).
--- ================================================================
-
--- ================================================================
--- TABLA DE AUDITORÍA PARA 'service_areas'
--- ================================================================
-CREATE TABLE IF NOT EXISTS service_areas_audit (
-  -- Identificador único del registro de auditoría.
-  id BIGSERIAL PRIMARY KEY,
-
-  -- ID del área afectada.
-  service_area_id BIGINT NOT NULL,
-
-  -- Tipo de acción: INSERT, UPDATE o DELETE.
-  action VARCHAR(10) NOT NULL,
-
-  -- ID del usuario que realizó la acción.
-  changed_by BIGINT,
-
-  -- Fecha y hora exacta en que se produjo el evento.
-  changed_at TIMESTAMPTZ DEFAULT NOW(),
-
-  -- Datos anteriores al cambio (para UPDATE/DELETE).
-  old_data JSONB,
-
-  -- Datos nuevos (para INSERT/UPDATE).
-  new_data JSONB,
-
-  -- Campos que fueron modificados (solo para UPDATE).
-  changed_fields JSONB,
-
-  -- Relación con la tabla principal.
-  CONSTRAINT fk_service_areas_audit_area
-    FOREIGN KEY (service_area_id) REFERENCES service_areas (id)
-    ON DELETE CASCADE
-);
--- ================================================================
-
--- ================================================================
--- FUNCIÓN DE AUDITORÍA PARA LA TABLA 'service_areas'
--- ================================================================
-CREATE OR REPLACE FUNCTION fn_audit_service_areas()
-RETURNS TRIGGER AS $$
-DECLARE
-  diffs JSONB := '{}';
-  column_name TEXT;
-BEGIN
-  -- 🔹 Evento de INSERCIÓN
-  IF (TG_OP = 'INSERT') THEN
-    INSERT INTO service_areas_audit (service_area_id, action, changed_by, new_data)
-    VALUES (
-      NEW.id,
-      TG_OP,
-      NEW.created_by,
-      to_jsonb(NEW)
-    );
-    RETURN NEW;
-  END IF;
-
-  -- 🔹 Evento de ACTUALIZACIÓN
-  IF (TG_OP = 'UPDATE') THEN
-    -- Detectar qué columnas fueron modificadas (ignorando campos de auditoría)
-    FOR column_name IN
-      SELECT column_name
-      FROM information_schema.columns
-      WHERE table_name = 'service_areas'
-        AND column_name NOT IN (
-          'created_at', 'created_by',
-          'updated_at', 'updated_by',
-          'deleted_at', 'deleted_by'
-        )
-    LOOP
-      IF (OLD.*)::jsonb ->> column_name IS DISTINCT FROM (NEW.*)::jsonb ->> column_name THEN
-        diffs := jsonb_set(
-          diffs,
-          ARRAY[column_name],
-          jsonb_build_object(
-            'old', (OLD.*)::jsonb -> column_name,
-            'new', (NEW.*)::jsonb -> column_name
-          )
-        );
-      END IF;
-    END LOOP;
-
-    -- Solo registrar si existen cambios relevantes
-    IF jsonb_object_length(diffs) = 0 THEN
-      RETURN NEW;
-    END IF;
-
-    INSERT INTO service_areas_audit (service_area_id, action, changed_by, old_data, new_data, changed_fields)
-    VALUES (
-      NEW.id,
-      TG_OP,
-      NEW.updated_by,
-      to_jsonb(OLD),
-      to_jsonb(NEW),
-      diffs
-    );
-    RETURN NEW;
-  END IF;
-
-  -- 🔹 Evento de ELIMINACIÓN
-  IF (TG_OP = 'DELETE') THEN
-    INSERT INTO service_areas_audit (service_area_id, action, changed_by, old_data)
-    VALUES (
-      OLD.id,
-      TG_OP,
-      OLD.deleted_by,
-      to_jsonb(OLD)
-    );
-    RETURN OLD;
-  END IF;
-
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
--- ================================================================
-
--- ================================================================
--- TRIGGER DE AUDITORÍA PARA 'service_areas'
--- ================================================================
-CREATE TRIGGER trg_audit_service_areas
-AFTER INSERT OR UPDATE OR DELETE
-ON service_areas
-FOR EACH ROW
-EXECUTE FUNCTION fn_audit_service_areas();
--- ================================================================
+-- =========================================================
+-- Índices complementarios
+-- =========================================================
+CREATE INDEX IF NOT EXISTS ix_clients_company_name ON clients (LOWER(company_name));
+-- Crea un índice en minúsculas sobre el nombre de la empresa.
+-- Mejora el rendimiento de búsquedas por nombre sin distinguir mayúsculas/minúsculas.
+-- Ejemplo de uso beneficiado:
+--   SELECT * FROM clients WHERE LOWER(company_name) LIKE '%geocontrol%';
 
 
 
--- ################################################################
--- ################################################################
--- ################################################################
+-- =========================================================
+-- Tabla: services
+-- =========================================================
+-- Esta tabla almacena el catálogo de servicios que ofrece el laboratorio,
+-- como ensayos, controles en terreno, análisis de materiales, etc.
+-- Cada servicio representa una unidad ofertable que puede incluirse
+-- dentro de una cotización o solicitud de cotización.
+-- =========================================================
 
+CREATE TABLE IF NOT EXISTS services (                       -- Crea la tabla si no existe
+  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  -- Identificador único autoincremental del servicio.
+  -- Se utiliza como clave primaria (PK) y también se referencia
+  -- desde otras tablas (por ejemplo: quotation_items.service_id).
 
+  name          VARCHAR(150) NOT NULL,
+  -- Nombre del servicio ofrecido (obligatorio).
+  -- Ejemplo: "Ensayo de Compresión de Probetas de Hormigón".
+  -- Debe ser lo suficientemente descriptivo para aparecer en una cotización o informe.
 
--- ================================================================
--- TABLA DE SERVICIOS DEL LABORATORIO (CATÁLOGO DE ENSAYOS)
--- ================================================================
-CREATE TABLE IF NOT EXISTS services (
-  -- Identificador numérico autoincremental único para cada servicio.
-  id BIGSERIAL PRIMARY KEY,
+  area          VARCHAR(150) NOT NULL,
+  -- Área o categoría a la que pertenece el servicio.
+  -- Ejemplo: "Hormigón y Mortero", "Suelos", "Asfaltos", etc.
+  -- Facilita la organización del catálogo y la posterior clasificación en informes o interfaces.
 
-  -- Identificador universal único (UUID) generado automáticamente.
-  uuid UUID DEFAULT gen_random_uuid() UNIQUE,
+  norma         VARCHAR(150) NOT NULL,
+  -- Norma técnica asociada al servicio (obligatoria).
+  -- Ejemplo: "NCh1037/1 Of.2009" o "ASTM C39".
+  -- Permite identificar el procedimiento bajo el cual se realiza el ensayo o control.
 
-  -- Nombre completo del servicio.
-  name VARCHAR(255) NOT NULL,
+  unit          VARCHAR(150) NOT NULL,
+  -- Unidad de medida o cobro del servicio (obligatoria).
+  -- Ejemplo: "m³", "unidad", "m²", "muestra".
+  -- Se utiliza en las cotizaciones para determinar precios unitarios y subtotales.
 
-  -- ID del área de servicio (referencia futura a tabla areas_servicio).
-  area_id BIGINT,
+  description   TEXT,
+  -- Descripción opcional más detallada del servicio.
+  -- Puede incluir condiciones, observaciones, limitaciones o alcance del ensayo.
+  -- No es obligatoria y se puede mostrar como texto auxiliar en el frontend.
 
-  -- Norma técnica o de ensayo (por ejemplo: ISO, NCh, MC, etc.).
-  test_standard VARCHAR(100),
+  base_price    NUMERIC(12,2) NOT NULL DEFAULT 0,
+  -- Precio base o unitario del servicio expresado en moneda local (CLP).
+  -- El tipo NUMERIC(12,2) permite hasta 10 dígitos enteros y 2 decimales (precisión suficiente para cotizaciones).
+  -- Valor por defecto = 0, para evitar errores en inserciones sin definir precio.
 
-  -- Unidad de venta (ej.: cada muestra, cada hora, etc.).
-  unit VARCHAR(50),
+  created_at    TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora de creación del registro.
+  -- Se completa automáticamente al insertar el servicio.
 
-  -- Código interno de la ficha del servicio.
-  record_code VARCHAR(50),
-
-  -- Notas o comentarios adicionales.
-  notes TEXT,
-
-  -- Indica si el servicio se realiza en terreno (TRUE) o en laboratorio (FALSE).
-  is_field_service BOOLEAN DEFAULT FALSE,
-
-  -- Indica si el servicio está acreditado (TRUE/FALSE).
-  is_accredited BOOLEAN DEFAULT FALSE,
-
-  -- Fecha y hora de creación del servicio.
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-
-  -- ID del usuario que creó el registro.
-  created_by BIGINT,
-
+  updated_at    TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora de la última actualización del servicio.
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-
-  -- ID del usuario que realizó la última actualización.
-  updated_by BIGINT,
-
-  -- Fecha y hora de eliminación lógica (soft delete).
-  deleted_at TIMESTAMPTZ,
-
-  -- ID del usuario que marcó el registro como eliminado (soft delete).
-  deleted_by BIGINT
+  -- Se actualiza automáticamente mediante el trigger global `set_updated_at`.
 );
--- ================================================================
+-- Fin definición tabla services
 
--- ================================================================
--- COMENTARIOS DESCRIPTIVOS DE LA TABLA 'services'
--- ================================================================
-COMMENT ON TABLE services IS 'Catálogo de servicios de laboratorio. Contiene los ensayos o productos ofrecidos por el laboratorio.';
+-- =========================================================
+-- Índices complementarios
+-- =========================================================
+-- Unicidad case-insensitive del nombre de servicio
+CREATE UNIQUE INDEX IF NOT EXISTS ux_services_name ON services (LOWER(name));
+-- Restricción de unicidad del nombre del servicio, ignorando mayúsculas/minúsculas.
+-- Evita duplicados como "Ensayo Proctor" y "ensayo proctor".
 
-COMMENT ON COLUMN services.id IS 'Identificador numérico autoincremental único para cada servicio.';
-COMMENT ON COLUMN services.uuid IS 'Identificador universal único (UUID) del servicio.';
-COMMENT ON COLUMN services.name IS 'Nombre completo del servicio o ensayo técnico.';
-COMMENT ON COLUMN services.area_id IS 'Identificador del área a la que pertenece el servicio (Suelo, Hormigón, Asfalto, etc.).';
-COMMENT ON COLUMN services.test_standard IS 'Norma de ensayo asociada al servicio (ISO, NCh, MC, etc.).';
-COMMENT ON COLUMN services.unit IS 'Unidad de venta o medida del servicio (cada uno, cada muestra, etc.).';
-COMMENT ON COLUMN services.record_code IS 'Código interno único asociado a la ficha del servicio.';
-COMMENT ON COLUMN services.notes IS 'Espacio para anotaciones internas o detalles adicionales.';
-COMMENT ON COLUMN services.is_field_service IS 'Indica si el servicio se realiza en terreno (TRUE) o en laboratorio (FALSE).';
-COMMENT ON COLUMN services.is_accredited IS 'Indica si el servicio está acreditado por algún organismo técnico.';
-COMMENT ON COLUMN services.created_at IS 'Fecha y hora en que se creó el registro del servicio.';
-COMMENT ON COLUMN services.created_by IS 'ID del usuario que creó el registro.';
-COMMENT ON COLUMN services.updated_at IS 'Fecha y hora de la última actualización del registro.';
-COMMENT ON COLUMN services.updated_by IS 'ID del usuario que realizó la última actualización del registro.';
-COMMENT ON COLUMN services.deleted_at IS 'Fecha y hora en que el servicio fue eliminado lógicamente (NULL = activo).';
-COMMENT ON COLUMN services.deleted_by IS 'ID del usuario que marcó el registro como eliminado (soft delete).';
--- ================================================================
 
--- ================================================================
--- RELACIONES CON LA TABLA 'users'
--- ================================================================
-ALTER TABLE services
-  ADD CONSTRAINT fk_services_created_by
-    FOREIGN KEY (created_by) REFERENCES users (id)
+
+-- =========================================================
+-- Tabla: quotation_request
+-- =========================================================
+-- Esta tabla registra todas las solicitudes de cotización que
+-- los clientes envían al laboratorio para requerir uno o varios servicios.
+--
+-- Cada solicitud pertenece a un cliente (clients.id) y puede incluir:
+--   - Datos de contacto del solicitante.
+--   - Ubicación de la obra o faena donde se requieren los servicios.
+--   - Una descripción de los servicios solicitados.
+--   - Estado del proceso (recibida, revisada, aprobada, etc.).
+--   - Información sobre quién revisó la solicitud y cuándo.
+--
+-- Posteriormente, cada solicitud puede dar origen a una o más
+-- cotizaciones formales almacenadas en la tabla 'quotations'.
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS quotation_request (             -- Crea la tabla si no existe
+  id                   INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  -- Identificador único autoincremental de la solicitud de cotización.
+  -- Es la clave primaria (PK) y será referenciada en la tabla 'quotations.request_id'.
+
+  client_id            INTEGER,
+  -- Clave foránea hacia 'clients.id'.
+  -- Indica qué cliente está realizando la solicitud.
+  -- Puede ser NULL para permitir solicitudes preliminares de clientes aún no registrados formalmente.
+
+  requester_full_name  VARCHAR(255) NOT NULL,
+  -- Nombre completo de la persona que realiza la solicitud (obligatorio).
+  -- Puede ser distinto del contacto principal del cliente (por ejemplo, un residente de obra o ingeniero externo).
+
+  requester_email      VARCHAR(255) NOT NULL,
+  -- Correo electrónico de quien realiza la solicitud.
+  -- Obligatorio para poder enviar respuestas o cotizaciones.
+
+  requester_phone      VARCHAR(20),
+  -- Teléfono de contacto del solicitante (opcional).
+
+  service_description  TEXT,
+  -- Descripción libre de los servicios requeridos o del trabajo solicitado.
+  -- Puede incluir especificaciones, normas, cantidades o cualquier información relevante.
+
+  obra_direccion       VARCHAR(255),
+  -- Dirección de la obra, faena o ubicación donde se prestarán los servicios.
+  -- Es opcional, pero recomendable cuando se trata de trabajos en terreno.
+
+  commune_id           INTEGER,
+  city_id              INTEGER,
+  region_id            INTEGER,
+  -- Identificadores de ubicación geográfica.
+  -- Cada uno es una clave foránea hacia las tablas maestras:
+  --   region_id  → regions.id
+  --   city_id    → cities.id
+  --   commune_id → communes.id
+  -- Estos campos permiten identificar con precisión dónde se realizará el trabajo solicitado.
+
+  status               VARCHAR(20) NOT NULL,
+  -- Estado actual de la solicitud (obligatorio).
+  -- Ejemplos posibles: 'recibida', 'revisada', 'en proceso', 'cerrada', 'rechazada'.
+  -- Permite controlar el flujo de trabajo y filtrarlas en el frontend o backend.
+
+  reviewed_by          INTEGER,          -- users.id
+  -- Clave foránea hacia 'users.id'.
+  -- Indica qué usuario del laboratorio (por ejemplo, un encargado técnico o vendedor)
+  -- revisó la solicitud de cotización.
+
+  reviewed_at          TIMESTAMP,
+  -- Fecha y hora en que el usuario asignado revisó la solicitud.
+  -- Se completa cuando la solicitud cambia de estado a “revisada” o “evaluada”.
+
+  review_notes         TEXT,
+  -- Campo libre para que el revisor deje observaciones internas o comentarios técnicos.
+
+  received_at          TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora en que la solicitud fue recibida por el sistema.
+  -- Se genera automáticamente al momento de insertarla.
+
+  created_at           TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora en que el registro fue creado en la base de datos.
+  -- Puede coincidir con received_at, pero se mantiene por consistencia con otras tablas.
+
+  updated_at           TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora de la última actualización del registro.
+  -- Se actualiza automáticamente mediante el trigger global 'set_updated_at'.
+
+  -- =========================================================
+  -- Definición de claves foráneas
+  -- =========================================================
+
+  CONSTRAINT fk_qreq_client
+    FOREIGN KEY (client_id) REFERENCES clients(id)
     ON UPDATE CASCADE ON DELETE SET NULL,
-  ADD CONSTRAINT fk_services_updated_by
-    FOREIGN KEY (updated_by) REFERENCES users (id)
+  -- Si se modifica el ID del cliente, se propaga el cambio (CASCADE).
+  -- Si se elimina el cliente, la solicitud conserva su historial con client_id = NULL.
+
+  CONSTRAINT fk_qreq_commune
+    FOREIGN KEY (commune_id) REFERENCES communes(id)
     ON UPDATE CASCADE ON DELETE SET NULL,
-  ADD CONSTRAINT fk_services_deleted_by
-    FOREIGN KEY (deleted_by) REFERENCES users (id)
-    ON UPDATE CASCADE ON DELETE SET NULL;
--- ================================================================
+  -- Referencia a la comuna (nivel más específico de ubicación).
+  -- Se mantiene incluso si se borra la comuna, asignando NULL.
 
--- ================================================================
--- RELACIONES CON LA TABLA 'service_areas'
--- ================================================================
-ALTER TABLE services
-  ADD CONSTRAINT fk_services_area
-    FOREIGN KEY (area_id) REFERENCES service_areas (id)
-    ON UPDATE CASCADE ON DELETE SET NULL;
--- ================================================================
+  CONSTRAINT fk_qreq_city
+    FOREIGN KEY (city_id) REFERENCES cities(id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+  -- Referencia a la ciudad.
 
--- ================================================================
--- TABLA DE AUDITORÍA PARA 'services'
--- ================================================================
-CREATE TABLE IF NOT EXISTS services_audit (
-  -- Identificador único del registro de auditoría.
-  id BIGSERIAL PRIMARY KEY,
+  CONSTRAINT fk_qreq_region
+    FOREIGN KEY (region_id) REFERENCES regions(id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+  -- Referencia a la región.
 
-  -- ID del servicio afectado.
-  service_id BIGINT NOT NULL,
-
-  -- Tipo de acción registrada: INSERT, UPDATE o DELETE.
-  action VARCHAR(10) NOT NULL,
-
-  -- ID del usuario que realizó la acción.
-  changed_by BIGINT,
-
-  -- Fecha y hora exacta en que ocurrió el evento.
-  changed_at TIMESTAMPTZ DEFAULT NOW(),
-
-  -- Datos anteriores al cambio (para UPDATE/DELETE).
-  old_data JSONB,
-
-  -- Datos nuevos (para INSERT/UPDATE).
-  new_data JSONB,
-
-  -- Campos que fueron modificados (solo para UPDATE).
-  changed_fields JSONB,
-
-  -- Relación con el servicio afectado.
-  CONSTRAINT fk_services_audit_service
-    FOREIGN KEY (service_id) REFERENCES services (id)
-    ON DELETE CASCADE
+  CONSTRAINT fk_qreq_reviewed_by
+    FOREIGN KEY (reviewed_by) REFERENCES users(id)
+    ON UPDATE CASCADE ON DELETE SET NULL
+  -- Relación con 'users.id' para saber quién revisó la solicitud.
+  -- Si el usuario se elimina, el campo pasa a NULL, pero se conserva el registro histórico.
 );
--- ================================================================
+-- Fin definición de tabla quotation_request
 
--- ================================================================
--- FUNCIÓN DE AUDITORÍA PARA LA TABLA 'services'
--- ================================================================
-CREATE OR REPLACE FUNCTION fn_audit_services()
-RETURNS TRIGGER AS $$
-DECLARE
-  diffs JSONB := '{}';
-  column_name TEXT;
+-- =========================================================
+-- Índices complementarios
+-- =========================================================
+
+CREATE INDEX IF NOT EXISTS ix_qreq_status ON quotation_request(status);
+-- Índice para acelerar búsquedas y listados por estado.
+-- Ejemplo de uso: SELECT * FROM quotation_request WHERE status = 'revisada';
+
+CREATE INDEX IF NOT EXISTS ix_qreq_client_id ON quotation_request(client_id);
+-- Índice que mejora las consultas que filtran por cliente.
+-- Ejemplo de uso: SELECT * FROM quotation_request WHERE client_id = 10;
+
+
+
+-- =========================================================
+-- Tabla: quotations
+-- =========================================================
+-- Esta tabla almacena las cotizaciones formales generadas por el laboratorio
+-- a partir de una solicitud de cotización (quotation_request).
+--
+-- Cada registro representa una cotización emitida a un cliente.
+-- Contiene información resumida de la solicitud, el usuario que la elaboró,
+-- los montos, el estado del documento y el enlace al archivo PDF.
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS quotations (                      -- Crea la tabla si no existe
+  id               INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  -- Identificador único autoincremental para cada cotización (clave primaria).
+  -- Referenciado por 'quotation_items.quotation_id'.
+
+  quote_number     BIGINT NOT NULL,             -- folio/ correlativo visible
+  -- Número correlativo o folio de la cotización, visible para el cliente.
+  -- Este número se genera a partir de una secuencia (ver bloque posterior).
+  -- Se usa para identificar fácilmente cotizaciones sin exponer el ID interno.
+
+  request_id       INTEGER,                     -- quotation_request.id
+  -- Clave foránea hacia 'quotation_request.id'.
+  -- Indica a qué solicitud de cotización corresponde esta cotización.
+  -- Puede ser NULL si se creó directamente sin solicitud previa.
+
+  user_id          INTEGER,                     -- vendedor/elaborador (users.id)
+  -- Clave foránea hacia 'users.id'.
+  -- Identifica al usuario (vendedor, secretaria o encargado técnico)
+  -- que elaboró la cotización.
+
+  request_summary  TEXT NOT NULL,
+  -- Resumen del contenido o alcance de la solicitud que dio origen a la cotización.
+  -- Este campo se rellena al momento de emitirla, describiendo brevemente los servicios ofrecidos.
+
+  issue_date       DATE,
+  -- Fecha de emisión de la cotización.
+  -- Se usa para el control de vigencia y registro histórico.
+
+  status           VARCHAR(20) NOT NULL,
+  -- Estado de la cotización (obligatorio).
+  -- Ejemplos: 'borrador', 'emitida', 'enviada', 'aceptada', 'rechazada', 'vencida'.
+  -- Permite controlar su ciclo de vida dentro del sistema.
+
+  subtotal         NUMERIC(12,2) NOT NULL DEFAULT 0,
+  -- Monto total sin impuestos, calculado como la suma de los subtotales de cada ítem.
+
+  tax_rate         NUMERIC(5,4)  NOT NULL DEFAULT 0,   -- p.ej. 0.19 = 19%
+  -- Tasa de impuesto aplicada a la cotización (por ejemplo, IVA).
+  -- Se almacena en formato decimal (0.19 = 19%).
+  -- Permite recalcular fácilmente el monto total si cambia el valor del IVA.
+
+  tax_amount       NUMERIC(12,2) NOT NULL DEFAULT 0,
+  -- Valor del impuesto calculado: subtotal * tax_rate.
+  -- Guardarlo facilita reportes sin tener que recalcular cada vez.
+
+  total            NUMERIC(12,2) NOT NULL DEFAULT 0,
+  -- Monto total con impuestos incluidos: subtotal + tax_amount.
+
+  pdf_url          TEXT,
+  -- Ruta o enlace al archivo PDF generado para la cotización.
+  -- Puede ser un archivo almacenado en el servidor o en un bucket de Object Storage.
+
+  created_at       TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora de creación del registro.
+
+  updated_at       TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora de la última actualización del registro.
+
+  -- =========================================================
+  -- Restricciones y claves foráneas
+  -- =========================================================
+
+  CONSTRAINT ux_quotations_quote_number UNIQUE (quote_number),
+  -- Garantiza que cada número de cotización (folio) sea único en el sistema.
+
+  CONSTRAINT fk_quotations_request
+    FOREIGN KEY (request_id) REFERENCES quotation_request(id)
+    ON UPDATE CASCADE ON DELETE SET NULL,
+  -- Si se modifica el ID de la solicitud original, el cambio se propaga (CASCADE).
+  -- Si la solicitud es eliminada, la cotización conserva su historial con request_id = NULL.
+
+  CONSTRAINT fk_quotations_user
+    FOREIGN KEY (user_id) REFERENCES users(id)
+    ON UPDATE CASCADE ON DELETE SET NULL
+  -- Relación con el usuario que generó la cotización.
+  -- Si el usuario se elimina, el campo pasa a NULL, preservando la cotización.
+);
+-- Fin definición tabla quotations
+
+-- =========================================================
+-- Índices complementarios
+-- =========================================================
+CREATE INDEX IF NOT EXISTS ix_quotations_status ON quotations(status);
+-- Índice que acelera la búsqueda de cotizaciones por estado.
+-- Ejemplo: SELECT * FROM quotations WHERE status = 'emitida';
+
+
+
+-- =========================================================
+-- Tabla: quotation_items
+-- =========================================================
+-- Esta tabla almacena los ítems o líneas de detalle asociados
+-- a cada cotización registrada en 'quotations'.
+--
+-- Cada ítem representa un servicio cotizado, su cantidad, precio unitario,
+-- descuentos y subtotal correspondiente.
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS quotation_items (                 -- Crea la tabla si no existe
+  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  -- Identificador único autoincremental del ítem (clave primaria).
+
+  quotation_id  INTEGER NOT NULL,
+  -- Clave foránea hacia 'quotations.id'.
+  -- Identifica a qué cotización pertenece el ítem.
+  -- Es obligatorio, ya que un ítem no puede existir sin cotización asociada.
+
+  service_id    INTEGER,
+  -- Clave foránea hacia 'services.id'.
+  -- Permite vincular el ítem con un servicio registrado en el catálogo general.
+  -- Puede ser NULL si se trata de un servicio no estándar o personalizado.
+
+  description   TEXT NOT NULL,
+  -- Descripción libre del ítem (obligatoria).
+  -- Generalmente corresponde al nombre del servicio,
+  -- pero se deja abierta para adaptaciones específicas (ej. “Control de compactación en obra X”).
+
+  quantity      INTEGER NOT NULL DEFAULT 1,
+  -- Cantidad del servicio cotizado (por defecto 1).
+
+  unit          VARCHAR(50),
+  -- Unidad de medida o cobro asociada al ítem.
+  -- Puede copiarse desde 'services.unit' o escribirse manualmente (m³, unidad, muestra, etc.).
+
+  unit_price    NUMERIC(12,2) NOT NULL DEFAULT 0,
+  -- Precio unitario del servicio (sin impuesto).
+
+  line_discount NUMERIC(12,2) DEFAULT 0,
+  -- Descuento aplicado a esta línea, si corresponde (en moneda, no en porcentaje).
+
+  subtotal      NUMERIC(12,2) NOT NULL DEFAULT 0,
+  -- Subtotal de la línea, calculado como:
+  -- (quantity * unit_price) - line_discount.
+
+  created_at    TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora de creación del registro.
+
+  updated_at    TIMESTAMP DEFAULT NOW(),
+  -- Fecha y hora de la última actualización (se actualiza vía trigger global).
+
+  -- =========================================================
+  -- Restricciones y claves foráneas
+  -- =========================================================
+
+  CONSTRAINT fk_qitems_quotation
+    FOREIGN KEY (quotation_id) REFERENCES quotations(id)
+    ON UPDATE CASCADE ON DELETE CASCADE,
+  -- Si se elimina una cotización, todos sus ítems asociados
+  -- se eliminan automáticamente (CASCADE).
+  -- Si el ID de la cotización cambia, se actualiza en cascada.
+
+  CONSTRAINT fk_qitems_service
+    FOREIGN KEY (service_id) REFERENCES services(id)
+    ON UPDATE CASCADE ON DELETE SET NULL
+  -- Si se elimina un servicio del catálogo, el ítem conserva la información
+  -- pero pierde la referencia al servicio original (service_id pasa a NULL).
+);
+-- Fin definición tabla quotation_items
+
+-- =========================================================
+-- Índices complementarios
+-- =========================================================
+CREATE INDEX IF NOT EXISTS ix_qitems_quotation_id ON quotation_items(quotation_id);
+-- Índice que mejora el rendimiento al listar los ítems de una cotización.
+-- Ejemplo: SELECT * FROM quotation_items WHERE quotation_id = 45;
+
+
+
+-- =========================================================
+-- Triggers para mantener updated_at
+-- =========================================================
+-- Este bloque crea una función y un conjunto de triggers que actualizan
+-- automáticamente el campo "updated_at" cada vez que se modifica un registro
+-- en cualquier tabla que contenga dicho campo.
+--
+-- De esta manera, se mantiene un control temporal preciso sobre los cambios
+-- realizados en las tablas principales del sistema (regiones, usuarios, clientes, etc.),
+-- sin necesidad de que el backend lo actualice manualmente en cada UPDATE.
+-- =========================================================
+
+-- =========================================================
+-- 1️⃣ Función: set_updated_at()
+-- =========================================================
+-- Esta función será llamada por los triggers antes de cada UPDATE.
+-- Su objetivo es sobrescribir el valor de "updated_at" con la hora actual (NOW()).
+
+CREATE OR REPLACE FUNCTION set_updated_at()
+RETURNS TRIGGER AS $$                      -- Define una función que retorna un tipo TRIGGER
 BEGIN
-  -- 🔹 Evento de INSERCIÓN
-  IF (TG_OP = 'INSERT') THEN
-    INSERT INTO services_audit (service_id, action, changed_by, new_data)
-    VALUES (
-      NEW.id,
-      TG_OP,
-      NEW.created_by,
-      to_jsonb(NEW)
+  NEW.updated_at := NOW();                 -- Asigna la fecha/hora actual al campo updated_at del registro modificado
+  RETURN NEW;                              -- Devuelve el registro modificado (obligatorio en triggers BEFORE UPDATE)
+END; $$ LANGUAGE plpgsql;                  -- Fin del cuerpo de la función, escrita en lenguaje PL/pgSQL
+
+-- =========================================================
+-- 2️⃣ Bloque anónimo DO para crear los triggers automáticamente
+-- =========================================================
+-- En lugar de crear un trigger manualmente para cada tabla,
+-- este bloque recorre una lista predefinida de tablas que contienen
+-- el campo "updated_at" y les genera el trigger correspondiente.
+--
+-- Ventaja: si más adelante agregas o quitas una tabla,
+-- solo debes modificar la lista dentro del bucle.
+
+DO $$                                      -- Bloque anónimo ejecutable directamente (sin necesidad de función persistente)
+DECLARE
+  r RECORD;                                -- Variable que servirá para iterar sobre las tablas seleccionadas
+BEGIN
+  -- Recorre todas las tablas públicas incluidas en la lista
+  FOR r IN
+    SELECT tablename
+    FROM pg_tables
+    WHERE schemaname = 'public'            -- Filtra solo las tablas del esquema público
+      AND tablename IN (                   -- Lista explícita de tablas que poseen columna "updated_at"
+        'regions','cities','communes','roles','users',
+        'clients','services','quotation_request',
+        'quotations','quotation_items'
+      )
+  LOOP
+    -- Por cada tabla, se ejecuta dinámicamente un bloque de SQL que:
+    -- 1. Elimina el trigger existente si ya estaba creado (para evitar duplicados).
+    -- 2. Crea un nuevo trigger BEFORE UPDATE que llama a la función set_updated_at().
+
+    EXECUTE format(
+      'DROP TRIGGER IF EXISTS trg_set_updated_at_%1$s ON %1$s;
+       CREATE TRIGGER trg_set_updated_at_%1$s
+       BEFORE UPDATE ON %1$s
+       FOR EACH ROW EXECUTE FUNCTION set_updated_at();',
+      r.tablename
     );
-    RETURN NEW;
-  END IF;
+    -- %1$s representa el nombre de la tabla actual del bucle (r.tablename),
+    -- y se usa dentro del texto SQL formateado mediante la función "format".
+    --
+    -- Resultado: se crea un trigger por cada tabla con nombre:
+    --   trg_set_updated_at_regions
+    --   trg_set_updated_at_users
+    --   trg_set_updated_at_clients
+    --   etc.
+    --
+    -- Cada trigger se ejecutará automáticamente antes de una actualización (BEFORE UPDATE),
+    -- y llamará a la función set_updated_at(), que establecerá el nuevo valor del timestamp.
+  END LOOP;
+END $$;                                   -- Fin del bloque DO anónimo
 
-  -- 🔹 Evento de ACTUALIZACIÓN
-  IF (TG_OP = 'UPDATE') THEN
-    -- Detectar columnas modificadas (excluyendo las de auditoría)
-    FOR column_name IN
-      SELECT column_name
-      FROM information_schema.columns
-      WHERE table_name = 'services'
-        AND column_name NOT IN (
-          'created_at', 'created_by',
-          'updated_at', 'updated_by',
-          'deleted_at', 'deleted_by'
-        )
-    LOOP
-      IF (OLD.*)::jsonb ->> column_name IS DISTINCT FROM (NEW.*)::jsonb ->> column_name THEN
-        diffs := jsonb_set(
-          diffs,
-          ARRAY[column_name],
-          jsonb_build_object(
-            'old', (OLD.*)::jsonb -> column_name,
-            'new', (NEW.*)::jsonb -> column_name
-          )
-        );
-      END IF;
-    END LOOP;
-
-    -- Solo registrar si existen cambios relevantes
-    IF jsonb_object_length(diffs) = 0 THEN
-      RETURN NEW;
-    END IF;
-
-    INSERT INTO services_audit (service_id, action, changed_by, old_data, new_data, changed_fields)
-    VALUES (
-      NEW.id,
-      TG_OP,
-      NEW.updated_by,
-      to_jsonb(OLD),
-      to_jsonb(NEW),
-      diffs
-    );
-    RETURN NEW;
-  END IF;
-
-  -- 🔹 Evento de ELIMINACIÓN
-  IF (TG_OP = 'DELETE') THEN
-    INSERT INTO services_audit (service_id, action, changed_by, old_data)
-    VALUES (
-      OLD.id,
-      TG_OP,
-      OLD.deleted_by,
-      to_jsonb(OLD)
-    );
-    RETURN OLD;
-  END IF;
-
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
--- ================================================================
-
--- ================================================================
--- TRIGGER DE AUDITORÍA PARA 'services'
--- ================================================================
-CREATE TRIGGER trg_audit_services
-AFTER INSERT OR UPDATE OR DELETE
-ON services
-FOR EACH ROW
-EXECUTE FUNCTION fn_audit_services();
--- ================================================================
+-- =========================================================
+-- 3️⃣ Confirmación de cambios
+-- =========================================================
+COMMIT;
+-- Asegura que todas las operaciones (creación de la función y triggers)
+-- se guarden de forma permanente en la base de datos.
+-- En entornos Docker, este COMMIT marca el final del script de inicialización.
 
 
 
--- ################################################################
--- ################################################################
--- ################################################################
+-- =========================================================
+-- SECUENCIA PARA FOLIO DE COTIZACIONES
+-- =========================================================
+-- Este bloque crea y configura una secuencia en PostgreSQL
+-- que se utiliza para generar automáticamente un número de folio
+-- único y correlativo en la tabla "quotations".
+--
+-- Así, cada vez que se inserta una nueva cotización, el sistema
+-- asigna un número de folio consecutivo (1000, 1001, 1002, etc.)
+-- sin intervención manual ni riesgo de duplicados.
+-- =========================================================
+
+-- =========================================================
+-- 1️⃣ Creación de la secuencia
+-- =========================================================
+-- La secuencia actúa como un contador independiente que PostgreSQL
+-- incrementa automáticamente cada vez que se utiliza la función nextval().
+
+CREATE SEQUENCE IF NOT EXISTS quotations_quote_number_seq
+    START WITH 1000       -- 🔸 Valor inicial del contador (primer folio). Modifícalo según el punto de partida deseado.
+    INCREMENT BY 1         -- Aumenta en 1 por cada nueva cotización insertada.
+    MINVALUE 1             -- Valor mínimo permitido por la secuencia.
+    OWNED BY quotations.quote_number;  -- Vincula la secuencia a la columna quote_number de la tabla quotations.
+-- La cláusula "OWNED BY" asegura que si la tabla o columna son eliminadas,
+-- PostgreSQL elimine automáticamente la secuencia asociada.
+-- Esto mantiene la base de datos limpia y evita secuencias huérfanas.
+-- =========================================================
+
+-- =========================================================
+-- 2️⃣ Asociación de la secuencia con la columna quote_number
+-- =========================================================
+-- Este paso establece que, si no se especifica manualmente un número de folio
+-- al insertar una nueva cotización, PostgreSQL lo obtendrá automáticamente
+-- desde la secuencia creada en el paso anterior.
+
+ALTER TABLE quotations ALTER COLUMN quote_number
+SET DEFAULT nextval('quotations_quote_number_seq');
+-- "nextval('nombre_de_secuencia')" obtiene el siguiente número disponible
+-- y lo incrementa internamente en la secuencia.
+--
+-- Ejemplo:
+--   Primer registro  -> quote_number = 1000
+--   Segundo registro -> quote_number = 1001
+--   Tercer registro  -> quote_number = 1002
+--
+-- Esto garantiza numeración secuencial y automática.
+-- =========================================================
 
 
 
--- ================================================================
--- 👁️ VISTA CONSOLIDADA DE AUDITORÍA DEL SISTEMA (vw_audit_log)
--- ================================================================
-CREATE OR REPLACE VIEW vw_audit_log AS
-SELECT
-  'users' AS entity,
-  ua.user_id AS record_id,
-  ua.action,
-  ua.changed_by,
-  CONCAT_WS(' ',
-    u.first_name,
-    u.last_name_1,
-    COALESCE(u.last_name_2, '')
-  ) AS changed_by_name,
-  u.email AS changed_by_email,
-  ua.changed_at,
-  ua.changed_fields,
-  ua.old_data,
-  ua.new_data
-FROM users_audit ua
-LEFT JOIN users u ON ua.changed_by = u.id
-
-UNION ALL
-
-SELECT
-  'service_areas' AS entity,
-  saa.service_area_id AS record_id,
-  saa.action,
-  saa.changed_by,
-  CONCAT_WS(' ',
-    u.first_name,
-    u.last_name_1,
-    COALESCE(u.last_name_2, '')
-  ) AS changed_by_name,
-  u.email AS changed_by_email,
-  saa.changed_at,
-  saa.changed_fields,
-  saa.old_data,
-  saa.new_data
-FROM service_areas_audit saa
-LEFT JOIN users u ON saa.changed_by = u.id
-
-UNION ALL
-
-SELECT
-  'services' AS entity,
-  sa.service_id AS record_id,
-  sa.action,
-  sa.changed_by,
-  CONCAT_WS(' ',
-    u.first_name,
-    u.last_name_1,
-    COALESCE(u.last_name_2, '')
-  ) AS changed_by_name,
-  u.email AS changed_by_email,
-  sa.changed_at,
-  sa.changed_fields,
-  sa.old_data,
-  sa.new_data
-FROM services_audit sa
-LEFT JOIN users u ON sa.changed_by = u.id;
-
--- ================================================================
--- DESCRIPCIÓN DE LA VISTA 'vw_audit_log'
--- ================================================================
-COMMENT ON VIEW vw_audit_log IS
-  'Vista consolidada de auditoría del sistema SGALT. Unifica los registros de auditoría de las tablas users, service_areas y services, incluyendo el nombre completo y correo del usuario que realizó cada acción.';
--- ================================================================
-
--- ================================================================
--- EJECUTAR EN CLIENTE SQL PARA VER LA VISTA 'vw_audit_log'
--- ================================================================
--- SELECT entity, action, changed_by_name, changed_by_email, changed_at
--- FROM vw_audit_log
--- ORDER BY changed_at DESC;
--- ================================================================
-
-
-
--- ################################################################
--- ################################################################
--- ################################################################
-
-
-
--- ================================================================
--- VISTA DE ACTIVIDAD POR USUARIO (vw_user_activity_log)
--- ================================================================
-CREATE OR REPLACE VIEW vw_user_activity_log AS
-SELECT
-  a.changed_by,
-  a.changed_by_name,
-  a.changed_by_email,
-  a.entity,
-  a.record_id,
-  a.action,
-  a.changed_at,
-  a.changed_fields,
-  a.old_data,
-  a.new_data
-FROM vw_audit_log a
-WHERE a.changed_by IS NOT NULL;
-
--- ================================================================
--- 🏷️ DESCRIPCIÓN DE LA VISTA 'vw_user_activity_log'
--- ================================================================
-COMMENT ON VIEW vw_user_activity_log IS
-  'Vista que consolida todas las acciones realizadas por cada usuario en el sistema SGALT. Permite analizar la actividad individual de los usuarios en todas las entidades auditadas (users, service_areas y services).';
--- ================================================================
-
--- ================================================================
--- EJECUTAR EN CLIENTE SQL PARA VER LA VISTA 'vw_user_activity_log'
--- ================================================================
--- ================================================================
--- Consultar toda la actividad de un usuario.
--- ================================================================
--- SELECT *
--- FROM vw_user_activity_log
--- WHERE changed_by = 1
--- ORDER BY changed_at DESC;
--- ================================================================
--- (donde 1 es el ID del usuario en la tabla users)
--- ================================================================
--- ================================================================
--- Buscar por correo electrónico del usuario
--- ================================================================
--- SELECT *
--- FROM vw_user_activity_log
--- WHERE changed_by_email = 'admin@geocontrol.cl'
--- ORDER BY changed_at DESC;
--- ================================================================
--- ================================================================
--- Ver resumen general por tipo de acción
--- ================================================================
--- SELECT
---   changed_by_name,
---   COUNT(*) FILTER (WHERE action = 'INSERT') AS inserts,
---   COUNT(*) FILTER (WHERE action = 'UPDATE') AS updates,
---   COUNT(*) FILTER (WHERE action = 'DELETE') AS deletes
--- FROM vw_user_activity_log
--- GROUP BY changed_by_name
--- ORDER BY inserts DESC;
--- ================================================================
-
-
-
--- ################################################################
--- ################################################################
--- ################################################################
-
-
-
--- ================================================================
+-- =========================================================
+-- Semillas mínimas (opcionales)
+-- =========================================================
+-- INSERT INTO roles(description) VALUES ('Administrador'), ('Vendedor') ON CONFLICT DO NOTHING;
+-- INSERT INTO regions(name) VALUES ('Región de Arica y Parinacota') ON CONFLICT DO NOTHING;
