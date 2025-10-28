@@ -1,11 +1,11 @@
-// src/config/db.js
+// src/config/connection.js
 
 // -----------------------------------------------------------------------------
 // Conexión a PostgreSQL usando un Pool (múltiples conexiones eficientes)
 // Requiere que `appConfig.js` exponga las credenciales desde variables de entorno
 // -----------------------------------------------------------------------------
 import { Pool } from 'pg';
-import config from './appConfig.js';
+import config from '../utils/appConfig.js';
 
 // Normalizamos tipos que vienen como string desde process.env
 const DB_PORT = Number(config.db.port) || 5432;

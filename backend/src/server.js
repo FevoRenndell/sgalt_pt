@@ -6,7 +6,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import pingRoute from './routes/pingRoute.js';
-import { connectDB } from './config/db.js'; // Verifica la conexión antes de iniciar
+import { connectDB } from './db/connection.js'; // Verifica la conexión antes de iniciar
 
 // Carga variables de entorno desde .env (PORT, DB_*, NODE_ENV, etc.)
 dotenv.config();
