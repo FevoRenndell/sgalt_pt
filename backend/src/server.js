@@ -1,48 +1,55 @@
-// ✅ Importamos el módulo 'express', que es el framework web que usaremos para manejar rutas y peticiones HTTP.
+// src/server.js
+
+// -----------------------------------------------------------------------------
+// Servidor HTTP principal de SGALT (Express + ESM)
+// -----------------------------------------------------------------------------
 import express from 'express';
-
-// ✅ Importamos 'dotenv', que permite leer variables de entorno desde un archivo .env y usarlas en el proyecto.
 import dotenv from 'dotenv';
-
-// ✅ Importamos todas las rutas.
 import pingRoute from './routes/pingRoute.js';
+import { connectDB } from './config/db.js'; // Verifica la conexión antes de iniciar
 
-// ✅ Configuramos dotenv para que cargue automáticamente las variables definidas en el archivo .env
+// Carga variables de entorno desde .env (PORT, DB_*, NODE_ENV, etc.)
 dotenv.config();
 
-// ✅ Obtenemos el número de puerto desde la variable de entorno PORT (definida en el archivo .env).
-// Si no está definida, usamos el puerto 3000 como valor por defecto.
-// Usamos Number() para asegurarnos que el valor sea numérico.
-const PORT = Number(process.env.PORT) || 3000;
-
-// ✅ Creamos una instancia de la aplicación Express.
+// Instancia de Express y middlewares básicos
 const app = express();
+app.use(express.json()); // Permite recibir JSON en el body
 
-// ✅ Este middleware permite que Express entienda solicitudes entrantes con cuerpo (body) en formato JSON.
-// Es decir, podremos recibir objetos JSON en las rutas sin errores.
-app.use(express.json());
-
-// Montamos las rutas importadas.
+// Rutas de la API
 app.use('/api', pingRoute);
 
-/*
-  ✅ Ruta raíz del backend:
-  Esta ruta GET responde a cualquier solicitud hecha a '/' con un mensaje de texto.
-  Es útil como "heartbeat" o comprobación de salud del servidor para verificar que está activo.
-*/
-app.get('/', (req, res) => {
+// Ruta raíz (healthcheck simple)
+app.get('/', (_req, res) => {
   res.send('🟢 Backend SGALT en funcionamiento');
 });
 
-/*
-  ✅ Método .listen():
-  Inicia el servidor para que escuche en el puerto definido (3000 o el que esté en el .env).
-  Cuando el servidor arranca correctamente, imprime un mensaje en consola.
-  También incluye una función .on('error') para capturar e informar si ocurre un error al iniciar.
-*/
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT} [Modo: ${process.env.NODE_ENV || 'development'}]`);
-}).on('error', (err) => {
-  console.error(`❌ Error al iniciar el servidor: ${err.message}`);
-});
-// El servidor ahora está listo para manejar rutas adicionales y peticiones HTTP.
+// Puerto de escucha (normalizado a number)
+const PORT = Number(process.env.PORT) || 3000;
+
+/**
+ * Arranca la aplicación:
+ * 1) Verifica conectividad a PostgreSQL (fail-fast si hay error).
+ * 2) Levanta el servidor HTTP.
+ */
+async function start() {
+  try {
+    await connectDB(); // Lanza error si no hay conexión
+    app
+      .listen(PORT, () => {
+        console.log(
+          `🚀 Servidor backend corriendo en http://localhost:${PORT} [Modo: ${process.env.NODE_ENV || 'development'}]`
+        );
+      })
+      .on('error', (err) => {
+        console.error(`❌ Error al iniciar el servidor: ${err.message}`);
+      });
+  } catch (err) {
+    console.error('❌ No se pudo iniciar el servidor por error de base de datos:', err.message);
+    process.exit(1); // Corta el proceso si no hay DB
+  }
+}
+
+start();
+
+// Export opcional (útil para tests/supertests si los agregas luego)
+export default app;

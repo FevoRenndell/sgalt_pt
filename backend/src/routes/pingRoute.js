@@ -1,11 +1,25 @@
+// src/routes/pingRoute.js
+
+// -----------------------------------------------------------------------------
+// Rutas relacionadas con las pruebas de disponibilidad del servidor (endpoint /ping)
+// -----------------------------------------------------------------------------
+
 import express from 'express';
-// Importamos directamente la función ping desde el controlador
 import { ping } from '../controllers/pingController.js';
 
+// Creamos una nueva instancia del enrutador de Express.
+// Esto nos permite definir rutas agrupadas por funcionalidad.
 const router = express.Router();
 
-// Definimos la ruta GET /ping usando la función importada ping
+/**
+ * Ruta: GET /ping
+ * 
+ * Objetivo:
+ *  - Permite verificar si el servidor y la API están operativos.
+ *  - Usa el controlador `ping` que devuelve un mensaje JSON desde el servicio.
+ */
 router.get('/ping', ping);
 
-// Exportamos el router usando export default (ES Modules)
+// Exportamos el router como exportación por defecto (ES Modules).
+// Este módulo se importará dentro del archivo principal de rutas o en `server.js`.
 export default router;

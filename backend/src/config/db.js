@@ -1,35 +1,49 @@
 // src/config/db.js
 
-// Se importa la clase Pool del paquete 'pg'
-// 'Pool' permite manejar múltiples conexiones a PostgreSQL.
-const { Pool } = require('pg');
+// -----------------------------------------------------------------------------
+// Conexión a PostgreSQL usando un Pool (múltiples conexiones eficientes)
+// Requiere que `appConfig.js` exponga las credenciales desde variables de entorno
+// -----------------------------------------------------------------------------
+import { Pool } from 'pg';
+import config from './appConfig.js';
 
-// Se importa la configuración general desde appConfig.js
-const config = require('./appConfig');
+// Normalizamos tipos que vienen como string desde process.env
+const DB_PORT = Number(config.db.port) || 5432;
 
-// Se crea una nueva instancia del pool de conexiones con PostgreSQL
-// Utiliza los valores extraídos desde las variables de entorno (.env) por medio del objeto `config`
-const pool = new Pool({
+// Pool único para toda la app (reutiliza conexiones y evita abrir una por request)
+export const pool = new Pool({
   host: config.db.host,
-  port: config.db.port,
+  port: DB_PORT,
   user: config.db.user,
   password: config.db.password,
   database: config.db.name,
+  // Si en el futuro se necesita SSL (p. ej., proveedores cloud), podría habilitarse:
+  // ssl: { rejectUnauthorized: false },
 });
 
-// Función asincrónica para intentar conectarse a la base de datos
-const connectDB = async () => {
+/**
+ * Verifica la conectividad a la base de datos.
+ * - Abre una conexión del pool
+ * - Ejecuta una consulta liviana (SELECT 1)
+ * - Libera la conexión
+ * Lanza el error hacia arriba si falla (útil para cortar el arranque del servidor).
+ */
+export async function connectDB() {
   try {
-    await pool.connect(); // Intenta conectarse al pool
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
     console.log('✅ Conexión a PostgreSQL exitosa');
-  } catch (error) {
-    console.error('❌ Error al conectar a la base de datos:', error.message);
+  } catch (err) {
+    console.error('❌ Error al conectar a la base de datos:', err.message);
+    throw err;
   }
-};
+}
 
-// Exporta tanto la función `connectDB` como el `pool`
-// Esto permite utilizar la conexión o el pool en otros archivos del proyecto.
-module.exports = {
-  connectDB,
-  pool,
-};
+/**
+ * Cierra ordenadamente el pool (para tests o apagados controlados).
+ */
+export async function closeDB() {
+  await pool.end();
+  console.log('🛑 Pool de PostgreSQL cerrado');
+}
