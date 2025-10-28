@@ -272,7 +272,7 @@ CREATE TABLE IF NOT EXISTS services (                       -- Crea la tabla si 
   -- Fecha y hora de creación del registro.
   -- Se completa automáticamente al insertar el servicio.
 
-  updated_at    TIMESTAMP DEFAULT NOW(),
+  updated_at    TIMESTAMP DEFAULT NOW()
   -- Fecha y hora de la última actualización del servicio.
   -- Se actualiza automáticamente mediante el trigger global `set_updated_at`.
 );
