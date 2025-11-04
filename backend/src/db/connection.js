@@ -5,6 +5,7 @@
 // Requiere que `appConfig.js` exponga las credenciales desde variables de entorno
 // -----------------------------------------------------------------------------
 import { Pool } from 'pg';
+
 import config from '../utils/appConfig.js';
 
 // Normalizamos tipos que vienen como string desde process.env

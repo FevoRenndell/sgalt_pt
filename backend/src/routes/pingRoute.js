@@ -5,6 +5,7 @@
 // -----------------------------------------------------------------------------
 
 import express from 'express';
+
 import { ping } from '../controllers/pingController.js';
 
 // Creamos una nueva instancia del enrutador de Express.
@@ -13,7 +14,7 @@ const router = express.Router();
 
 /**
  * Ruta: GET /ping
- * 
+ *
  * Objetivo:
  *  - Permite verificar si el servidor y la API están operativos.
  *  - Usa el controlador `ping` que devuelve un mensaje JSON desde el servicio.

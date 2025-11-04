@@ -9,7 +9,7 @@
 
 /**
  * Devuelve un mensaje de respuesta simple para verificar el estado del servidor.
- * 
+ *
  * @returns {string} Mensaje de confirmación de que el servicio está operativo.
  */
 export const getPingMessage = () => 'pong';

@@ -3,10 +3,11 @@
 // -----------------------------------------------------------------------------
 // Servidor HTTP principal de SGALT (Express + ESM)
 // -----------------------------------------------------------------------------
-import express from 'express';
 import dotenv from 'dotenv';
-import pingRoute from './routes/pingRoute.js';
+import express from 'express';
+
 import { connectDB } from './db/connection.js'; // Verifica la conexión antes de iniciar
+import pingRoute from './routes/pingRoute.js';
 
 // Carga variables de entorno desde .env (PORT, DB_*, NODE_ENV, etc.)
 dotenv.config();
@@ -37,7 +38,7 @@ async function start() {
     app
       .listen(PORT, () => {
         console.log(
-          `🚀 Servidor backend corriendo en http://localhost:${PORT} [Modo: ${process.env.NODE_ENV || 'development'}]`
+          `🚀 Servidor backend corriendo en http://localhost:${PORT} [Modo: ${process.env.NODE_ENV || 'development'}]`,
         );
       })
       .on('error', (err) => {

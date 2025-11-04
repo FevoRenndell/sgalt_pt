@@ -27,10 +27,11 @@
  * ============================================================
  */
 
-import dotenv from "dotenv";
-import pkg from "pg";
-import readline from "readline";
-import { exec } from "child_process";
+import { exec } from 'child_process';
+import readline from 'readline';
+
+import dotenv from 'dotenv';
+import pkg from 'pg';
 
 const { Client } = pkg;
 
@@ -40,18 +41,18 @@ const { Client } = pkg;
 dotenv.config();
 
 const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
+  host: process.env.DB_HOST || 'localhost',
   port: Number(process.env.DB_PORT || 5432),
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "postgres",
-  database: process.env.DB_NAME || "sgalt",
+  user: process.env.DB_USER || 'postgres',
+  password: process.env.DB_PASSWORD || 'postgres',
+  database: process.env.DB_NAME || 'sgalt',
 };
 
 // Esquema (por si en el futuro usas otro distinto a 'public')
-const DB_SCHEMA = process.env.DB_SCHEMA || "public";
+const DB_SCHEMA = process.env.DB_SCHEMA || 'public';
 
 // Email de admin configurable; mantiene tu valor por defecto
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "admin@sgalt.cl").trim();
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@sgalt.cl').trim();
 
 // ============================================================
 // 2️⃣ Utilidades
@@ -90,7 +91,7 @@ async function assertUsersTableShape(client) {
     throw new Error(`No existe la tabla ${DB_SCHEMA}.users. Verifica tu init.sql y el esquema.`);
   }
   const c = await client.query(colQ, [DB_SCHEMA]);
-  const hasEmail = c.rows.some((r) => r.column_name === "email");
+  const hasEmail = c.rows.some((r) => r.column_name === 'email');
   if (!hasEmail) {
     throw new Error(`La tabla ${DB_SCHEMA}.users no posee columna "email".`);
   }
@@ -102,25 +103,27 @@ async function assertUsersTableShape(client) {
 async function resetAdminUser() {
   const client = new Client(dbConfig);
 
-  console.log("⚙️  Iniciando proceso para restablecer usuario administrador...");
+  console.log('⚙️  Iniciando proceso para restablecer usuario administrador...');
   console.log(`📧 Usuario objetivo: ${ADMIN_EMAIL}`);
-  console.log(`🗂️  Base: ${dbConfig.database}  |  Esquema: ${DB_SCHEMA}  |  Host: ${dbConfig.host}:${dbConfig.port}\n`);
+  console.log(
+    `🗂️  Base: ${dbConfig.database}  |  Esquema: ${DB_SCHEMA}  |  Host: ${dbConfig.host}:${dbConfig.port}\n`,
+  );
 
   // ------------------------------------------------------------
   // Confirmar con el usuario antes de proceder
   // ------------------------------------------------------------
   const answer = await askConfirmation(
-    "❗ ¿Estás seguro de que deseas eliminar y volver a crear el usuario admin? (y/n): "
+    '❗ ¿Estás seguro de que deseas eliminar y volver a crear el usuario admin? (y/n): ',
   );
-  if (answer !== "y" && answer !== "yes") {
-    console.log("\n🚫 Operación cancelada por el usuario. No se realizaron cambios.");
+  if (answer !== 'y' && answer !== 'yes') {
+    console.log('\n🚫 Operación cancelada por el usuario. No se realizaron cambios.');
     process.exit(0);
   }
 
   try {
-    console.log("\n🔄 Conectando a la base de datos...");
+    console.log('\n🔄 Conectando a la base de datos...');
     await client.connect();
-    console.log("✅ Conexión establecida con éxito.\n");
+    console.log('✅ Conexión establecida con éxito.\n');
 
     // Asegura que operamos sobre el esquema correcto
     await setSearchPath(client, DB_SCHEMA);
@@ -134,10 +137,10 @@ async function resetAdminUser() {
     // ------------------------------------------------------------
     console.log(`🧹 Eliminando usuario admin (${ADMIN_EMAIL}) si existe...`);
 
-    await client.query("BEGIN");
+    await client.query('BEGIN');
     const preview = await client.query(
       `SELECT id, email FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
-      [ADMIN_EMAIL]
+      [ADMIN_EMAIL],
     );
 
     if (preview.rowCount > 0) {
@@ -147,24 +150,26 @@ async function resetAdminUser() {
         RETURNING id, email
       `;
       const deleteResult = await client.query(deleteQuery, [ADMIN_EMAIL]);
-      console.log(`✅ Usuario eliminado: ${deleteResult.rows[0].email} (id=${deleteResult.rows[0].id})`);
+      console.log(
+        `✅ Usuario eliminado: ${deleteResult.rows[0].email} (id=${deleteResult.rows[0].id})`,
+      );
     } else {
-      console.log("ℹ️  No existía ningún usuario admin previo.");
+      console.log('ℹ️  No existía ningún usuario admin previo.');
     }
-    await client.query("COMMIT");
+    await client.query('COMMIT');
 
     // ------------------------------------------------------------
     // 2️⃣ Cerrar conexión antes de recrear
     // ------------------------------------------------------------
     await client.end();
-    console.log("\n🔚 Conexión a la base de datos cerrada.");
-    console.log("🔁 Procediendo a recrear el usuario admin...\n");
+    console.log('\n🔚 Conexión a la base de datos cerrada.');
+    console.log('🔁 Procediendo a recrear el usuario admin...\n');
 
     // ------------------------------------------------------------
     // 3️⃣ Ejecutar el script de creación del usuario admin
     // ------------------------------------------------------------
     // Conserva el mismo mecanismo que tenías (npm run seed:admin)
-    exec("npm run seed:admin", (error, stdout, stderr) => {
+    exec('npm run seed:admin', (error, stdout, stderr) => {
       if (error) {
         console.error(`❌ Error al ejecutar seed:admin: ${error.message}`);
         return;
@@ -175,13 +180,23 @@ async function resetAdminUser() {
       }
       console.log(stdout);
     });
-
   } catch (error) {
     // Asegura rollback si la transacción estaba abierta
-    try { await client.query("ROLLBACK"); } catch (_) {}
-    console.error("❌ Error durante el proceso de restablecimiento:");
+    try {
+      await client.query('ROLLBACK');
+    } catch (e) {
+      console.warn('⚠️  Falló el ROLLBACK:', e.message);
+    }
+
+    console.error('❌ Error durante el proceso de restablecimiento:');
     console.error(error.message);
-    try { await client.end(); } catch (_) {}
+
+    try {
+      await client.end();
+    } catch (e) {
+      console.warn('⚠️  Falló el cierre de conexión:', e.message);
+    }
+
     process.exitCode = 1;
   }
 }

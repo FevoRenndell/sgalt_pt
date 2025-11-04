@@ -44,11 +44,11 @@ const config = {
   // Asegúrate de definir las siguientes variables en dicho archivo:
   //   DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
   db: {
-    host: process.env.DB_HOST || 'localhost',   // Dirección del servidor de la BD
-    port: process.env.DB_PORT || 5432,          // Puerto donde escucha PostgreSQL
-    user: process.env.DB_USER || 'postgres',    // Usuario de la base de datos
-    password: process.env.DB_PASSWORD || '',    // Contraseña del usuario
-    name: process.env.DB_NAME || 'database',    // Nombre de la base de datos
+    host: process.env.DB_HOST || 'localhost', // Dirección del servidor de la BD
+    port: process.env.DB_PORT || 5432, // Puerto donde escucha PostgreSQL
+    user: process.env.DB_USER || 'postgres', // Usuario de la base de datos
+    password: process.env.DB_PASSWORD || '', // Contraseña del usuario
+    name: process.env.DB_NAME || 'database', // Nombre de la base de datos
   },
 };
 
