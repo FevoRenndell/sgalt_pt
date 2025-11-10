@@ -1,55 +1,60 @@
-// src/server.js
-
-// -----------------------------------------------------------------------------
-// Servidor HTTP principal de SGALT (Express + ESM)
-// -----------------------------------------------------------------------------
+import 'dotenv/config';
+import http from 'http';
 import express from 'express';
-import dotenv from 'dotenv';
-import pingRoute from './routes/pingRoute.js';
-import { connectDB } from './db/connection.js'; // Verifica la conexión antes de iniciar
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import cors from 'cors';
+import listEndpoints from 'express-list-endpoints';
+// import logger from './utils/logger.js';
+import initRoutes from './routes/init-routes.js';
 
-// Carga variables de entorno desde .env (PORT, DB_*, NODE_ENV, etc.)
-dotenv.config();
-
-// Instancia de Express y middlewares básicos
 const app = express();
-app.use(express.json()); // Permite recibir JSON en el body
+const port =  4000;
 
-// Rutas de la API
-app.use('/api', pingRoute);
+// Crear el servidor HTTP
+const server = http.createServer(app);
 
-// Ruta raíz (healthcheck simple)
-app.get('/', (_req, res) => {
-  res.send('🟢 Backend SGALT en funcionamiento');
+// Configuraciones de seguridad y middleware
+app.use(express.json());
+app.use(helmet());
+ 
+app.use(
+  cors({
+    origin: ['http://192.168.1.90:5173',],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
+
+// Limitador de tasa
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 50000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Puerto de escucha (normalizado a number)
-const PORT = Number(process.env.PORT) || 3000;
+app.use(limiter);
+app.get('/', (req, res) => {
+  res.json({ ok: true, message: 'API corriendo ✅' });
+});
 
-/**
- * Arranca la aplicación:
- * 1) Verifica conectividad a PostgreSQL (fail-fast si hay error).
- * 2) Levanta el servidor HTTP.
- */
-async function start() {
-  try {
-    await connectDB(); // Lanza error si no hay conexión
-    app
-      .listen(PORT, () => {
-        console.log(
-          `🚀 Servidor backend corriendo en http://localhost:${PORT} [Modo: ${process.env.NODE_ENV || 'development'}]`
-        );
-      })
-      .on('error', (err) => {
-        console.error(`❌ Error al iniciar el servidor: ${err.message}`);
-      });
-  } catch (err) {
-    console.error('❌ No se pudo iniciar el servidor por error de base de datos:', err.message);
-    process.exit(1); // Corta el proceso si no hay DB
-  }
-}
+// Inicializar las rutas
+initRoutes(app);
 
-start();
+// Manejo de errores
+//errorManager(app, { logger });
 
-// Export opcional (útil para tests/supertests si los agregas luego)
+// Listar todos los endpoints registrados
+const endpoints = listEndpoints(app);
+endpoints.forEach((endpoint) => {
+  console.log(endpoint.path, ' ', endpoint.methods);
+});
+
+// Iniciar el servidor HTTP
+server.listen(port, () => {
+  console.log(`Servidor en funcionamiento en http://localhost:${port}`);
+});
+
+// (Opcional) exportar app si lo necesitas para tests u otros usos
 export default app;

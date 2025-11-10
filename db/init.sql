@@ -19,7 +19,7 @@ BEGIN;
 
 -- Crea la tabla de regiones administrativas del país (nivel 1)
 CREATE TABLE IF NOT EXISTS regions (            -- Si no existe, la crea; evita error en re-ejecuciones
-  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK entera autoincremental moderna (IDENTITY)
+  id            INTEGER PRIMARY KEY,  -- PK entera autoincremental moderna (IDENTITY)
   name          VARCHAR(100) NOT NULL,          -- Nombre de la región; obligatorio
   created_at    TIMESTAMP DEFAULT NOW(),        -- Marca de creación con valor por defecto actual
   updated_at    TIMESTAMP DEFAULT NOW()         -- Marca de última actualización (se actualizará vía trigger)
@@ -31,7 +31,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_regions_name ON regions (LOWER(name));
 
 -- Crea la tabla de ciudades (nivel 2), hija de regions
 CREATE TABLE IF NOT EXISTS cities (             -- Catálogo de ciudades
-  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK autoincremental
+  id            INTEGER PRIMARY KEY,  -- PK autoincremental
   name          VARCHAR(100) NOT NULL,          -- Nombre de la ciudad; obligatorio
   region_id     INTEGER NOT NULL,               -- FK a regions.id; cada ciudad pertenece a una región
   created_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp creación
@@ -48,7 +48,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_cities_region_name ON cities (region_id, LO
 
 -- Crea la tabla de comunas (nivel 3), hija de cities
 CREATE TABLE IF NOT EXISTS communes (           -- Catálogo de comunas/localidades
-  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK autoincremental
+  id            INTEGER PRIMARY KEY,  -- PK autoincremental
   name          VARCHAR(100) NOT NULL,          -- Nombre de la comuna; obligatorio
   city_id       INTEGER NOT NULL,               -- FK a cities.id; cada comuna pertenece a una ciudad
   created_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp creación
@@ -66,7 +66,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_communes_city_name ON communes (city_id, LO
 -- Catálogo de roles de usuario (perfiles/permisos lógicos)
 -- NOTA: No depende de otras tablas; será referenciado por users.role_id
 CREATE TABLE IF NOT EXISTS roles (              -- Tabla de roles
-  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  -- PK autoincremental
+  id            INTEGER PRIMARY KEY,  -- PK autoincremental
   description   VARCHAR(100) NOT NULL,          -- Nombre/etiqueta del rol (p. ej. 'Administrador', 'Vendedor')
   created_at    TIMESTAMP DEFAULT NOW(),        -- Timestamp creación
   updated_at    TIMESTAMP DEFAULT NOW()         -- Timestamp actualización
@@ -87,7 +87,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_roles_description ON roles (LOWER(descripti
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabla solo si no existe
-  id             INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,  
+  id             INTEGER PRIMARY KEY,  
   -- Identificador único autoincremental para cada usuario.
   -- Se utiliza como clave primaria (PK) y como referencia en otras tablas (por ejemplo: quotations.user_id).
 
