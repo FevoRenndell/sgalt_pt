@@ -8,14 +8,14 @@ const middlewares = [
   authenticateJWT,
 ];
 
-const initRoutes = (app) =>  {
+const initRoutes = (apiName, app) =>  {
 
   //ruta publica
-  app.use('/auth'  , authRoutes  );
+  app.use(`/${apiName}/auth`  , authRoutes  );
 
   //ruta privadas
-  app.use('/test'   , middlewares, testRoutes  );
-  app.use('/clients', middlewares, clientRoutes);
+  app.use(`/${apiName}/test`   , middlewares, testRoutes  );
+  app.use(`/${apiName}/clients`, middlewares, clientRoutes);
 
 
    app.use(errorHandler);

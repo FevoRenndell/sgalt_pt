@@ -12,10 +12,10 @@ const LoginPage    = lazy(() => import('../features/auth/pages/LoginPage'   ));
 // ----------------------------------------------------------------------
 
 const authJwt = {
-  path: 'jwt',
+  path: 'auth',
   element: (
     <GuestGuard>
-      <Suspense>
+      <Suspense fallback={null}>
         <Outlet />
       </Suspense>
     </GuestGuard>
@@ -23,16 +23,9 @@ const authJwt = {
   children: [
     {
       path: 'login',
-      element: (
-          <LoginPage />
-      ),
+      element: <LoginPage />,
     },
   ],
 };
 
-export const authRoutes = [
-  {
-    path: 'auth',
-    children: [authJwt],
-  },
-];
+export const authRoutes = [authJwt];

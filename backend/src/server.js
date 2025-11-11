@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 });
 
 // Inicializar las rutas
-initRoutes(app);
+initRoutes('sgal_pt', app);
 
 // Manejo de errores
 //errorManager(app, { logger });
@@ -55,6 +55,8 @@ endpoints.forEach((endpoint) => {
 server.listen(port, () => {
   console.log(`Servidor en funcionamiento en http://localhost:${port}`);
 });
+
+
 
 // (Opcional) exportar app si lo necesitas para tests u otros usos
 export default app;

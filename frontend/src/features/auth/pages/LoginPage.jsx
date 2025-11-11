@@ -17,19 +17,19 @@ import { yupResolver } from '@hookform/resolvers/yup';
 
 import { loginSchema } from '../validation/loginSchema';
 import { FormProvider, RHFTextField } from '../../../shared/components/hook-form';
-import { useAuth } from '../../../auth/AuthProvider';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useLoginMutation } from '../api/authApi';
 
 export default function LoginPage() {
-
-  const { login } = useAuth();
-
   const navigate = useNavigate();
   const location = useLocation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
+
   const from = location.state?.from?.pathname || '/dashboard';
+
+  const [login, { isLoading }] = useLoginMutation(); // RTKQ mutation
 
   const methods = useForm({
     resolver: yupResolver(loginSchema),
@@ -51,15 +51,24 @@ export default function LoginPage() {
 
   const onSubmit = async (values) => {
     setServerError('');
+
     try {
+      // 👇 usamos unwrap para que lance error normal si el backend responde 4xx/5xx
       await login({
         email: values.email,
         password_hash: values.password_hash,
         remember,
-      });
+      }).unwrap();
+
+      // Si el login fue exitoso, ya se ejecutó setCredentials en onQueryStarted
       navigate(from, { replace: true });
     } catch (err) {
-      setServerError(err.message || 'Error al iniciar sesión');
+      // err puede ser { data, status, error }
+      const msg =
+        err?.data?.message ||
+        err?.error ||
+        'Error al iniciar sesión. Verifica tus credenciales.';
+      setServerError(msg);
     }
   };
 
@@ -196,10 +205,10 @@ export default function LoginPage() {
             type="submit"
             fullWidth
             variant="contained"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoading}
             sx={{ mt: 1.5, py: 1, borderRadius: 2, fontSize: 13 }}
           >
-            {isSubmitting ? (
+            {isSubmitting || isLoading ? (
               <>
                 <CircularProgress
                   size={16}

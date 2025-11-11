@@ -1,6 +1,8 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 
 import { authRoutes } from './auth';
+import { dashboardRoutes } from './dashboard';
+import { usersRoutes } from './users';
  
 // ----------------------------------------------------------------------
 
@@ -18,8 +20,12 @@ export default function Router() {
     // Auth routes
     ...authRoutes,
 
+    ...dashboardRoutes,
+
+    ...usersRoutes,
+
     // No match 404
-    { path: '*', element: <Navigate to="/login" replace /> },
+    { path: '*', element: <Navigate to="/dashboard" replace /> },
   ]);
 
   return routes;

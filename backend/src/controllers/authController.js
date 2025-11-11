@@ -16,7 +16,7 @@ const login = async (req, res) => {
         throw new UnauthorizedError('Invalid credentials');
     }
 
-    return res.status(200).json({ token: generateToken(user) });
+    return res.status(200).json({ token: generateToken(user) , user });
 };
 
 const me = async (req, res) => {
@@ -39,7 +39,6 @@ const me = async (req, res) => {
         throw new NotFoundError('usuario no encontrado');
     }
 
-    // Devolver los datos del usuario
     return res.status(200).json({
         status: 'success',
         message: 'Información de usuario obtenida con éxito',
@@ -52,6 +51,24 @@ const me = async (req, res) => {
 
 };
 
+const logout = async (req, res) => {
+
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    throw new UnauthorizedError('Token no proporcionado');
+  }
+
+  const token = authHeader.split(' ')[1];
+  // no hay columna de blacklist en la bd, asi que solo respondemos ok
+
+  return res.status(200).json({
+    status: 'success',
+    success: true,
+    statusCode: 200,
+    message: 'Sesión cerrada correctamente',
+  });
+};
 
 
-export { login, me };
+export { login, me, logout };
