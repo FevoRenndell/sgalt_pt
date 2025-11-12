@@ -1,12 +1,13 @@
 import { Helmet } from 'react-helmet-async';
+import UserView from '../components/users/UserView';
 
 export default function UserPage() {
   return (
     <>
-    
-        <title> Usuarios </title>
-       
-        <h1> User Management Page </h1>
+
+      <title> Usuarios </title>
+
+      <UserView />
     </>
   );
 }
