@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useFormContext, Controller } from 'react-hook-form';
-import { TextField, MenuItem } from '@mui/material';
+import { TextField, Autocomplete } from '@mui/material';
 
 RHFSelect.propTypes = {
   name: PropTypes.string,
@@ -14,30 +14,35 @@ RHFSelect.propTypes = {
 };
 
 export default function RHFSelect({ name, label, options = [], ...other }) {
-  const { control } = useFormContext();
+ 
+   const { control, setValue } = useFormContext();
 
   return (
     <Controller
       name={name}
       control={control}
+      defaultValue={null}
       render={({ field, fieldState: { error } }) => (
-        <TextField
-          {...field}
-          select
-          fullWidth
-          size="small"
-          label={label}
-          InputLabelProps={{ shrink: true }}
-          error={!!error}
-          helperText={error?.message}
-          {...other}
-        >
-          {options.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </MenuItem>
-          ))}
-        </TextField>
+        <Autocomplete
+          size='small'
+         {...field}
+          options={options}
+          getOptionLabel={(option) => option?.name || ''}
+          noOptionsText="No Existe"
+          isOptionEqualToValue={(option, selectedValue) => {
+              if(option){
+                return !!selectedValue && option?.id === selectedValue?.id;
+              }
+          }}
+          onChange={(_, newValue) => setValue(name, newValue || null)}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={label}
+            />
+          )}
+         
+        />
       )}
     />
   );

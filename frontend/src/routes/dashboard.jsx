@@ -1,23 +1,34 @@
 import { lazy, Suspense } from 'react';
+import LayoutV1 from '../layouts/layout-1';
+import LayoutV2 from '../layouts/layout-2';
+import { AuthGuard } from '../shared/components/auth';
+import { LoadingProgress } from '../shared/components/loader';
+import { useSettings } from '../shared/hooks/useSettings';
 
-import { Outlet } from 'react-router-dom';
+// ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
+const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage'));
 
-import { AuthGuard } from '../auth/guard';
-import DashboardPage from '../features/dashboard/pages/DashboardPage';
-import DashboardLayout from '../layout/DashboardLayout';
+const ActiveLayout = () => {
+  const { settings } = useSettings();
 
-// ----------------------------------------------------------------------
+  return (
+    <AuthGuard>
+      <Suspense fallback={<LoadingProgress />}>
+        {settings.activeLayout === 'layout2' ? <LayoutV2 /> : <LayoutV1 />}
+      </Suspense>
+    </AuthGuard>
+  );
+};
 
-export const dashboardRoutes = [
+export const DashboardRoutes = [
   {
-    path: '/',
-    element: (
-      <AuthGuard>
-        <DashboardLayout />
-      </AuthGuard>
-    ),
+    path: 'dashboard',
+    element: <ActiveLayout />,
     children: [
-      { path: 'dashboard', element: <DashboardPage /> },
+      {
+        index: true,
+        element: <DashboardPage />,
+      },
     ],
   },
 ];

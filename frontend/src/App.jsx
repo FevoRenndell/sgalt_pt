@@ -1,22 +1,47 @@
-import './App.css'
-import QuotesPage from './features/quotes/pages/QuotesPage';
+import { createBrowserRouter, RouterProvider } from 'react-router';
+import { ProgressProvider } from '@bprogress/react';
+// MUI
+import CssBaseline from '@mui/material/CssBaseline';
+
+import { ThemeProvider } from '@mui/material/styles';
+
 import { store } from './app/store';
-import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import Router from './routes/index';
-import AppThemeProvider from './shared/providers/AppThemeProvider';
+// RIGHT-TO-LEFT SUPPORT COMPONENT
+import { RTL } from './shared/components/RTL';
+// ROUTES METHOD
 
-
+// MUI THEME CREATION METHOD
+import { createCustomTheme } from './theme';
+// SITE SETTINGS CUSTOM DEFINED HOOK
+import { useSettings } from './shared/hooks/useSettings';
+// I18N FILE
+import './i18n';
+import { routes } from './routes';
 export default function App() {
-  return (
-    <Provider store={store}>
-      <AppThemeProvider>
-        <BrowserRouter>
-          <Router />
-        </BrowserRouter>
-      </AppThemeProvider>
-    </Provider>
-  );
+  // SITE SETTINGS CUSTOM DEFINED HOOK
+  const {
+    settings
+  } = useSettings();
+
+  // MUI THEME CREATION
+  const theme = createCustomTheme(settings);
+
+  // ROUTER CREATE
+  const router = createBrowserRouter(routes());
+  return <ThemeProvider theme={theme}>
+      <RTL>
+          <ProgressProvider options={{
+            showSpinner: false
+          }}>
+          <CssBaseline />
+          <Provider store={store}>
+            <RouterProvider router={router} />
+          </Provider>
+
+        </ProgressProvider>
+      </RTL>
+  </ThemeProvider>
+
 }
- 
- 
+

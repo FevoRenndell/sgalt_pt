@@ -1,102 +1,49 @@
-import PropTypes from 'prop-types';
+import { useCallback } from 'react';
+// MUI
+import Checkbox from '@mui/material/Checkbox';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableSortLabel from '@mui/material/TableSortLabel';
+import visuallyHidden from '@mui/utils/visuallyHidden';
+import { styled } from '@mui/material/styles';
 
-import { Box, Checkbox, TableRow, TableCell, TableHead, TableSortLabel } from '@mui/material';
-import { useState } from 'react';
+// STYLED COMPONENTS
+const StyledTableHead = styled(TableHead)(({
+  theme
+}) => ({
+  backgroundColor: theme.palette.action.hover
+}));
+const HeaderCell = styled(TableCell)(({
+  theme
+}) => ({
+  fontWeight: 500,
+  color: theme.palette.text.primary
+}));
 
-
-const visuallyHidden = {
-  border: 0,
-  margin: -1,
-  padding: 0,
-  width: '1px',
-  height: '1px',
-  overflow: 'hidden',
-  position: 'absolute',
-  whiteSpace: 'nowrap',
-  clip: 'rect(0 0 0 0)',
-};
-
-const getPadding = (isStretch) => {
-  if(isStretch){
-    return {pr:0, pl:0.4, pt:1, pb:1}
-  }
-  return {}
-}
-
-TableHead.propTypes = {
-  onSort: PropTypes.func,
-  orderBy: PropTypes.string,
-  headLabel: PropTypes.array,
-  rowCount: PropTypes.number,
-  numSelected: PropTypes.number,
-  onSelectAllRows: PropTypes.func,
-  order: PropTypes.oneOf(['asc', 'desc']),
-  sx: PropTypes.object,
-  stretch : PropTypes.any,
-};
-
-export default function TableHeadCustom({
+export default function TableHeadCCustom({
   order,
   orderBy,
-  rowCount = 0,
-  headLabel,
-  numSelected = 0,
-  onSort,
-  onSelectAllRows,
-  sx,
-  stretch
+  headCells,
+  onRequestSort,
 }) {
-
-  const [checked, setChecked] = useState(false);
-
-
-  const onSelectAll = (event, isSelectAll) => {
-    setChecked(isSelectAll);
-    onSelectAllRows(null, isSelectAll)
-  }
-
+  const createSortHandler = useCallback(property => event => {
+    onRequestSort(event, property);
+  }, [onRequestSort]);
+ 
   return (
-    <TableHead sx={sx}>
+    <StyledTableHead>
       <TableRow>
-          {onSelectAllRows && (
-            <TableCell padding="checkbox">
-              <Checkbox
-                indeterminate={numSelected > 0 && numSelected < rowCount}
-                checked={checked}
-                onChange={(event) => onSelectAll(null, event.target.checked)}
-              />
-            </TableCell>
-          )}
-
-
-
-        {headLabel.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.align || 'left'}
-            sortDirection={orderBy === headCell.id ? order : false}
-            sx={{ width: headCell.width, minWidth: headCell.minWidth, ...getPadding(stretch?.modify) }}
-          >
-            {onSort ? (
-              <TableSortLabel
-                hideSortIcon
-                active={orderBy === headCell.id}
-                direction={orderBy === headCell.id ? order : 'asc'}
-                onClick={() => onSort(headCell.id)}
-                sx={{ textTransform: 'capitalize' }}
-              >
-                {headCell.label}
-
-                {orderBy === headCell.id ? (
-                  <Box sx={{ ...visuallyHidden }}>{order === 'desc' ? 'sorted descending' : 'sorted ascending'}</Box>
-                ) : null}
-              </TableSortLabel>
-            ) : (
-              headCell.label
-            )}
-          </TableCell>
-        ))}
+ 
+        {headCells.map(headCell => <HeaderCell key={headCell.id} padding={headCell.disablePadding ? 'none' : 'normal'} sortDirection={orderBy === headCell.id ? order : false} sx={{ minWidth: headCell.minWidth }}>
+            <TableSortLabel active={orderBy === headCell.id} onClick={createSortHandler(headCell.id)} direction={orderBy === headCell.id ? order : 'asc'}>
+              {headCell.label}
+              {orderBy === headCell.id ? <span style={visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </span> : null}
+            </TableSortLabel>
+          </HeaderCell>)}
       </TableRow>
-    </TableHead>
+    </StyledTableHead>
   );
 }

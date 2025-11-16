@@ -1,15 +1,27 @@
-import PropTypes from 'prop-types';
-import { TableRow, TableCell, Typography, IconButton } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router';
+// MUI
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
+// MUI ICON COMPONENTS
+import Edit from '@mui/icons-material/Edit';
+import DeleteOutline from '@mui/icons-material/DeleteOutline';
+// CUSTOM COMPONENTS
+import { TableMoreMenuItem, TableMoreMenu } from '../../../../shared/components/table';
+import { fDateLogic } from '../../../../shared/utils/formatTime';
+// DATA TYPES
+import { paths } from '../../../../routes/paths';
+// ==============================================================
 
-UserTableRow.propTypes = {
-  row: PropTypes.object,
-  selected: PropTypes.bool,
-  onEdit: PropTypes.func,
-};
+// ==============================================================
 
-export default function UserTableRow({ row, selected, onEdit }) {
-  
+export default function UserTableRow({
+  user,
+  isSelected,
+  handleSelectRow,
+  handleDeleteUser
+}) {
+
   const {
     id,
     first_name,
@@ -19,36 +31,47 @@ export default function UserTableRow({ row, selected, onEdit }) {
     role_id,
     is_active,
     created_at,
-    updated_at,
-  } = row;
+    updated_at
+  } = user;
 
-  const handleEdit = () => {
-    if (onEdit) onEdit(row);
-  };
+  const navigate = useNavigate();
+  const [openMenuEl, setOpenMenuEl] = useState(null);
+
+  const handleOpenMenu = useCallback(event => {
+    setOpenMenuEl(event.currentTarget);
+  }, []);
+
+  const handleCloseOpenMenu = useCallback(() => {
+    setOpenMenuEl(null);
+  }, []);
+
+  const handleEdit = useCallback(() => {
+    handleCloseOpenMenu();
+    navigate(paths.user_edit(id));
+  }, [navigate, handleCloseOpenMenu]);
+
+  const handleDelete = useCallback(() => {
+    handleCloseOpenMenu();
+    handleDeleteUser(user.id);
+  }, [handleCloseOpenMenu, handleDeleteUser, user.id]);
+
 
   return (
-    <TableRow hover selected={selected}>
-      <TableCell align="left">
-        <IconButton onClick={handleEdit}>
-          <EditIcon />
-        </IconButton>
+    <TableRow hover>
+      <TableCell padding="normal">
+        <TableMoreMenu open={openMenuEl} handleOpen={handleOpenMenu} handleClose={handleCloseOpenMenu}>
+          <TableMoreMenuItem Icon={Edit} title="Edit" handleClick={handleEdit} />
+          <TableMoreMenuItem Icon={DeleteOutline} title="Delete" handleClick={handleDelete} />
+        </TableMoreMenu>
       </TableCell>
+      <TableCell padding="normal" >{id} </TableCell>
+      <TableCell padding="normal" >{`${first_name} ${last_name_1} ${last_name_2}`}</TableCell>
+      <TableCell padding="normal" >{email}</TableCell>
+      <TableCell padding="normal" >{role_id}</TableCell>
+      <TableCell padding="normal" >{is_active}</TableCell>
+      <TableCell padding="normal" >{fDateLogic(created_at)}</TableCell>
+      <TableCell padding="normal" >{fDateLogic(updated_at)}</TableCell>
 
-      <TableCell align="left">{id}</TableCell>
-      <TableCell align="left">{first_name}</TableCell>
-      <TableCell align="left">{last_name_1}</TableCell>
-      <TableCell align="left">{last_name_2 || '-'}</TableCell>
-      <TableCell align="left">{email}</TableCell>
-      <TableCell align="left">{role_id ?? '-'}</TableCell>
-
-      <TableCell align="left">
-        <Typography color={is_active ? 'success.main' : 'error.main'}>
-          {is_active ? 'Activo' : 'Inactivo'}
-        </Typography>
-      </TableCell>
-
-      <TableCell align="left">{created_at || '-'}</TableCell>
-      <TableCell align="left">{updated_at || '-'}</TableCell>
     </TableRow>
   );
 }

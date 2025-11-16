@@ -87,7 +87,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_roles_description ON roles (LOWER(descripti
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabla solo si no existe
-  id             INTEGER PRIMARY KEY,  
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,  
   -- Identificador único autoincremental para cada usuario.
   -- Se utiliza como clave primaria (PK) y como referencia en otras tablas (por ejemplo: quotations.user_id).
 
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabl
   --     evitando la eliminación del usuario (SET NULL).
 );  
 -- Fin definición de tabla 'users'
-
+CREATE SEQUENCE users_id_seq OWNED BY public.users.id;
 -- =========================================================
 -- Índices complementarios
 -- =========================================================

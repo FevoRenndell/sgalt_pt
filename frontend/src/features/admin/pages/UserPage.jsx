@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import UserView from '../components/users/UserView';
+import UserListView from './pages-view/UserListView';
 
 export default function UserPage() {
   return (
@@ -7,7 +7,9 @@ export default function UserPage() {
 
       <title> Usuarios </title>
 
-      <UserView />
+      <UserListView />
     </>
   );
 }
+
+ 

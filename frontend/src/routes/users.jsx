@@ -1,23 +1,33 @@
 import { lazy, Suspense } from 'react';
+import LayoutV1 from '../layouts/layout-1';
+import LayoutV2 from '../layouts/layout-2';
+import { AuthGuard } from '../shared/components/auth';
+import { LoadingProgress } from '../shared/components/loader';
+import { useSettings } from '../shared/hooks/useSettings';
 
-import { Outlet } from 'react-router-dom';
+// ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
+const UserPage = lazy(() => import('../features/admin/pages/UserPage'));
+const UserCreatePage = lazy(() => import('../features/admin/pages/CreateUserPage'));
+const ActiveLayout = () => {
+  const { settings } = useSettings();
 
-import { AuthGuard } from '../auth/guard';
-import UserPage from '../features/admin/pages/UserPage';
-import DashboardLayout from '../layout/DashboardLayout';
- 
-// ----------------------------------------------------------------------
+  return (
+    <AuthGuard>
+      <Suspense fallback={<LoadingProgress />}>
+        {settings.activeLayout === 'layout2' ? <LayoutV2 /> : <LayoutV1 />}
+      </Suspense>
+    </AuthGuard>
+  );
+};
 
-export const usersRoutes = [
+export const Users = [
   {
-    path: '/',
-    element: (
-      <AuthGuard>
-         <DashboardLayout />
-      </AuthGuard>
-    ),
+    path: 'admin',
+    element: <ActiveLayout />,
     children: [
-      { path: 'users', element: <UserPage /> },
+      { path: 'users/list'     , element: <UserPage       /> },
+      { path: 'users/create'   , element: <UserCreatePage /> },
+      { path: 'users/:id/edit' , element: <UserCreatePage /> },
     ],
   },
 ];

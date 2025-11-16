@@ -1,129 +1,154 @@
-/* eslint-disable no-shadow */
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { TableHeadCustom } from '../../../../shared/components/table';
-import {
-    Box,
-    Table,
-    TableBody,
-    TableContainer,
-    TablePagination,
-    Paper,
-    Alert,
-    Skeleton,
-} from '@mui/material';
-import useTable, { getComparator } from '../../../../shared//hooks/useTable';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+// MUI
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableContainer from '@mui/material/TableContainer';
+import TablePagination from '@mui/material/TablePagination';
+// CUSTOM COMPONENTS
+import { Scrollbar } from '../../../../shared/components/scrollbar';
+import { TableDataNotFound, TableToolbar } from '../../../../shared/components/table';
+// CUSTOM PAGE SECTION COMPONENTS
+import SearchArea from '../../../../shared/components/search-area/SearchArea';
+import HeadingArea from '../../../../shared/components/heading-area/HeadingArea';
 import UserTableRow from './UserTableRow';
+import TableHeadCustom from '../../../../shared/components/table/TableHeadCustom.jsx';
+// CUSTOM DEFINED HOOK
+import { useMuiTable, getComparator, stableSort } from '../../../../shared/hooks/useMuiTable';
+import Add from '../../../../shared/icons/Add';
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-UserTableList.propTypes = {
-    details: PropTypes.array,
-};
+export default function UserTableList({ details }) {
 
-export default function UserTableList({ details = [] }) {
+  const navigate = useNavigate();
+
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    setUsers(details);
+  }, [details]);
+
+  const [userFilter, setUserFilter] = useState({
+    role: '',
+    search: ''
+  });
+
+  const TABLE_HEAD = [
+        {
+      id: 'actions',
+      numeric: true,
+      disablePadding: false,
+      label: 'Acciones'
+    },
+    { id: 'id', label: 'ID', align: 'left', minWidth: '10px' },
+    { id: 'first_name', label: 'Nombre', align: 'left', minWidth: '200px' },
+    { id: 'email', label: 'Correo Electrónico', align: 'left', minWidth: '180px' },
+    { id: 'role_id', label: 'Rol', align: 'left', minWidth: '80px' },
+    { id: 'is_active', label: 'Estado', align: 'left', minWidth: '80px' },
+    { id: 'created_at', label: 'Fecha Creación', align: 'left', minWidth: '160px' },
+    { id: 'updated_at', label: 'Fecha Modificación', align: 'left', minWidth: '200px' },
+
+  ];
 
 
-    const TABLE_HEAD = [
-        { id: 'edit', label: '', align: 'left' },
-        { id: 'id', label: 'ID', align: 'left', minWidth: '10px' },
-        { id: 'first_name', label: 'Nombre', align: 'left', minWidth: '120px' },
-        { id: 'last_name_1', label: 'Primer Apellido', align: 'left', minWidth: '120px' },
-        { id: 'last_name_2', label: 'Segundo Apellido', align: 'left', minWidth: '120px' },
-        { id: 'email', label: 'Correo Electrónico', align: 'left', minWidth: '180px' },
-        { id: 'role_id', label: 'Rol', align: 'left', minWidth: '80px' },
-        { id: 'is_active', label: 'Estado', align: 'left', minWidth: '80px' },
-        { id: 'created_at', label: 'Fecha Creación', align: 'left', minWidth: '110px' },
-        { id: 'updated_at', label: 'Fecha Modificación', align: 'left', minWidth: '110px' },
-    ];
+
+  const {
+    page,
+    order,
+    orderBy,
+    selected,
+    isSelected,
+    rowsPerPage,
+    setPage,
+    handleSelectRow,
+    handleChangePage,
+    handleRequestSort,
+    handleSelectAllRows,
+    handleChangeRowsPerPage
+  } = useMuiTable({
+    defaultOrderBy: 'name'
+  });
+
+  useEffect(() => {
+    setPage(0);
+  }, [userFilter, setPage]);
+
+  const handleChangeFilter = useCallback((key, value) => {
+    setUserFilter(prevFilter => ({
+      ...prevFilter,
+      [key]: value
+    }));
+  }, []);
+
+  const handleChangeTab = useCallback((_, newValue) => {
+    handleChangeFilter('role', newValue);
+  }, [handleChangeFilter]);
+
+  const handleSearchChange = useCallback(e => {
+    handleChangeFilter('search', e.target.value);
+  }, [handleChangeFilter]);
 
 
-    const [tableData, setTableData] = useState([]);
+  const handleDeleteUser = useCallback(id => {
+    setUsers(prevUsers => prevUsers.filter(item => item.id !== id));
+  }, []);
 
-    useEffect(() => {
-        setTableData(details);
-    }, [details]);
+  const handleAllUserDelete = useCallback(() => {
+    setUsers(prevUsers => prevUsers.filter(item => !selected.includes(item.id)));
+    handleSelectAllRows([])();
+  }, [selected, handleSelectAllRows]);
 
-    const isLoading = false;
 
-    const table = useTable();
-
-    const {
-        page,
-        order,
-        orderBy,
-        rowsPerPage,
-        selected,
-        onSort,
-        onChangePage,
-        onChangeRowsPerPage,
-    } = table;
-
-    const dataFiltered = applySortFilter({
-        tableData,
-        comparator: getComparator(table.order, table.orderBy)
+  const filteredUsers = useMemo(() => {
+    const sortedUsers = stableSort(users, getComparator(order, orderBy));
+    return sortedUsers.filter(item => {
+      if (userFilter.role) {
+        return item.role.toLowerCase() === userFilter.role.toLowerCase();
+      } else if (userFilter.search) {
+        return item.name.toLowerCase().includes(userFilter.search.toLowerCase());
+      }
+      return true;
     });
+  }, [users, order, orderBy, userFilter.role, userFilter.search]);
 
-    const handleEdit = (object) => {
-        if (!isEmptyObject(object)) {
-            setObjectToEdit({ ...object });
-        }
-    };
+  const paginatedUsers = useMemo(() => filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage), [filteredUsers, page, rowsPerPage]);
+  const allUserIds = useMemo(() => filteredUsers.map(row => row.id), [filteredUsers]);
 
-    useEffect(() => {
-        table.setPage(0);
-    }, []);
+  const addButton =
+    <Button variant="contained" startIcon={<Add />} onClick={() => navigate('/admin/users/create')}>
+      Add New User
+    </Button>;
 
-    return (
-        <>
-            <TableContainer component={Paper} sx={{ overflow: 'hidden' }}>
-                <Table>
-                    <TableHeadCustom
-                        order={order}
-                        orderBy={orderBy}
-                        headLabel={TABLE_HEAD}
-                        rowCount={tableData?.length}
-                        numSelected={selected.length}
-                        onSort={onSort}
-                    />
-                    <TableBody>
-                        {dataFiltered
-                            ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((row) => (
-                                <UserTableRow
-                                    key={row.id}
-                                    row={row}
-                                    selected={selected.includes(row.id)}
-                                />
-                            ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+  return <div className="pt-2 pb-4">
+    <Card>
+      <Box px={2} pt={2}>
+        <HeadingArea value={userFilter.role} changeTab={handleChangeTab} addButton={addButton} />
 
-            <Box sx={{ position: 'block' }}>
-                <TablePagination
-                    rowsPerPageOptions={[5, 15, 25]}
-                    component="div"
-                    count={dataFiltered.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={onChangePage}
-                    onRowsPerPageChange={onChangeRowsPerPage}
-                />
-            </Box>
-        </>
-    );
+        <SearchArea value={userFilter.search} onChange={handleSearchChange} gridRoute="/dashboard/user-grid" listRoute="/dashboard/user-list" />
+      </Box>
 
-    function applySortFilter({ tableData = [], comparator }) {
-        const stabilizedThis = tableData.map((el, index) => [el, index]);
+      {/* TABLE ROW SELECTION HEADER  */}
+      {selected.length > 0 && <TableToolbar selected={selected.length} handleDeleteRows={handleAllUserDelete} />}
 
-        stabilizedThis.sort((a, b) => {
-            const order = comparator(a[0], b[0]);
-            if (order !== 0) return order;
-            return a[1] - b[1];
-        });
+      {/* TABLE HEAD & BODY ROWS */}
+      <TableContainer>
+        <Scrollbar autoHide={false}>
+          <Table>
+            <TableHeadCustom order={order} orderBy={orderBy} numSelected={selected.length} rowCount={filteredUsers.length} onRequestSort={handleRequestSort} onSelectAllRows={handleSelectAllRows(allUserIds)} headCells={TABLE_HEAD} />
 
-        tableData = stabilizedThis.map((el) => el[0]);
+            <TableBody>
+              {paginatedUsers.length === 0 ? <TableDataNotFound /> : paginatedUsers.map(user => <UserTableRow key={user.id} user={user} isSelected={isSelected(user.id)} handleSelectRow={handleSelectRow} handleDeleteUser={handleDeleteUser} />)}
+            </TableBody>
+          </Table>
+        </Scrollbar>
+      </TableContainer>
 
-
-        return tableData;
-    }
+      {/* PAGINATION SECTION */}
+      <Box padding={1}>
+        <TablePagination page={page} component="div" rowsPerPage={rowsPerPage} count={filteredUsers.length} onPageChange={handleChangePage} rowsPerPageOptions={[5, 10, 25]} onRowsPerPageChange={handleChangeRowsPerPage} showFirstButton showLastButton />
+      </Box>
+    </Card>
+  </div>;
 }

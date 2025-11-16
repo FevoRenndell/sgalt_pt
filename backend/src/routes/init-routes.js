@@ -2,6 +2,8 @@ import authenticateJWT from '../middlewares/authenticateJWT.js';
 import clientRoutes from './clientRoutes.js';
 import testRoutes from './testRoutes.js';
 import authRoutes from './authRoutes.js';
+import filterRoutes from './filterRoutes.js';
+import userRoutes from './userRoutes.js';
 import { errorHandler } from '../middlewares/errorHandler.js';
 
 const middlewares = [
@@ -15,7 +17,9 @@ const initRoutes = (apiName, app) =>  {
 
   //ruta privadas
   app.use(`/${apiName}/test`   , middlewares, testRoutes  );
+  app.use(`/${apiName}/users`, middlewares, userRoutes);
   app.use(`/${apiName}/clients`, middlewares, clientRoutes);
+  app.use(`/${apiName}/filters`, middlewares, filterRoutes);
 
 
    app.use(errorHandler);

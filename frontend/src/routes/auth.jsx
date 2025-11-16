@@ -1,31 +1,31 @@
-import { lazy, Suspense } from 'react';
+import { lazy } from 'react';
+import { GuestGuard } from '../shared/components/auth';
 
-import { Outlet } from 'react-router-dom';
+// AUTH PAGES (tu sistema real)
+const Login = lazy(() => import('../features/auth/pages/LoginPage'));
+const Register = lazy(() => import('../features/auth/pages/RegisterPage'));
+const VerifyCode = lazy(() => import('../features/auth/pages/VerifyCodePage'));
+const ForgetPassword = lazy(() => import('../features/auth/pages/ForgetPasswordPage'));
 
-import { GuestGuard } from '../auth/guard';
+// AUTH DEMO — JWT (lo que SÍ usarás)
+ 
+export const AuthRoutes = [
+  // LOGIN / REGISTER reales de tu proyecto
+  {
+    element: <GuestGuard />,
+    children: [
+      { path: 'login', element: <Login /> },
+      { path: 'register', element: <Register /> },
+      { path: 'forget-password', element: <ForgetPassword /> },
+      { path: 'verify-code', element: <VerifyCode /> },
+    ],
+  },
 
-// ----------------------------------------------------------------------
-
-// JWT
-const LoginPage    = lazy(() => import('../features/auth/pages/LoginPage'   ));
-
-// ----------------------------------------------------------------------
-
-const authJwt = {
-  path: 'auth',
-  element: (
-    <GuestGuard>
-      <Suspense fallback={null}>
-        <Outlet />
-      </Suspense>
-    </GuestGuard>
-  ),
-  children: [
-    {
-      path: 'login',
-      element: <LoginPage />,
-    },
-  ],
-};
-
-export const authRoutes = [authJwt];
+  // JWT DEMO
+  {
+    path: 'jwt',
+    children: [
+       <></>
+    ],
+  },
+];

@@ -20,7 +20,10 @@ app.use(helmet());
  
 app.use(
   cors({
-    origin: ['http://192.168.1.90:5173',],
+    origin: [
+      'http://192.168.1.90:5173',
+      'http://localhost:5173',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }),

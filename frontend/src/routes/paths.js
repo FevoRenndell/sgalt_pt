@@ -1,34 +1,31 @@
-// ----------------------------------------------------------------------
-
-
-
-function path(root, sublink) {
-  return `${root}${sublink}`;
-}
-
-// ----------------------------------------------------------------------
-
-const ROOTS = {
-  AUTH: '/auth',
-  DASHBOARD: '/dashboard',
-};
-
+// routes/paths.js
 
 export const paths = {
-  minimalUI: 'https://mui.com/store/items/minimal-dashboard/',
-  // AUTH
-  auth: {
-    jwt: {
-      login: `${ROOTS.AUTH}/jwt/login`,
-      // login: `${ROOTS.AUTH}/jwt/login`,
-      register: `${ROOTS.AUTH}/jwt/register`,
-    },
-  },
+  root: '/dashboard',
 
-  // DASHBOARD
-  dashboard: {
-    root: `${ROOTS.DASHBOARD}`,
-  },
+  // Usuarios
+  users_list:   '/admin/users/list',
+  user_edit: (id) => `/admin/users/${id}/edit`,
+  users_create: '/admin/users/create',
+  users_roles:  '/admin/users/roles',
 
+  // Cotizaciones
+  cotizaciones: '/dashboard/cotizaciones',
+  cotizacionesCrear: '/dashboard/cotizaciones/crear',
+  cotizacionesRevision: '/dashboard/cotizaciones/en-revision',
+  cotizacionesAceptadas: '/dashboard/cotizaciones/aceptadas',
+  cotizacionesRechazadas: '/dashboard/cotizaciones/rechazadas',
 
+  // Clientes
+  clientes: '/dashboard/clientes',
+  clientesCrear: '/dashboard/clientes/crear',
+  clientesHistorial: '/dashboard/clientes/historial',
+
+  // Cuenta
+  perfil: '/dashboard/profile',
+};
+
+export const PATH_CLIENT = {
+  solicitud: '/cliente/solicitud-cotizacion',
+  estado: '/cliente/mis-cotizaciones',
 };
