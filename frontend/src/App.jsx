@@ -4,6 +4,8 @@ import { ProgressProvider } from '@bprogress/react';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import { ThemeProvider } from '@mui/material/styles';
+import { SnackbarProvider } from 'notistack';
+import { ConfirmDialogProvider } from './contexts/ConfirmDialogContext';
 
 import { store } from './app/store';
 import { Provider } from 'react-redux';
@@ -18,6 +20,7 @@ import { useSettings } from './shared/hooks/useSettings';
 // I18N FILE
 import './i18n';
 import { routes } from './routes';
+
 export default function App() {
   // SITE SETTINGS CUSTOM DEFINED HOOK
   const {
@@ -29,19 +32,30 @@ export default function App() {
 
   // ROUTER CREATE
   const router = createBrowserRouter(routes());
-  return <ThemeProvider theme={theme}>
-      <RTL>
-          <ProgressProvider options={{
-            showSpinner: false
-          }}>
-          <CssBaseline />
-          <Provider store={store}>
-            <RouterProvider router={router} />
-          </Provider>
-
-        </ProgressProvider>
-      </RTL>
-  </ThemeProvider>
+  return (
+    <SnackbarProvider
+      maxSnack={3}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+    >
+      <ThemeProvider theme={theme}>
+        <ConfirmDialogProvider>
+          <RTL>
+            <ProgressProvider options={{
+              showSpinner: false
+            }}>
+              <CssBaseline />
+              <Provider store={store}>
+                <RouterProvider router={router} />
+              </Provider>
+            </ProgressProvider>
+          </RTL>
+        </ConfirmDialogProvider>
+      </ThemeProvider>
+    </SnackbarProvider>
+  )
 
 }
 

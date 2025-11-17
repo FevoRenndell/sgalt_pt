@@ -11,16 +11,19 @@ import { TableMoreMenuItem, TableMoreMenu } from '../../../../shared/components/
 import { fDateLogic } from '../../../../shared/utils/formatTime';
 // DATA TYPES
 import { paths } from '../../../../routes/paths';
+import { Chip } from '@mui/material';
+import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
+
 // ==============================================================
 
 // ==============================================================
 
 export default function UserTableRow({
   user,
-  isSelected,
-  handleSelectRow,
   handleDeleteUser
 }) {
+
+  const confirm = useConfirmDialog();
 
   const {
     id,
@@ -28,7 +31,7 @@ export default function UserTableRow({
     last_name_1,
     last_name_2,
     email,
-    role_id,
+    role,
     is_active,
     created_at,
     updated_at
@@ -50,8 +53,21 @@ export default function UserTableRow({
     navigate(paths.user_edit(id));
   }, [navigate, handleCloseOpenMenu]);
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = useCallback(async () => {
+    
     handleCloseOpenMenu();
+
+    const ok = await confirm({
+      title: 'Confirmar eliminación',
+      description: `¿Estás seguro de que deseas eliminar al usuario ${first_name} ${last_name_1}? Esta acción no se puede deshacer.`,
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+    });
+
+    if (!ok) {
+      return;
+    }
+
     handleDeleteUser(user.id);
   }, [handleCloseOpenMenu, handleDeleteUser, user.id]);
 
@@ -67,8 +83,10 @@ export default function UserTableRow({
       <TableCell padding="normal" >{id} </TableCell>
       <TableCell padding="normal" >{`${first_name} ${last_name_1} ${last_name_2}`}</TableCell>
       <TableCell padding="normal" >{email}</TableCell>
-      <TableCell padding="normal" >{role_id}</TableCell>
-      <TableCell padding="normal" >{is_active}</TableCell>
+      <TableCell padding="normal" >{role?.name}</TableCell>
+      <TableCell padding="normal">
+        <Chip size="small" label={is_active ? 'Active' : 'Inactive'} color={is_active ? 'success' : 'error'} />
+      </TableCell>
       <TableCell padding="normal" >{fDateLogic(created_at)}</TableCell>
       <TableCell padding="normal" >{fDateLogic(updated_at)}</TableCell>
 

@@ -20,7 +20,7 @@ export default function UserForm() {
           <RHFTextField key="last_name_2" name="last_name_2" label="Segundo Apellido" type="text" />
           <RHFTextField key="email" name="email" label="Correo Electrónico" type="email" />
           <RHFTextField key="password_hash" name="password_hash" label="Contraseña" type="password" />
-          <RHFSelect key="role_id" name="role_id" label="Rol" options={[]} />
+          <RHFSelect key="role" name="role" label="Rol" options={[]} />
           <RHFSelect
             key="is_active"
             name="is_active"

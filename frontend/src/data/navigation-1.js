@@ -14,17 +14,14 @@ export const navigations = [
     icon: duotone.UserList, // o el icono que prefieras
     children: [
       {
-        name: 'Panel de administración de usuarios',
+        name: 'administración de usuarios',
         path: '/admin/users/list',
       },
       {
         name: 'Crear usuario',
         path: '/admin/users/crear',
       },
-      {
-        name: 'Editar usuario',
-        path: '/admin/:id/users/editar',
-      },
+
       {
         name: 'Roles y permisos',
         path: '/admin/users/roles',
@@ -38,7 +35,7 @@ export const navigations = [
     icon: duotone.Invoice, // reutilizo el de Invoice que ya traía el template
     children: [
       {
-        name: 'Panel de administración de cotizaciones',
+        name: 'administración de cotizaciones',
         path: '/dashboard/cotizaciones',
       },
       {
@@ -66,7 +63,7 @@ export const navigations = [
     icon: duotone.UserProfile, // similar a perfil / clientes
     children: [
       {
-        name: 'Panel de administración de clientes',
+        name: 'administración de clientes',
         path: '/dashboard/clientes',
       },
       {

@@ -8,15 +8,15 @@ export const navigation = [
     Icon: duotone.PersonChalkboard,
     children: [
       {
-        name: 'Panel de usuarios',
+        name: 'Usuarios',
         path: '/admin/users',
       },
       {
-        name: 'Panel de cotizaciones',
+        name: 'Cotizaciones',
         path: '/dashboard/admin/cotizaciones',
       },
       {
-        name: 'Panel de clientes',
+        name: 'Clientes',
         path: '/dashboard/admin/clientes',
       },
     ],

@@ -3,6 +3,8 @@
 export const paths = {
   root: '/dashboard',
 
+  login : '/login',
+
   // Usuarios
   users_list:   '/admin/users/list',
   user_edit: (id) => `/admin/users/${id}/edit`,

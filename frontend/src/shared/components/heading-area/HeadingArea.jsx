@@ -41,8 +41,7 @@ export default function HeadingArea({
   value,
   changeTab,
   addButton
-}) {
-
+}) {  
   return <FlexBetween flexWrap="wrap" gap={1}>
       <FlexBox alignItems="center" gap={1.5}>
         <StyledAvatar variant="rounded">
@@ -54,13 +53,12 @@ export default function HeadingArea({
         </Typography>
       </FlexBox>
 
-      <TabContext value={value}>
-        <TabListWrapper variant="scrollable" onChange={changeTab}>
-          <Tab disableRipple label="All Users" value="" />
-          <Tab disableRipple label="Editor" value="editor" />
-          <Tab disableRipple label="Contributor" value="contributor" />
-          <Tab disableRipple label="Administrator" value="administrator" />
-          <Tab disableRipple label="Subscriber" value="subscriber" />
+      <TabContext value={value} >
+        <TabListWrapper variant="scrollable"  onChange={changeTab}  >
+          <Tab disableRipple label="All Users" value={0} />
+          <Tab disableRipple label="Administradores" value={1} />
+          <Tab disableRipple label="Clientes" value={2} />
+          <Tab disableRipple label="Cotizadores" value={3} />
         </TabListWrapper>
       </TabContext>
       { addButton }

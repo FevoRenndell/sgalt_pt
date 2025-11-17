@@ -30,10 +30,8 @@ const ActionButtons = styled('div')(({
 export default function SearchArea({
   value = '',
   onChange,
-  gridRoute,
-  listRoute
 }) {
-  const navigate = useNavigate();
+
   const {
     pathname
   } = useLocation();
@@ -46,19 +44,22 @@ export default function SearchArea({
       }
     }} />
 
-      {/* NAVIGATION BUTTONS */}
-      <ActionButtons className="actions">
-        <IconButton disableRipple onClick={() => navigate(listRoute)}>
-          <FormatBullets sx={{
-          color: activeColor(listRoute)
-        }} />
-        </IconButton>
+    {/*
+          
+        <ActionButtons className="actions">
+          <IconButton disableRipple onClick={() => navigate(listRoute)}>
+            <FormatBullets sx={{
+            color: activeColor(listRoute)
+          }} />
+          </IconButton>
 
-        <IconButton disableRipple onClick={() => navigate(gridRoute)}>
-          <Apps sx={{
-          color: activeColor(gridRoute)
-        }} />
-        </IconButton>
-      </ActionButtons>
+          <IconButton disableRipple onClick={() => navigate(gridRoute)}>
+            <Apps sx={{
+            color: activeColor(gridRoute)
+          }} />
+          </IconButton>
+        </ActionButtons>
+    */}
+
     </FlexBetween>;
 }

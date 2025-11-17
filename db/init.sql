@@ -14,7 +14,7 @@ BEGIN;
 --  controlar perfiles de usuario)
 -- Relaciones clave:
 --   regions(1) ──< cities(*) ──< communes(*)
---   roles es independiente y se referenciará desde users.role_id
+--   roles es independiente y se referenciará desde users.role
 -- =========================================================
 
 -- Crea la tabla de regiones administrativas del país (nivel 1)
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS communes (           -- Catálogo de comunas/localida
 CREATE UNIQUE INDEX IF NOT EXISTS ux_communes_city_name ON communes (city_id, LOWER(name));
 
 -- Catálogo de roles de usuario (perfiles/permisos lógicos)
--- NOTA: No depende de otras tablas; será referenciado por users.role_id
+-- NOTA: No depende de otras tablas; será referenciado por users.role
 CREATE TABLE IF NOT EXISTS roles (              -- Tabla de roles
   id            INTEGER PRIMARY KEY,  -- PK autoincremental
   description   VARCHAR(100) NOT NULL,          -- Nombre/etiqueta del rol (p. ej. 'Administrador', 'Vendedor')
@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabl
   -- Hash de la contraseña en formato encriptado (por ejemplo con bcrypt).
   -- No se almacenan contraseñas en texto plano por motivos de seguridad.
 
-  role_id        INTEGER,  
+  role        INTEGER,  
   -- Clave foránea hacia 'roles.id'.
   -- Define el rol o perfil del usuario dentro del sistema (Administrador, Vendedor, Técnico, etc.).
   -- Puede ser NULL si el usuario aún no tiene un rol asignado.
@@ -129,12 +129,12 @@ CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabl
   -- Se actualiza automáticamente mediante el trigger global `set_updated_at`.
 
   CONSTRAINT fk_users_role
-    FOREIGN KEY (role_id)
+    FOREIGN KEY (role)
     REFERENCES roles(id)
     ON UPDATE CASCADE ON DELETE SET NULL  
   -- Clave foránea hacia 'roles.id':
   --   - Si se actualiza el ID en la tabla 'roles', el cambio se propaga (CASCADE).
-  --   - Si se elimina un rol, el campo 'role_id' del usuario afectado pasa a NULL,
+  --   - Si se elimina un rol, el campo 'role' del usuario afectado pasa a NULL,
   --     evitando la eliminación del usuario (SET NULL).
 );  
 -- Fin definición de tabla 'users'
@@ -142,8 +142,8 @@ CREATE SEQUENCE users_id_seq OWNED BY public.users.id;
 -- =========================================================
 -- Índices complementarios
 -- =========================================================
-CREATE INDEX IF NOT EXISTS ix_users_role_id ON users(role_id);
--- Índice simple para mejorar el rendimiento de las consultas por 'role_id',
+CREATE INDEX IF NOT EXISTS ix_users_role ON users(role);
+-- Índice simple para mejorar el rendimiento de las consultas por 'role',
 -- por ejemplo, cuando se listan todos los usuarios de un rol específico.
 
 -- Unicidad case-insensitive del email

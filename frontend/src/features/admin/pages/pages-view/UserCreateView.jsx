@@ -1,153 +1,243 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
 // MUI
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import { FormProvider, RHFSelect, RHFTextField } from '../../../../shared/components/hook-form';
 import { CardContent, CardHeader } from '@mui/material';
-import { userValidationCreateSchema } from '../../validations/usersValidations';
+
+// CUSTOM
+import { FormProvider, RHFSelect, RHFSwitch, RHFTextField } from '../../../../shared/components/hook-form';
+import { userValidationCreateSchema, userValidationUpdateSchema } from '../../validations/usersValidations';
 import { paths } from '../../../../routes/paths';
-import { useCreateUserMutation, useUpdateUserMutation, useFetchUserByIdQuery } from '../../api/userApi';
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+  useFetchUserByIdQuery,
+} from '../../api/userApi';
 import { useFetchUsersFiltersQuery } from '../../api/filterApi';
-import { useEffect, useState } from 'react';
+import { enqueueSnackbar } from 'notistack';
 
 // ---------------- COMPONENT ----------------
 export default function UserCreateView() {
 
-    let { id } = useParams();
-    let location = useLocation();
-     const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-    const isEdit = location.pathname.includes('edit');
+  const initialValues = {
+    first_name: '',
+    last_name_1: '',
+    last_name_2: '',
+    role: null,
+    is_active: false,
+    email: '',
+    password_hash: '',
+    repeat_password: '',
+  };
+  
+  const confirm = useConfirmDialog();
+  
+  const isEdit = location.pathname.includes('edit');
 
-    const { data: options, isLoading } = useFetchUsersFiltersQuery();
+  const { data: options } = useFetchUsersFiltersQuery();
 
-    const {
-        data: userData ,
-        isLoading : isUserLoading,
-        error,
-    } = useFetchUserByIdQuery(id, {
-        skip: !isEdit || !id,      
-    });
+  const {
+    data: userData,
+    isLoading: isUserLoading,
+    error,
+  } = useFetchUserByIdQuery(id, {
+    skip: !isEdit || !id,
+  });
 
-    const [createUser, { isLoading: isCreating, error: createError }] = useCreateUserMutation();
-    const [updateUser, { isLoading: isUpdating, error: updateError }] = useUpdateUserMutation();
- 
-    const initialValues = {
-        first_name: '',
-        last_name_1: '',
-        last_name_2: '',
-        role_id: null,
-        is_active: null,
-        email: '',
-        password: '',
+  const [createUser, { isLoading: isCreating, error: createError }] = useCreateUserMutation();
+  const [updateUser, { isLoading: isUpdating, error: updateError }] = useUpdateUserMutation();
+
+  const methods = useForm({
+    defaultValues: initialValues,
+    resolver: yupResolver(isEdit ? userValidationUpdateSchema : userValidationCreateSchema),
+  });
+
+  const {
+    handleSubmit,
+    reset,
+    watch,
+    formState: { isSubmitting, isValid },
+  } = methods;
+
+  useEffect(() => {
+    if (isEdit && userData) {
+      reset({
+        first_name: userData.first_name ?? '',
+        last_name_1: userData.last_name_1 ?? '',
+        last_name_2: userData.last_name_2 ?? '',
+        role: userData.role ?? null,
+        is_active: userData.is_active ?? null,
+        email: userData.email ?? '',
+        password_hash: '',
         repeat_password: '',
-    };
-    
-
-    const [ values , setValues ] = useState(userData || initialValues);
-
-    const methods = useForm({
-        defaultValues: values,
-        resolver: yupResolver(userValidationCreateSchema),
-    });
-
-    useEffect(() => {
-        if(isEdit && userData){
-            setValues(userData);
-            methods.reset(userData);
-        }
-    }, [isEdit, userData, methods]);
-
-    const { isSubmitting, handleSubmit } = methods;
-
-    const handleFormSubmit = handleSubmit((values) => {
-        if(!isEdit){
-            createUser(values);
-        }else{
-            updateUser({ id, ...values });
-        }
-    });
-
-    const handleGoBack = () => {
-        navigate(paths.users_list);
+      });
     }
+  }, [isEdit, userData, reset]);
+ const watchedValues = watch();
+  const onSubmit = handleSubmit(async (values) => {
 
-    return (
-        <FormProvider methods={methods} onSubmit={handleFormSubmit}>
-            <Card>
-                <CardHeader title={isEdit ? "Editar Usuario" : "Crear Usuario"} />
-                <CardContent>
-                    <div className="pt-2 pb-4">
+   
 
-                        <Card className="p-3">
+    console.log(watchedValues)
 
-                            <Grid container spacing={3}>
-                                <Grid size={{ sm: 4, xs: 12 }}>
-                                    <RHFTextField fullWidth name="first_name" label="Nombre" />
-                                </Grid>
-                                <Grid size={{ sm: 4, xs: 12 }}>
-                                    <RHFTextField fullWidth name="last_name_1" label="Apellido Paterno" />
-                                </Grid>
-                                <Grid size={{ sm: 4, xs: 12 }}>
-                                    <RHFTextField fullWidth name="last_name_2" label="Apellido Materno" />
-                                </Grid>
-                            </Grid>
+    const { role, ...rest } = values;
 
-                            <Grid container spacing={3} sx={{ mt: 2 }}>
-                                <Grid size={{ sm: 6, xs: 12 }}>
-                                    <RHFSelect fullWidth name="role_id" label="Rol" options={options?.roles || []} />
-                                </Grid>
+    const data = {
+      ...rest,
+      role_id: role?.id,   // aquí ya metes solo el id
+    };
 
-                                <Grid size={{ sm: 6, xs: 12 }}>
-                                    <RHFSelect fullWidth name="is_active" label="Activo" options={options?.state || []} />
-                                </Grid>
-                            </Grid>
+    try {
 
-                            <Grid container spacing={3} sx={{ mt: 2 }}>
-                                <Grid size={{ sm: 4, xs: 12 }}>
-                                    <RHFTextField fullWidth name="email" label="Email" />
-                                </Grid>
+      const ok = await confirm({
+        title: isEdit ? 'Confirmar actualización' : 'Confirmar creación',
+        description: `¿Deseas ${ isEdit ? 'actualizar los cambios de' : 'crear este nuevo'} usuario?`,
+        confirmText: isEdit ? 'Actualizar' : 'Crear',
+        cancelText: 'Cancelar',
+      });
 
-                                <Grid size={{ sm: 4, xs: 12 }}>
-                                    <RHFTextField fullWidth name="password" label="Password" />
-                                </Grid>
+      if (!ok) {
+        return;
+      }
 
-                                <Grid size={{ sm: 4, xs: 12 }}>
-                                    <RHFTextField fullWidth name="repeat_password" label="Repita Contraseña" />
-                                </Grid>
-                            </Grid>
+      if (!isEdit) {
+        await createUser(data).unwrap();
+      } else {
+        await updateUser({ id, ...data }).unwrap();
+      }
 
-                            <Grid container spacing={3} sx={{ pt: 3 }}>
-                                <Grid size={{ sm: 4, xs: 12 }}>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        fullWidth
-                                        loading={isSubmitting}
-                                    >
-                                        Crear Usuario
-                                    </Button>
-                                </Grid>
-                                <Grid size={{ sm: 1, xs: 12 }}>
-                                    <Button
-    
-                                        variant="contained"
-                                        fullWidth
-                                        onClick={handleGoBack}
-                                    >
-                                        Volver
-                                    </Button>
-                                </Grid>
-                            </Grid>
+      enqueueSnackbar(
+        isEdit ? `Usuario actualizado ${values.first_name}` : 'Usuario creado',
+        {
+          variant: 'success',
+          autoHideDuration: 1500,
+          onExited: () => {
+            navigate(paths.users_list);
+          }
+        }
+      );
 
-                        </Card>
+    } catch (err) {
+      console.error('Error en la mutación', err);
+    }
+  });
 
-                    </div>
-                </CardContent>
+  const handleGoBack = () => {
+    navigate(paths.users_list);
+  };
 
-            </Card>   </FormProvider>
-    );
+  return (
+    <FormProvider methods={methods} onSubmit={onSubmit}>
+      <Card>
+        <CardHeader title={isEdit ? `Editar Usuario ${watch('first_name')}` : 'Crear Usuario'}
+          action={
+            <RHFSwitch
+              fullWidth
+              name="is_active"
+              label="Activo"
+              options={options?.state || []}
+              sizeParam="small"
+            />
+          }
+        />
+        <CardContent>
+          <div className="pt-2 pb-4">
+            <Card className="p-3">
+              <Grid container spacing={3} sx={{ mt: 2 }}>
+                <Grid size={{ sm: 6, xs: 12 }}>
+                  <RHFSelect
+                    fullWidth
+                    name="role"
+                    label="Rol"
+                    options={options?.roles || []}
+                    sizeParam="small"
+                  />
+                </Grid>
+                <Grid size={{ sm: 6, xs: 12 }}>
+                  <RHFTextField fullWidth name="email" label="Email" sizeParam="small" />
+                </Grid>
+
+
+              </Grid>
+              <Grid container spacing={3} sx={{ mt: 2 }}>
+                <Grid size={{ sm: 4, xs: 12 }}>
+                  <RHFTextField fullWidth name="first_name" label="Nombre" sizeParam="small" />
+                </Grid>
+                <Grid size={{ sm: 4, xs: 12 }}>
+                  <RHFTextField
+                    fullWidth
+                    name="last_name_1"
+                    label="Apellido Paterno"
+                    sizeParam="small"
+                  />
+                </Grid>
+                <Grid size={{ sm: 4, xs: 12 }}>
+                  <RHFTextField
+                    fullWidth
+                    name="last_name_2"
+                    label="Apellido Materno"
+                    sizeParam="small"
+                  />
+                </Grid>
+              </Grid>
+              <Grid container spacing={3} sx={{ mt: 2 }}>
+
+                <Grid size={{ sm: 6, xs: 12 }}>
+                  <RHFTextField fullWidth name="password_hash" label="Password" sizeParam="small" />
+                </Grid>
+
+                <Grid size={{ sm: 6, xs: 12 }}>
+                  <RHFTextField
+                    fullWidth
+                    name="repeat_password"
+                    label="Repita Contraseña"
+                    sizeParam="small"
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container spacing={3} sx={{ pt: 3 }}>
+                <Grid size={{ sm: 3, xs: 12 }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                    disabled={isSubmitting || isCreating || isUpdating}
+                  >
+                    {isEdit ? 'Actualizar Usuario' : 'Crear Usuario'}
+                  </Button>
+                </Grid>
+                <Grid size={{ sm: 3, xs: 12 }}>
+                  {isEdit ? (
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      fullWidth
+                      disabled={isSubmitting || isCreating || isUpdating}
+                    >
+                      Eliminar usuario
+                    </Button>
+                  ) : null}
+                </Grid>
+                <Grid size={{ sm: 1, xs: 12 }}>
+                  <Button variant="contained" fullWidth onClick={handleGoBack}>
+                    Volver
+                  </Button>
+                </Grid>
+              </Grid>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
+    </FormProvider>
+  );
 }

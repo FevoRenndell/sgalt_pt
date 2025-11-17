@@ -26,6 +26,7 @@
     "dayjs": "^1.11.19",
     "framer-motion": "^12.23.24",
     "nodemon": "^3.1.11",
+    "notistack": "^3.0.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.66.0",

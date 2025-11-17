@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router';
  
-import { PATH_AFTER_LOGIN } from '../../../config';
+import { paths }  from '../../../routes/paths';
 import { useAuthState } from '../../hooks/useAuthState';
  
 
@@ -17,10 +17,10 @@ export function AuthGuard({ children }) {
   if (!initialized) return null;
   if (isAuthenticated) return <>{children}</>;
 
-  if (!isAuthenticated && location.pathname !== PATH_AFTER_LOGIN) {
+  if (!isAuthenticated && location.pathname !== paths.login) {
     return (
       <Navigate
-        to={PATH_AFTER_LOGIN}
+        to={paths.login}
         state={{ from: pathname }}
         replace
       />

@@ -9,14 +9,14 @@ export default function RHFTextField({ handlefilterService = null, name, helperT
     <Controller
       name={name}
       control={control}
-      defaultValue={type === "number" ? '' : ""} // 🔹 Evita `undefined`
+      defaultValue={type === "number" ? '' : ""}  
       render={({ field, fieldState: { error } }) => (
         <TextField
           color="primary"
           {...field}
           fullWidth
           type={type}
-          value={field.value || ''} // 🔹 Manejo correcto de valores iniciales
+          value={field.value || ''} 
           onChange={(event) => {
             let newValue = event.target.value.length > 100
             ? event.target.value.slice(0,100)
@@ -27,11 +27,7 @@ export default function RHFTextField({ handlefilterService = null, name, helperT
           error={!!error}
           helperText={error ? error?.message : helperText}
           {...other}
-          size={sizeParam.length > 0 ? sizeParam : "small"}
-          InputProps={{
-            ...InputProps,
-            inputProps : {maxLength : 100}
-          }}
+          size={sizeParam}
         />
       )}
     />

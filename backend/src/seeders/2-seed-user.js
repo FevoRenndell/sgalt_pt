@@ -13,7 +13,7 @@ export async function up(queryInterface, Sequelize) {
       last_name_2: 'Perez',
       email: 'wlp@gmail.com',
       password_hash: hashedPassword,
-      role_id: 1, // Administrador
+      role: 1, // Administrador
       is_active: true,
       created_at: new Date(),
       updated_at: new Date(),
