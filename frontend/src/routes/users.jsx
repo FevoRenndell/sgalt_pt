@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import LayoutV1 from '../layouts/layout-1';
 import LayoutV2 from '../layouts/layout-2';
-import { AuthGuard } from '../shared/components/auth';
+import { AuthGuard } from '../features/auth/components';
 import { LoadingProgress } from '../shared/components/loader';
 import { useSettings } from '../shared/hooks/useSettings';
 

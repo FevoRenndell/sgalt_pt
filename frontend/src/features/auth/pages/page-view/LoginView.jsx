@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // MUI
@@ -21,7 +20,8 @@ import { FlexBetween, FlexBox } from '../../../../shared/components/Flexbox';
 import { loginSchema } from '../../validation/loginSchema';
 import { FormProvider, RHFTextField } from '../../../../shared/components/hook-form';
 import { useLoginMutation } from '../../api/authApi';
-
+import { useDispatch } from "react-redux";
+import { setCredentials } from '../../slice/authSlice';
 
 export default function LoginPageView() {
 
@@ -34,6 +34,8 @@ export default function LoginPageView() {
     password_hash: '',
     remember: true,
   };
+
+  const dispatch = useDispatch();
 
   const methods = useForm({
     resolver: yupResolver(loginSchema),
@@ -58,13 +60,20 @@ export default function LoginPageView() {
 
     try {
 
-      await login({
+      const data = await login({
         email: values.email,
         password_hash: values.password_hash,
         remember,
       }).unwrap();
 
-      navigate(from, { replace: true });
+      dispatch(
+        setCredentials({
+          token: data.token,
+          user: data.user || null,
+          remember: arg.remember,
+        }),
+      );
+
     } catch (err) {
       console.log(err)
       const msg =
@@ -75,7 +84,6 @@ export default function LoginPageView() {
     }
   });
 
-  console.log("disabled={!isValid} " + isValid);
   return <Layout login>
     <Box maxWidth={550} p={4}>
       <Typography variant="h4" fontWeight={600} fontSize={{

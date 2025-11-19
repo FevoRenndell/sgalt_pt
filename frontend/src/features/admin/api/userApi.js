@@ -15,9 +15,9 @@ export const userApi = baseApi.injectEndpoints({
           : [{ type: 'User', id: 'LIST' }],
     }),
 
-fetchUserById: builder.query({
-  query: (id) => ({ url: `/users/${id}` }), // siempre devuelve algo
-}), 
+    fetchUserById: builder.query({
+      query: (id) => ({ url: `/users/${id}` }), // siempre devuelve algo
+    }), 
     createUser: builder.mutation({
       query: (body) => ({
         url: '/users/create',

@@ -7,7 +7,7 @@ import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import { CardContent, CardHeader } from '@mui/material';
+import { CardContent, CardHeader, Snackbar } from '@mui/material';
 
 // CUSTOM
 import { FormProvider, RHFSelect, RHFSwitch, RHFTextField } from '../../../../shared/components/hook-form';
@@ -20,6 +20,7 @@ import {
 } from '../../api/userApi';
 import { useFetchUsersFiltersQuery } from '../../api/filterApi';
 import { enqueueSnackbar } from 'notistack';
+import { handleApiError } from '../../../../shared/utils/handleApiError';
 
 // ---------------- COMPONENT ----------------
 export default function UserCreateView() {
@@ -38,9 +39,9 @@ export default function UserCreateView() {
     password_hash: '',
     repeat_password: '',
   };
-  
+
   const confirm = useConfirmDialog();
-  
+
   const isEdit = location.pathname.includes('edit');
 
   const { data: options } = useFetchUsersFiltersQuery();
@@ -82,12 +83,9 @@ export default function UserCreateView() {
       });
     }
   }, [isEdit, userData, reset]);
- const watchedValues = watch();
+
+
   const onSubmit = handleSubmit(async (values) => {
-
-   
-
-    console.log(watchedValues)
 
     const { role, ...rest } = values;
 
@@ -100,7 +98,7 @@ export default function UserCreateView() {
 
       const ok = await confirm({
         title: isEdit ? 'Confirmar actualización' : 'Confirmar creación',
-        description: `¿Deseas ${ isEdit ? 'actualizar los cambios de' : 'crear este nuevo'} usuario?`,
+        description: `¿Deseas ${isEdit ? 'actualizar los cambios de' : 'crear este nuevo'} usuario?`,
         confirmText: isEdit ? 'Actualizar' : 'Crear',
         cancelText: 'Cancelar',
       });
@@ -127,7 +125,7 @@ export default function UserCreateView() {
       );
 
     } catch (err) {
-      console.error('Error en la mutación', err);
+      handleApiError(err);
     }
   });
 
@@ -209,27 +207,32 @@ export default function UserCreateView() {
                 <Grid size={{ sm: 3, xs: 12 }}>
                   <Button
                     type="submit"
-                    variant="contained"
+                    variant="outlined"
+                    outlined={true}
+                    color="success"
                     fullWidth
                     disabled={isSubmitting || isCreating || isUpdating}
                   >
                     {isEdit ? 'Actualizar Usuario' : 'Crear Usuario'}
                   </Button>
                 </Grid>
-                <Grid size={{ sm: 3, xs: 12 }}>
-                  {isEdit ? (
+                {isEdit ? (
+                  <Grid size={{ sm: 3, xs: 12 }}>
+
                     <Button
                       type="submit"
-                      variant="contained"
+                      variant="outlined"
                       fullWidth
+                      color="error"
                       disabled={isSubmitting || isCreating || isUpdating}
                     >
                       Eliminar usuario
                     </Button>
-                  ) : null}
-                </Grid>
+                  </Grid>
+                ) : null}
+
                 <Grid size={{ sm: 1, xs: 12 }}>
-                  <Button variant="contained" fullWidth onClick={handleGoBack}>
+                  <Button variant="outlined" color="primary" fullWidth onClick={handleGoBack}>
                     Volver
                   </Button>
                 </Grid>

@@ -35,53 +35,56 @@ export const OutlinedInput = theme => ({
     }
   }
 });
-export const FilledInput = theme => ({
+export const FilledInput = (theme) => ({
   defaultProps: {
-    disableUnderline: true
+    disableUnderline: true,
   },
   styleOverrides: {
-    root: ({
-      ownerState: {
-        color,
-        error
-      }
-    }) => ({
+    root: ({ ownerState: { color, error } }) => ({
       borderRadius: 8,
       border: '1px solid transparent',
-      backgroundColor: error ? theme.palette.error[50] : theme.palette.grey[100],
-      transition: `background-color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms, box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms`,
+      backgroundColor: error
+        ? theme.palette.error[50]
+        : theme.palette.grey[100],
+      transition:
+        'background-color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms, box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+
       ':hover': {
-        backgroundColor: error ? theme.palette.error[50] : theme.palette.grey[100]
+        backgroundColor: error
+          ? theme.palette.error[50]
+          : theme.palette.grey[100],
       },
+
       '&.Mui-disabled': {
         backgroundColor: theme.palette.grey[200],
         ...theme.applyStyles('dark', {
-          backgroundColor: theme.palette.grey[400]
-        })
-      },
-      '&.Mui-focused': {
-        backgroundColor: error ? theme.palette.error[50] : theme.palette.grey[100],
-        ...(color === 'primary' && {
-          border: `1px solid ${error ? theme.palette.error.main : theme.palette.primary.main}`,
-          boxShadow: `${error ? theme.palette.error.main : theme.palette.primary.main} 0 0 0 1px`
+          backgroundColor: theme.palette.grey[400],
         }),
-        ...theme.applyStyles('dark', {
-          backgroundColor: error ? alpha(theme.palette.error[900], 0.2) : theme.palette.grey[800]
-        })
-      },
+      },'&.Mui-focused': {
+  backgroundColor: 'inherit',   // mantiene el mismo fondo, sin azul
+},
+
+
+      // 🎨 Estilos modo oscuro para estado "normal" y hover
       ...theme.applyStyles('dark', {
-        backgroundColor: error ? alpha(theme.palette.error[900], 0.2) : theme.palette.grey[800],
+        backgroundColor: error
+          ? alpha(theme.palette.error[900], 0.2)
+          : theme.palette.grey[800],
         ':hover': {
-          backgroundColor: error ? alpha(theme.palette.error[900], 0.2) : theme.palette.grey[800]
-        }
-      })
+          backgroundColor: error
+            ? alpha(theme.palette.error[900], 0.2)
+            : theme.palette.grey[800],
+        },
+      }),
     }),
+
     sizeSmall: {
       fontSize: 14,
-      fontWeight: 400
-    }
-  }
+      fontWeight: 400,
+    },
+  },
 });
+
 
 // ==============================================================
 //  MUI INPUT LABEL

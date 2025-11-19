@@ -15,6 +15,7 @@ const authSlice = createSlice({
     setCredentials: (state, action) => {
       const { token, user, remember } = action.payload || {};
 
+      console.log(token, user, remember)
       if (token) state.token = token;
       if (user !== undefined) state.user = user;
 

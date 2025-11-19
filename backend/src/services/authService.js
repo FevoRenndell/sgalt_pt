@@ -16,6 +16,8 @@ async function authenticate(email, password_hash) {
 
     const isPasswordValid = await bcrypt.compare(password_hash, userFinded.password_hash);
 
+    delete userFinded.dataValues.password_hash;
+
     return isPasswordValid ? userFinded : null;
 }
 

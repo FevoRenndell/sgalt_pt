@@ -7,6 +7,8 @@ import cors from 'cors';
 import listEndpoints from 'express-list-endpoints';
 // import logger from './utils/logger.js';
 import initRoutes from './routes/init-routes.js';
+import { errorHandler } from './error/errorHandler.js';
+
 
 const app = express();
 const port =  4000;
@@ -47,7 +49,7 @@ initRoutes('sgal_pt', app);
 
 // Manejo de errores
 //errorManager(app, { logger });
-
+app.use(errorHandler);
 // Listar todos los endpoints registrados
 const endpoints = listEndpoints(app);
 endpoints.forEach((endpoint) => {

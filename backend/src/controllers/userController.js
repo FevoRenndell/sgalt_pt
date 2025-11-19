@@ -15,12 +15,12 @@ export const fetchUsers = async (req, res) => {
     }
 };
 
-export const addUser = async (req, res) => {
+export const addUser = async (req, res, next) => {
     try {
         const newUser = await createUser(req.body);
         res.status(201).json(newUser);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating user', error });
+        next(error);
     }
 };
 

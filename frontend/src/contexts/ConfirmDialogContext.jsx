@@ -26,20 +26,20 @@ export function ConfirmDialogProvider({ children }) {
     resolve: null,
   });
 
-  const confirm = useCallback((options = {}) => {
+  const confirm = (options = {}) => {
     console.log('confirm() description =>', options.description);
 
     return new Promise((resolve) => {
       setState({
         open: true,
         title: options.title || 'Confirmación',
-        description: options.description || '',
+        description:  "hello there",
         confirmText: options.confirmText || 'Aceptar',
         cancelText: options.cancelText || 'Cancelar',
         resolve,
       });
     });
-  }, []);
+  };
 
   const handleClose = (result) => {
     setState((prev) => {
@@ -75,13 +75,13 @@ export function ConfirmDialogProvider({ children }) {
         )}
 
         <DialogActions>
-          <Button onClick={() => handleClose(false)} color="inherit">
+          <Button onClick={() => handleClose(false)} variant="outlined" color="error">
             {state.cancelText}
           </Button>
           <Button
             onClick={() => handleClose(true)}
-            variant="contained"
-            color="primary"
+            variant="outlined"
+            color="success"
           >
             {state.confirmText}
           </Button>

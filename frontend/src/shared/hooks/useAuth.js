@@ -2,8 +2,9 @@ import { useSelector } from 'react-redux';
 import { useLogoutMutation } from '../../features/auth/api/authApi';
 
 export const useAuth = () => {
+
   const { user, token } = useSelector((s) => s.auth);
-  const [logoutTrigger] = useLogoutMutation();
+  const [ logoutTrigger ] = useLogoutMutation();
 
   return {
     user,

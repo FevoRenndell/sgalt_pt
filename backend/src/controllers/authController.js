@@ -32,12 +32,12 @@ const me = async (req, res) => {
     if (!decoded) {
         throw new NotFoundError('usuario no encontrado');
     }
+    console.log(decoded)
+    const user = {/* agregar usuario*/} || {};
 
-    const user = await this.userService.getUserById(decoded.user.id);
-
-    if (!user) {
+    /*if (!user) {
         throw new NotFoundError('usuario no encontrado');
-    }
+    }*/
 
     return res.status(200).json({
         status: 'success',
@@ -45,7 +45,7 @@ const me = async (req, res) => {
         statusCode: 200,
         success: true,
         message: 'Validacion Exitosa',
-        userData: user
+        user
     });
 
 

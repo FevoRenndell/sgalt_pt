@@ -13,6 +13,9 @@ export function RoleBasedGuard({
   const {
     user
   } = useAuth();
+
+  console.log(user)
+
   const userRole = user?.role;
   const hasRequiredRole = userRole && roles.includes(userRole);
   if (hasRequiredRole) {

@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { GuestGuard } from '../shared/components/auth';
+import { GuestGuard } from '../features/auth/components';
 
 // AUTH PAGES (tu sistema real)
 const Login = lazy(() => import('../features/auth/pages/LoginPage'));

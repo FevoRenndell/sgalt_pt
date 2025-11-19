@@ -30,13 +30,8 @@ export async function getUsers() {
 }
 
 export async function createUser(userData) {
-  try {
     const newUser = await db.models.User.create(userData);
     return newUser;
-  } catch (error) {
-    console.error('Error creating user:', error);
-    throw new AppError('Error creating user', 500);
-  }
 }
 
 export async function getUserById(userId) {
