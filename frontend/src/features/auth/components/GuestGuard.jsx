@@ -11,7 +11,6 @@ export function GuestGuard({ children }) {
   const { state } = useLocation();
 
   const { isAuthenticated } = useAuthState();
-  console.log(state);
 
   const locationState = state;
   const redirectPath = locationState?.from || '/dashboard';

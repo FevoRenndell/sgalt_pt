@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev": "cross-env NODE_ENV=development node src/server.js",
+    "start": "cross-env NODE_ENV=production node src/server.js",
     "server": "nodemon src/server.js",
     "seed:admin": "node src/seed/createAdminUser.js",
     "seed:reset": "node src/seed/resetAdminUser.js",
@@ -32,6 +33,7 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "nodemon": "^3.1.10",
     "sequelize-cli": "^6.6.3"
   }

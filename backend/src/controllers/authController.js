@@ -32,7 +32,7 @@ const me = async (req, res) => {
     if (!decoded) {
         throw new NotFoundError('usuario no encontrado');
     }
-    console.log(decoded)
+
     const user = {/* agregar usuario*/} || {};
 
     /*if (!user) {

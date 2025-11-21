@@ -62,12 +62,7 @@ server.listen(port, () => {
   console.log(`Servidor en funcionamiento en http://localhost:${port}`);
 });
 
-const run = async () => {
-  const hash = await bcrypt.hash('12345678980', 10);
-  console.log(hash);
-};
 
-run();
 
 // (Opcional) exportar app si lo necesitas para tests u otros usos
 export default app;

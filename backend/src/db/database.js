@@ -6,8 +6,6 @@ import config from './config.js'; // Asegúrate de que este es el archivo correc
 const environment = process.env.NODE_ENV || 'development';
 const envConfig = config[environment];
 
-console.log(envConfig)
- 
 const sequelize = new Sequelize(
   envConfig.database,
   envConfig.username,
