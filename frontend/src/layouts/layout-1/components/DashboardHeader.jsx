@@ -68,16 +68,7 @@ export default function DashboardHeader() {
 
         <Box flexGrow={1} ml={1} />
 
-        {/* TEXT DIRECTION SWITCH BUTTON */}
-        {settings.direction === 'rtl' ? <IconButton onClick={() => handleChangeDirection('ltr')}>
-            <MenuLeft sx={{
-          color: 'grey.400'
-        }} />
-          </IconButton> : <IconButton onClick={() => handleChangeDirection('rtl')}>
-            <MenuLeftRight sx={{
-          color: 'grey.400'
-        }} />
-          </IconButton>}
+ 
 
         {/* THEME SWITCH BUTTON */}
         <IconButton onClick={() => handleChangeTheme(settings.theme === 'light' ? 'dark' : 'light')}>
@@ -85,9 +76,9 @@ export default function DashboardHeader() {
         </IconButton>
 
         {upSm && <Fragment>
-            <LanguagePopover />
+     
             <NotificationsPopover />
-            <ServicePopover />
+             
           </Fragment>}
 
         <ProfilePopover />

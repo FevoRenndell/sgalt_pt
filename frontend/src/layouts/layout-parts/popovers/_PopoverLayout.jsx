@@ -67,7 +67,7 @@ export default memo(function PopoverLayout({
 
         {showMoreButton && <PopoverFooter>
             <Button variant="text" fullWidth disableRipple>
-              View all Notifications
+               ver toda las notificaciones
             </Button>
           </PopoverFooter>}
       </Popover>

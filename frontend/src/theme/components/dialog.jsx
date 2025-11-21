@@ -20,12 +20,13 @@ export const DialogTitle = () => ({
 export const DialogContent = () => ({
   styleOverrides: {
     root: {
-      paddingBottom: 0
+      paddingBottom: 0,
     },
     dividers: {
-      display: 'none'
-    }
-  }
+      borderTop: 'none',
+      borderBottom: 'none',
+    },
+  },
 });
 export const DialogActions = () => ({
   styleOverrides: {

@@ -9,7 +9,7 @@ import MultiLevelMenu from './MultiLevelMenu';
 import { Link } from '../../../shared/components/link';
 import { Scrollbar } from '../../../shared/components/scrollbar';
 import { FlexBetween } from '../../../shared/components/flexbox';
-import UserAccount from '../../layout-parts/UserAccount';
+// import UserAccount from '../../layout-parts/UserAccount';
 // CUSTOM ICON COMPONENT
 import ArrowLeftToLine from '../../../shared/icons/duotone/ArrowLeftToLine';
 // STYLED COMPONENTS
@@ -44,7 +44,7 @@ const SidebarContent = memo(({
 }}>
     <Box height="100%" px={2}>
       <MultiLevelMenu sidebarCompact={isCompact} />
-      {!isCompact && <UserAccount />}
+     { /*  {!isCompact && <UserAccount />} */}
     </Box>
   </Scrollbar>);
 const SidebarHeader = memo(({

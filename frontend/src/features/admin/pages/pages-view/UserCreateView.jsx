@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
+ 
 // MUI
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
@@ -39,8 +39,7 @@ export default function UserCreateView() {
     password_hash: '',
     repeat_password: '',
   };
-
-  const confirm = useConfirmDialog();
+ 
 
   const isEdit = location.pathname.includes('edit');
 
@@ -147,7 +146,7 @@ export default function UserCreateView() {
             />
           }
         />
-        <CardContent>
+        <CardContent sx={{ pt: 0 , pl:10, pr:10}}>
           <div className="pt-2 pb-4">
             <Card className="p-3">
               <Grid container spacing={3} sx={{ mt: 2 }}>
@@ -161,18 +160,19 @@ export default function UserCreateView() {
                   />
                 </Grid>
                 <Grid size={{ sm: 6, xs: 12 }}>
-                  <RHFTextField fullWidth name="email" label="Email" sizeParam="small" />
+                  <RHFTextField  size='small' fullWidth name="email" label="Email" sizeParam="small" />
                 </Grid>
 
 
               </Grid>
               <Grid container spacing={3} sx={{ mt: 2 }}>
                 <Grid size={{ sm: 4, xs: 12 }}>
-                  <RHFTextField fullWidth name="first_name" label="Nombre" sizeParam="small" />
+                  <RHFTextField  size='small' fullWidth name="first_name" label="Nombre" sizeParam="small" />
                 </Grid>
                 <Grid size={{ sm: 4, xs: 12 }}>
                   <RHFTextField
                     fullWidth
+                     size='small'
                     name="last_name_1"
                     label="Apellido Paterno"
                     sizeParam="small"
@@ -180,6 +180,7 @@ export default function UserCreateView() {
                 </Grid>
                 <Grid size={{ sm: 4, xs: 12 }}>
                   <RHFTextField
+                    size='small'
                     fullWidth
                     name="last_name_2"
                     label="Apellido Materno"
@@ -190,12 +191,13 @@ export default function UserCreateView() {
               <Grid container spacing={3} sx={{ mt: 2 }}>
 
                 <Grid size={{ sm: 6, xs: 12 }}>
-                  <RHFTextField fullWidth name="password_hash" label="Password" sizeParam="small" />
+                  <RHFTextField  size='small' fullWidth name="password_hash" label="Password" sizeParam="small" />
                 </Grid>
 
                 <Grid size={{ sm: 6, xs: 12 }}>
                   <RHFTextField
                     fullWidth
+                     size='small'
                     name="repeat_password"
                     label="Repita Contraseña"
                     sizeParam="small"
@@ -206,7 +208,9 @@ export default function UserCreateView() {
               <Grid container spacing={3} sx={{ pt: 3 }}>
                 <Grid size={{ sm: 3, xs: 12 }}>
                   <Button
+                    size='small'
                     type="submit"
+                    
                     variant="outlined"
                     outlined={true}
                     color="success"
@@ -220,6 +224,7 @@ export default function UserCreateView() {
                   <Grid size={{ sm: 3, xs: 12 }}>
 
                     <Button
+                      size='small'
                       type="submit"
                       variant="outlined"
                       fullWidth
@@ -232,7 +237,7 @@ export default function UserCreateView() {
                 ) : null}
 
                 <Grid size={{ sm: 1, xs: 12 }}>
-                  <Button variant="outlined" color="primary" fullWidth onClick={handleGoBack}>
+                  <Button size='small' variant="outlined" color="primary" fullWidth onClick={handleGoBack}>
                     Volver
                   </Button>
                 </Grid>

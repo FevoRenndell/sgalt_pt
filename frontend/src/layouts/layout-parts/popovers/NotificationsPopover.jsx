@@ -34,7 +34,7 @@ const ListItemWrapper = styled('div', {
   display: 'flex',
   cursor: 'pointer',
   alignItems: 'center',
-  borderColor: 'divider',
+  borderBottom: `1px solid ${theme.palette.divider}`,
   backgroundColor: isNew ? theme.palette.action.hover : 'transparent',
   '&:hover': {
     backgroundColor: theme.palette.action.hover
@@ -59,30 +59,30 @@ export default function NotificationsPopover() {
   const UNREAD_MSG_LEN = MESSAGES.filter(item => item.type === 'new_message').length;
   const RENDER_CONTENT = () => {
     return <TabContext value={tabValue}>
-        <TabList onChange={handleTabChange}>
-          <StyledTab value="1" label={`Messages (${UNREAD_MSG_LEN})`} />
-          <StyledTab value="2" label="Archived" />
-        </TabList>
+      <TabList onChange={handleTabChange}>
+        <StyledTab value="1" label={`Messages (${UNREAD_MSG_LEN})`} />
+        <StyledTab value="2" label="Archived" />
+      </TabList>
 
-        {MESSAGES.length === 0 ? <Typography variant="body2" fontWeight="500" textAlign="center" p={2}>
-            There are no notifications
-          </Typography> : <TabPanel value="1">
-            {MESSAGES.map(msg => <ListItem key={msg.id} type={msg.type} name={msg.name} image={msg.image} message={msg.message} />)}
-          </TabPanel>}
+      {MESSAGES.length === 0 ? <Typography variant="body2" fontWeight="500" textAlign="center" p={2}>
+        There are no notifications
+      </Typography> : <TabPanel value="1">
+        {MESSAGES.map(msg => <ListItem key={msg.id} type={msg.type} name={msg.name} image={msg.image} message={msg.message} />)}
+      </TabPanel>}
 
-        {ARCHIVES.length === 0 ? <Typography variant="body2" fontWeight="500" textAlign="center" p={2}>
-            There are no archives
-          </Typography> : <TabPanel value="2">
-            {ARCHIVES.map(msg => <ListItem key={msg.id} type={msg.type} name={msg.name} image={msg.image} message={msg.message} />)}
-          </TabPanel>}
-      </TabContext>;
+      {ARCHIVES.length === 0 ? <Typography variant="body2" fontWeight="500" textAlign="center" p={2}>
+        There are no archives
+      </Typography> : <TabPanel value="2">
+        {ARCHIVES.map(msg => <ListItem key={msg.id} type={msg.type} name={msg.name} image={msg.image} message={msg.message} />)}
+      </TabPanel>}
+    </TabContext>;
   };
   const SELECT_BUTTON = <Badge color="error" badgeContent={0}>
-      <NotificationsIcon sx={{
+    <NotificationsIcon sx={{
       color: 'grey.400'
     }} />
-    </Badge>;
-  return <PopoverLayout title="Notifications" renderContent={RENDER_CONTENT} selectButton={SELECT_BUTTON} />;
+  </Badge>;
+  return <PopoverLayout title="Notificaciones" renderContent={RENDER_CONTENT} selectButton={SELECT_BUTTON} />;
 }
 
 // ==============================================================
@@ -95,22 +95,27 @@ function ListItem({
 }) {
   const isNew = type === 'new_message';
   return <ListItemWrapper isNew={isNew}>
-      <div className="thumbnail">
-        <div className="dot" />
-        <Avatar src={image} alt={name} sx={{
+    <div className="thumbnail">
+      <div className="dot" />
+      <Avatar src={image} alt={name} sx={{
         width: 35,
         height: 35
       }} />
-      </div>
+    </div>
 
-      <div>
-        <Typography variant="body2" fontWeight={500}>
-          {name}
-        </Typography>
+    <div>
+      <Typography variant="body2" fontWeight={500}>
+        {name}
+      </Typography>
 
-        <Typography variant="body2" noWrap fontSize={12} color="text.secondary">
-          {message}
-        </Typography>
-      </div>
-    </ListItemWrapper>;
+      <Typography
+        variant="body2"
+        fontSize={12}
+        color="text.secondary"
+        sx={{ whiteSpace: 'normal', wordBreak: 'break-word' }}
+      >
+        {message}
+      </Typography>
+    </div>
+  </ListItemWrapper>;
 }

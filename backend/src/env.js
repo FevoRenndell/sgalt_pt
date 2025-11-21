@@ -29,8 +29,6 @@ const env = {
   },
 };
 
-console.log(env)
-
 // Validaciones
 if (!env.jwt.secret) {
   throw new Error('Falta JWT_SECRET en el archivo .env');

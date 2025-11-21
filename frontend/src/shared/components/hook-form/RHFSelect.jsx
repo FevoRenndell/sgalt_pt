@@ -13,7 +13,7 @@ RHFSelect.propTypes = {
   ),
 };
 
-export default function RHFSelect({ name, label, options = [], ...other }) {
+export default function RHFSelect({ name, label, options = [], sx, ...other }) {
  
    const { control, setValue } = useFormContext();
 
@@ -24,6 +24,7 @@ export default function RHFSelect({ name, label, options = [], ...other }) {
       defaultValue={null}
       render={({ field, fieldState: { error } }) => (
         <Autocomplete
+                     
           size='small'
          {...field}
           options={options}

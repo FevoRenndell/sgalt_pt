@@ -118,8 +118,8 @@ export default function UserTableList({ details }) {
   const allUserIds     = useMemo(() => filteredUsers.map(row => row.id), [filteredUsers]);
 
   const addButton =
-    <Button variant="outlined" color='success' startIcon={<Add />} onClick={() => navigate('/admin/users/create')}>
-      Add New User
+    <Button variant="outlined" color='success' startIcon={<Add />} size='small' onClick={() => navigate('/admin/users/create')}>
+      Agregar nuevo usuario
     </Button>;
 
   return <div className="pt-2 pb-4">
