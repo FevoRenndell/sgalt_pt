@@ -7,11 +7,11 @@ services:  # Aquí se definen todos los contenedores del proyecto.
     build: ./backend  # Construye la imagen desde el Dockerfile en ./backend
     container_name: sgalt-backend  # Nombre personalizado del contenedor
     ports:
-      - "3000:3000"  # Expone el puerto 3000 del contenedor al 3000 del host
+      - "4000:4000"  # Expone el puerto 3000 del contenedor al 3000 del host
     depends_on:
       - db  # Este servicio espera que 'db' (PostgreSQL) esté iniciado
     environment:
-      - PORT=3000  # Puerto en el que corre el backend dentro del contenedor
+      - PORT=4000  # Puerto en el que corre el backend dentro del contenedor
       - DB_HOST=db  # Nombre del servicio (host) de PostgreSQL en esta red
       - DB_PORT=5432
       - DB_USER=postgres
@@ -42,18 +42,18 @@ services:  # Aquí se definen todos los contenedores del proyecto.
 
   ### 🟣 POSTGRES DATABASE SERVICE ###
   db:
-    image: postgres:16  # Usa una imagen oficial de PostgreSQL 16
+    image: postgres:16
     container_name: sgalt-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: sgalt
-      TZ: America/Santiago  # Configura la zona horaria
+      TZ: America/Santiago
     ports:
-      - "5432:5432"  # Expone la base de datos localmente (opcional)
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data  # Persiste los datos aunque reinicies el contenedor
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  # 👈 ejecuta este script al crear la DB
+      - db_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  # ← solo estructura
     networks:
       - sgalt-network
 

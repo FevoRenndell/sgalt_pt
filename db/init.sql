@@ -75,6 +75,10 @@ CREATE TABLE IF NOT EXISTS roles (              -- Tabla de roles
 -- Índice único case-insensitive para no repetir descripciones de rol con diferente casing
 CREATE UNIQUE INDEX IF NOT EXISTS ux_roles_description ON roles (LOWER(description));
 
+INSERT INTO roles (id, description, created_at, updated_at) VALUES
+(1, 'Administrador', NOW(), NOW()),
+(2, 'Cliente',       NOW(), NOW()),
+(3, 'Cotizador',     NOW(), NOW());
 
 
 -- =========================================================
@@ -87,7 +91,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_roles_description ON roles (LOWER(descripti
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabla solo si no existe
-  id             INTEGER PRIMARY KEY AUTOINCREMENT,  
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
   -- Identificador único autoincremental para cada usuario.
   -- Se utiliza como clave primaria (PK) y como referencia en otras tablas (por ejemplo: quotations.user_id).
 
@@ -111,7 +116,7 @@ CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabl
   -- Hash de la contraseña en formato encriptado (por ejemplo con bcrypt).
   -- No se almacenan contraseñas en texto plano por motivos de seguridad.
 
-  role        INTEGER,  
+  role_id        INTEGER,  
   -- Clave foránea hacia 'roles.id'.
   -- Define el rol o perfil del usuario dentro del sistema (Administrador, Vendedor, Técnico, etc.).
   -- Puede ser NULL si el usuario aún no tiene un rol asignado.
@@ -127,9 +132,10 @@ CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabl
   updated_at     TIMESTAMP DEFAULT NOW(),  
   -- Fecha y hora de la última actualización.
   -- Se actualiza automáticamente mediante el trigger global `set_updated_at`.
+  soft_deleted  BOOLEAN DEFAULT FALSE,
 
   CONSTRAINT fk_users_role
-    FOREIGN KEY (role)
+    FOREIGN KEY (role_id)
     REFERENCES roles(id)
     ON UPDATE CASCADE ON DELETE SET NULL  
   -- Clave foránea hacia 'roles.id':
@@ -138,11 +144,11 @@ CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabl
   --     evitando la eliminación del usuario (SET NULL).
 );  
 -- Fin definición de tabla 'users'
-CREATE SEQUENCE users_id_seq OWNED BY public.users.id;
+-- CREATE SEQUENCE users_id_seq OWNED BY public.users.id;
 -- =========================================================
 -- Índices complementarios
 -- =========================================================
-CREATE INDEX IF NOT EXISTS ix_users_role ON users(role);
+CREATE INDEX IF NOT EXISTS ix_users_role ON users(role_id);
 -- Índice simple para mejorar el rendimiento de las consultas por 'role',
 -- por ejemplo, cuando se listan todos los usuarios de un rol específico.
 
@@ -151,7 +157,31 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_users_email ON users (LOWER(email));
 -- Restricción de unicidad sobre el campo 'email' sin distinguir mayúsculas/minúsculas.
 -- Evita duplicar correos con variaciones como 'Usuario@...' y 'usuario@...'.
 
+INSERT INTO users (first_name, last_name_1, last_name_2, email, password_hash, role_id, is_active, created_at, updated_at) VALUES
+('Lupita', 'Lopez', 'XD', 'lupita@gmail.com',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
+ 2, TRUE, NOW(), NOW()),
 
+('Luisito', 'Comunica', 'Nada', 'lcomunica@gmail.com',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
+ 2, TRUE, NOW(), NOW()),
+
+('Willian', 'Lupin', 'Perez', 'wlp@gmail.com',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
+ 1, TRUE, NOW(), NOW()),
+
+('Luis', 'Franco', 'Wine', 'lfranco@gmail.com',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
+ 1, TRUE, NOW(), NOW()),
+
+('Luisito', 'Comunica', 'Nada', 'wlp2@gmail.com',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
+ 2, TRUE, NOW(), NOW()),
+
+('emundo', 'Perez', NULL, 'wlp50@gmail.com',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
+ 2, TRUE, NOW(), NOW());
+ 
 
 -- =========================================================
 -- Tabla: clients

@@ -21,7 +21,7 @@ export async function getUsers() {
           attributes: [[db.sequelize.fn("TRIM", db.sequelize.col("description")), "name"]],
           as: 'role',
         },
-      ]
+      ],
     });
   } catch (error) {
     console.error('Error fetching users:', error);

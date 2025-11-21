@@ -9,18 +9,18 @@ import { Navigate } from 'react-router-dom';
 // const ErrorPage = lazy(() => import('../pages/error/404'));
 
 export const routes = () => {
-  return [
+    return [
 
-    {
-      path: '/',
-      element: <Navigate to={PATH_AFTER_LOGIN} replace />,
-    },
-    
-  ...Users,
-  // AUTHENTICATION PAGES ROUTES & DIFFERENT AUTH DEMO PAGES ROUTES
-  ...AuthRoutes,
-  // INSIDE DASHBOARD PAGES ROUTES
-  ...DashboardRoutes,
-  // PAGES ROUTES
-];
+      {
+        path: '/',
+        element: <Navigate to={PATH_AFTER_LOGIN} replace />,
+      },
+      
+    ...Users,
+    // AUTHENTICATION PAGES ROUTES & DIFFERENT AUTH DEMO PAGES ROUTES
+    ...AuthRoutes,
+    // INSIDE DASHBOARD PAGES ROUTES
+    ...DashboardRoutes,
+    // PAGES ROUTES
+  ];
 };

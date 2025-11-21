@@ -8,13 +8,14 @@ import { useSettings } from '../shared/hooks/useSettings';
 // ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
 const UserPage = lazy(() => import('../features/admin/pages/UserPage'));
 const UserCreatePage = lazy(() => import('../features/admin/pages/CreateUserPage'));
+
 const ActiveLayout = () => {
   const { settings } = useSettings();
 
   return (
     <AuthGuard>
       <Suspense fallback={<LoadingProgress />}>
-        {settings.activeLayout === 'layout2' ? <LayoutV2 /> : <LayoutV1 />}
+        {settings?.activeLayout === 'layout2' ? <LayoutV2 /> : <LayoutV1 />}
       </Suspense>
     </AuthGuard>
   );

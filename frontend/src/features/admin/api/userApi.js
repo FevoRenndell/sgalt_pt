@@ -4,7 +4,7 @@ import { baseApi } from '@/app/api/baseApi';
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 
-    fetchUsers: builder.query({
+    fetchUsers: builder.query({ //useFetchUsersQuery,
       query: () => '/users/all',
       providesTags: (result) =>
         result
@@ -15,10 +15,10 @@ export const userApi = baseApi.injectEndpoints({
           : [{ type: 'User', id: 'LIST' }],
     }),
 
-    fetchUserById: builder.query({
+    fetchUserById: builder.query({ //useFetchUserByIdQuery
       query: (id) => ({ url: `/users/${id}` }), // siempre devuelve algo
     }), 
-    createUser: builder.mutation({
+    createUser: builder.mutation({ // useCreateUserMutation
       query: (body) => ({
         url: '/users/create',
         method: 'POST',
@@ -30,7 +30,7 @@ export const userApi = baseApi.injectEndpoints({
       ],
     }),
 
-    updateUser: builder.mutation({
+    updateUser: builder.mutation({ // useUpdateUserMutation
       query: ({ id, ...data }) => ({
         url: `/users/update/${id}`,
         method: 'PUT',
@@ -43,7 +43,7 @@ export const userApi = baseApi.injectEndpoints({
       ],
     }),
 
-    deleteUser: builder.mutation({
+    deleteUser: builder.mutation({ // useDeleteUserMutation
       query: (id) => ({
         url: `/users/delete/${id}`,
         method: 'DELETE',

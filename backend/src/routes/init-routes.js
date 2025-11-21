@@ -17,12 +17,12 @@ const initRoutes = (apiName, app) =>  {
 
   //ruta privadas
   app.use(`/${apiName}/test`   , middlewares, testRoutes  );
-  app.use(`/${apiName}/users`, middlewares, userRoutes);
+  app.use(`/${apiName}/users`  , middlewares, userRoutes  );
   app.use(`/${apiName}/clients`, middlewares, clientRoutes);
   app.use(`/${apiName}/filters`, middlewares, filterRoutes);
 
 
-   app.use(errorHandler);
+  app.use(errorHandler);
 };
 
 export default initRoutes;

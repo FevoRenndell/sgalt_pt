@@ -77,13 +77,13 @@ const baseOptions = {
 // ==============================================================
 // Theme Factory Function
 // ==============================================================
-export function createCustomTheme(settings) {
+export function createCustomTheme(settings = {}) {
   // Get theme configuration or fallback to light theme
-  const themeOption = themesOptions[settings.theme] || themesOptions[THEMES.LIGHT];
+  const themeOption = themesOptions[settings?.theme] || themesOptions[THEMES.LIGHT];
 
   // Merge base options with theme options and user settings
   const mergedThemeOptions = merge({}, baseOptions, themeOption, {
-    direction: settings.direction
+    direction: settings?.direction
   });
 
   // Create theme instance

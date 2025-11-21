@@ -14,7 +14,7 @@ const ActiveLayout = () => {
   return (
     <AuthGuard>
       <Suspense fallback={<LoadingProgress />}>
-        {settings.activeLayout === 'layout2' ? <LayoutV2 /> : <LayoutV1 />}
+        {settings?.activeLayout === 'layout2' ? <LayoutV2 /> : <LayoutV1 />}
       </Suspense>
     </AuthGuard>
   );

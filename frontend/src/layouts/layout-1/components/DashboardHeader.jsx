@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 // SITE SETTINGS CONTEXT FILE
-import { SettingsContext } from '@/contexts/settingsContext';
+import { SettingsContext } from '../../../contexts/SettingsContext';
 // CUSTOM ICON COMPONENTS
 import Menu from '../../../shared/icons/Menu';
 import MenuLeft from '../../../shared/icons/MenuLeft';

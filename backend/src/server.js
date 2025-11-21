@@ -8,8 +8,8 @@ import listEndpoints from 'express-list-endpoints';
 // import logger from './utils/logger.js';
 import initRoutes from './routes/init-routes.js';
 import { errorHandler } from './error/errorHandler.js';
-
-
+import bcrypt from 'bcryptjs';
+ 
 const app = express();
 const port =  4000;
 
@@ -25,6 +25,7 @@ app.use(
     origin: [
       'http://192.168.1.90:5173',
       'http://localhost:5173',
+      'http://172.18.0.4:5173/'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -61,7 +62,12 @@ server.listen(port, () => {
   console.log(`Servidor en funcionamiento en http://localhost:${port}`);
 });
 
+const run = async () => {
+  const hash = await bcrypt.hash('12345678980', 10);
+  console.log(hash);
+};
 
+run();
 
 // (Opcional) exportar app si lo necesitas para tests u otros usos
 export default app;

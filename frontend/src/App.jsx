@@ -33,14 +33,15 @@ export default function App() {
   // ROUTER CREATE
   const router = createBrowserRouter(routes());
   return (
-    <SnackbarProvider
-      maxSnack={3}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-    >
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <SnackbarProvider
+        maxSnack={3}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+
         <ConfirmDialogProvider>
           <RTL>
             <ProgressProvider options={{
@@ -53,8 +54,9 @@ export default function App() {
             </ProgressProvider>
           </RTL>
         </ConfirmDialogProvider>
-      </ThemeProvider>
-    </SnackbarProvider>
+
+      </SnackbarProvider>
+    </ThemeProvider>
   )
 
 }

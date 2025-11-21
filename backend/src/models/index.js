@@ -1,26 +1,26 @@
 import { Sequelize } from 'sequelize';
-import config from '../db/config.js';
 import initModels from './init-models.js';
-
+import env from '../env.js';
+ 
 const db = {};
 
 // Conexión
-const sequelize = new Sequelize(
-  config.DB_NAME,
-  config.DB_USER,
-  config.DB_PASS,
+export const sequelize = new Sequelize(
+  env.db.name,
+  env.db.user,
+  env.db.pass,
   {
-    dialect: config.dialect || 'postgres',
-    host: config.DB_HOST,
-    port: config.DB_PORT,
+    dialect: env.db.dialect,
+    host: env.db.host,
+    port: env.db.port,
     logging: false,
     define: {
       paranoid: false,
       freezeTableName: true,
       timestamps: false,
     },
-  },
-);
+  }
+)
 
 // iniciar modelos
 const models = initModels(sequelize);

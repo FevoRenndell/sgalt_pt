@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import db from '../models/index.js';
 import jwt from 'jsonwebtoken';
-import config from '../db/config.js';
+import env from '../env.js';
 
 async function authenticate(email, password_hash) {
 
@@ -27,13 +27,13 @@ function generateToken(user) {
         iat: Math.floor(Date.now() / 1000),  // Tiempo de emisión
         exp: Math.floor(Date.now() / 1000) + (82000)  // Expiración (casi 23 horas)
     },
-        config.JWT_SECRET
+        env.jwt.secret
     );
 }
 
 function verifyToken(token) {
     try {
-        return jwt.verify(token, config.JWT_SECRET);
+        return jwt.verify(token, env.jwt.secret);
     } catch (err) {
         console.error('Token verification error in AuthService:', err);
         throw err;
