@@ -21,6 +21,7 @@ import {
 import { useFetchUsersFiltersQuery } from '../../api/filterApi';
 import { enqueueSnackbar } from 'notistack';
 import { handleApiError } from '../../../../shared/utils/handleApiError';
+import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
 
 // ---------------- COMPONENT ----------------
 export default function UserCreateView() {
@@ -40,6 +41,7 @@ export default function UserCreateView() {
     repeat_password: '',
   };
  
+  const confirm = useConfirmDialog();
 
   const isEdit = location.pathname.includes('edit');
 
@@ -97,7 +99,7 @@ export default function UserCreateView() {
 
       const ok = await confirm({
         title: isEdit ? 'Confirmar actualización' : 'Confirmar creación',
-        description: `¿Deseas ${isEdit ? 'actualizar los cambios de' : 'crear este nuevo'} usuario?`,
+        description: `¿Deseas ${isEdit ? `actualizar los cambios de ${userData.first_name} ${userData.last_name_1}` : `crear este nuevo ${values.first_name} ${values.last_name_1}`} usuario?`,
         confirmText: isEdit ? 'Actualizar' : 'Crear',
         cancelText: 'Cancelar',
       });
@@ -130,6 +132,26 @@ export default function UserCreateView() {
 
   const handleGoBack = () => {
     navigate(paths.users_list);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const ok = await confirm({
+        title: 'Confirmar eliminación',
+        description: `¿Deseas eliminar el usuario ${userData.first_name} ${userData.last_name_1}? Esta acción no se puede deshacer.`,
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+        type: 'error',
+      });
+      if (!ok) {
+        return;
+      }
+      // Aquí iría la lógica para eliminar el usuario
+      enqueueSnackbar('Usuario eliminado', { variant: 'info', autoHideDuration: 1500 });
+      navigate(paths.users_list);
+    } catch (err) {
+      handleApiError(err);
+    }
   };
 
   return (
@@ -225,11 +247,11 @@ export default function UserCreateView() {
 
                     <Button
                       size='small'
-                      type="submit"
                       variant="outlined"
                       fullWidth
                       color="error"
                       disabled={isSubmitting || isCreating || isUpdating}
+                      onClick={handleDelete}
                     >
                       Eliminar usuario
                     </Button>

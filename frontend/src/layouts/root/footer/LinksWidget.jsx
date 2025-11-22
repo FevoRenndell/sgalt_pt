@@ -1,9 +1,10 @@
 import { Fragment } from 'react';
 import Typography from '@mui/material/Typography';
 // CUSTOM COMPONENTS
-import { Link } from '@/components/link';
+ 
 // STYLED COMPONENTS
 import { LinkList } from './styles';
+import { Link } from '../../../shared/components/link';
 
 // ==============================================================
 

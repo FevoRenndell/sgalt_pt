@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 import { ThemeProvider } from '@mui/material/styles';
 import { SnackbarProvider } from 'notistack';
- 
+import { ConfirmDialogProvider } from './contexts/ConfirmDialogContext';
 
 import { store } from './app/store';
 import { Provider } from 'react-redux';
@@ -42,7 +42,7 @@ export default function App() {
         }}
       >
 
-        
+        <ConfirmDialogProvider>
           <RTL>
             <ProgressProvider options={{
               showSpinner: false
@@ -53,7 +53,7 @@ export default function App() {
               </Provider>
             </ProgressProvider>
           </RTL>
-        
+        </ConfirmDialogProvider>
 
       </SnackbarProvider>
     </ThemeProvider>

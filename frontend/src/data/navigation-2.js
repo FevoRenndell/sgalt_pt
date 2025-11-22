@@ -97,11 +97,11 @@ export const navigation = [
     children: [
       {
         name: 'Solicitud de cotización',
-        path: '/cliente/solicitud-cotizacion',
+        path: '/public/solicitud-cotizacion',
       },
       {
         name: 'Estado de mi cotización',
-        path: '/cliente/mis-cotizaciones',
+        path: '/public/mis-cotizaciones',
       },
     ],
   },

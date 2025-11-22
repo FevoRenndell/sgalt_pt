@@ -11,7 +11,7 @@ export const fetchUsers = async (req, res) => {
         const users = await getUsers();
         res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching users', error });
+        next(error);
     }
 };
 
@@ -32,7 +32,7 @@ export const fetchUserById = async (req, res) => {
         }
         res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching user', error });
+        next(error);
     }
 };
 
@@ -50,7 +50,7 @@ export const removeUser = async (req, res) => {
         const deletedUser = await deleteUser(req.params.id);
         res.status(200).json(deletedUser);
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting user', error });
+        next(error);
     }
 };
 

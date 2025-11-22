@@ -4,6 +4,7 @@ import testRoutes from './testRoutes.js';
 import authRoutes from './authRoutes.js';
 import filterRoutes from './filterRoutes.js';
 import userRoutes from './userRoutes.js';
+import quoterRoutes from './quoterRoutes.js';
 import { errorHandler } from '../middlewares/errorHandler.js';
 
 const middlewares = [
@@ -14,7 +15,7 @@ const initRoutes = (apiName, app) =>  {
 
   //ruta publica
   app.use(`/${apiName}/auth`  , authRoutes  );
-
+  app.use(`/${apiName}/quoter`  , quoterRoutes  );
   //ruta privadas
   app.use(`/${apiName}/test`   , middlewares, testRoutes  );
   app.use(`/${apiName}/users`  , middlewares, userRoutes  );

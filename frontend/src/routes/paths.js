@@ -25,9 +25,11 @@ export const paths = {
 
   // Cuenta
   perfil: '/dashboard/profile',
+
 };
 
-export const PATH_CLIENT = {
-  solicitud: '/cliente/solicitud-cotizacion',
-  estado: '/cliente/mis-cotizaciones',
+export const public_paths = {
+  solicitud: '/public/solicitud-cotizacion',
+  estado: '/public/mis-cotizaciones',
+  quote_request_view: '/public/quote-request/view',
 };

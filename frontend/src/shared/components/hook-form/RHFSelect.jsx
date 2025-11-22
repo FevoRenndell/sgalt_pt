@@ -13,9 +13,9 @@ RHFSelect.propTypes = {
   ),
 };
 
-export default function RHFSelect({ name, label, options = [], sx, ...other }) {
- 
-   const { control, setValue } = useFormContext();
+export default function RHFSelect({ name, label, helperText, options = [], sx, ...other }) {
+
+  const { control, setValue } = useFormContext();
 
   return (
     <Controller
@@ -24,25 +24,29 @@ export default function RHFSelect({ name, label, options = [], sx, ...other }) {
       defaultValue={null}
       render={({ field, fieldState: { error } }) => (
         <Autocomplete
-                     
+
           size='small'
-         {...field}
+          {...field}
           options={options}
           getOptionLabel={(option) => option?.name || ''}
           noOptionsText="No Existe"
           isOptionEqualToValue={(option, selectedValue) => {
-              if(option){
-                return !!selectedValue && option?.id === selectedValue?.id;
-              }
+            if (option) {
+              return !!selectedValue && option?.id === selectedValue?.id;
+            }
           }}
-          onChange={(_, newValue) => setValue(name, newValue || null)}
+          onChange={(_, newValue) => {
+            field.onChange(newValue)
+            setValue(name, newValue || null)}}
           renderInput={(params) => (
             <TextField
               {...params}
               label={label}
+              error={!!error}
+              helperText={error ? error?.message : helperText}
             />
           )}
-         
+
         />
       )}
     />

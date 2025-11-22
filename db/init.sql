@@ -770,3 +770,147 @@ SET DEFAULT nextval('quotations_quote_number_seq');
 -- =========================================================
 -- INSERT INTO roles(description) VALUES ('Administrador'), ('Vendedor') ON CONFLICT DO NOTHING;
 -- INSERT INTO regions(name) VALUES ('Región de Arica y Parinacota') ON CONFLICT DO NOTHING;
+
+
+DELETE FROM communes;
+delete from cities;
+delete from regions;
+
+
+INSERT INTO regions (id, name, created_at, updated_at) VALUES
+(1,  'Arica y Parinacota',                          NOW(), NOW()),
+(2,  'Tarapacá',                                    NOW(), NOW()),
+(3,  'Antofagasta',                                 NOW(), NOW()),
+(4,  'Atacama',                                     NOW(), NOW()),
+(5,  'Coquimbo',                                    NOW(), NOW()),
+(6,  'Valparaíso',                                  NOW(), NOW()),
+(7,  'Metropolitana de Santiago',                   NOW(), NOW()),
+(8,  'Libertador General Bernardo O’Higgins',       NOW(), NOW()),
+(9,  'Maule',                                       NOW(), NOW()),
+(10, 'Ñuble',                                       NOW(), NOW()),
+(11, 'Biobío',                                      NOW(), NOW()),
+(12, 'La Araucanía',                                NOW(), NOW()),
+(13, 'Los Ríos',                                    NOW(), NOW()),
+(14, 'Los Lagos',                                   NOW(), NOW()),
+(15, 'Aysén del General Carlos Ibáñez del Campo',   NOW(), NOW()),
+(16, 'Magallanes y de la Antártica Chilena',        NOW(), NOW());
+
+ 
+
+INSERT INTO cities (id, name, region_id, created_at, updated_at) VALUES
+-- Región 1: Arica y Parinacota
+(1,  'Arica',        1,  NOW(), NOW()),
+
+-- Región 2: Tarapacá
+(2,  'Iquique',      2,  NOW(), NOW()),
+
+-- Región 3: Antofagasta
+(3,  'Antofagasta',  3,  NOW(), NOW()),
+
+-- Región 4: Atacama
+(4,  'Copiapó',      4,  NOW(), NOW()),
+
+-- Región 5: Coquimbo
+(5,  'La Serena',    5,  NOW(), NOW()),
+
+-- Región 6: Valparaíso
+(6,  'Valparaíso',   6,  NOW(), NOW()),
+
+-- Región 7: Metropolitana de Santiago
+(7,  'Santiago',     7,  NOW(), NOW()),
+
+-- Región 8: Libertador General Bernardo O’Higgins
+(8,  'Rancagua',     8,  NOW(), NOW()),
+
+-- Región 9: Maule
+(9,  'Talca',        9,  NOW(), NOW()),
+
+-- Región 10: Ñuble
+(10, 'Chillán',      10, NOW(), NOW()),
+
+-- Región 11: Biobío
+(11, 'Concepción',   11, NOW(), NOW()),
+
+-- Región 12: La Araucanía
+(12, 'Temuco',       12, NOW(), NOW()),
+
+-- Región 13: Los Ríos
+(13, 'Valdivia',     13, NOW(), NOW()),
+
+-- Región 14: Los Lagos
+(14, 'Puerto Montt', 14, NOW(), NOW()),
+
+-- Región 15: Aysén
+(15, 'Coyhaique',    15, NOW(), NOW()),
+
+-- Región 16: Magallanes y de la Antártica Chilena
+(16, 'Punta Arenas', 16, NOW(), NOW());
+
+ 
+INSERT INTO communes (id, name, city_id, created_at, updated_at) VALUES
+(1, 'Santiago', 7, NOW(), NOW()),
+(2, 'Cerrillos', 7, NOW(), NOW()),
+(3, 'Cerro Navia', 7, NOW(), NOW()),
+(4, 'Conchalí', 7, NOW(), NOW()),
+(5, 'El Bosque', 7, NOW(), NOW()),
+(6, 'Estación Central', 7, NOW(), NOW()),
+(7, 'Huechuraba', 7, NOW(), NOW()),
+(8, 'Independencia', 7, NOW(), NOW()),
+(9, 'La Cisterna', 7, NOW(), NOW()),
+(10, 'La Florida', 7, NOW(), NOW()),
+(11, 'La Granja', 7, NOW(), NOW()),
+(12, 'La Pintana', 7, NOW(), NOW()),
+(13, 'La Reina', 7, NOW(), NOW()),
+(14, 'Las Condes', 7, NOW(), NOW()),
+(15, 'Lo Barnechea', 7, NOW(), NOW()),
+(16, 'Lo Espejo', 7, NOW(), NOW()),
+(17, 'Lo Prado', 7, NOW(), NOW()),
+(18, 'Macul', 7, NOW(), NOW()),
+(19, 'Maipú', 7, NOW(), NOW()),
+(20, 'Ñuñoa', 7, NOW(), NOW()),
+(21, 'Pedro Aguirre Cerda', 7, NOW(), NOW()),
+(22, 'Peñalolén', 7, NOW(), NOW()),
+(23, 'Providencia', 7, NOW(), NOW()),
+(24, 'Pudahuel', 7, NOW(), NOW()),
+(25, 'Quilicura', 7, NOW(), NOW()),
+(26, 'Quinta Normal', 7, NOW(), NOW()),
+(27, 'Recoleta', 7, NOW(), NOW()),
+(28, 'Renca', 7, NOW(), NOW()),
+(29, 'San Joaquín', 7, NOW(), NOW()),
+(30, 'San Miguel', 7, NOW(), NOW()),
+(31, 'San Ramón', 7, NOW(), NOW()),
+(32, 'Vitacura', 7, NOW(), NOW()),
+
+-- Provincia Cordillera (también RM, si quieres que dependan del mismo city_id)
+(33, 'Puente Alto', 7, NOW(), NOW()),
+(34, 'Pirque', 7, NOW(), NOW()),
+(35, 'San José de Maipo', 7, NOW(), NOW()),
+
+-- Provincia Chacabuco
+(36, 'Colina', 7, NOW(), NOW()),
+(37, 'Lampa', 7, NOW(), NOW()),
+(38, 'Tiltil', 7, NOW(), NOW()),
+
+-- Provincia Maipo
+(39, 'San Bernardo', 7, NOW(), NOW()),
+(40, 'Buin', 7, NOW(), NOW()),
+(41, 'Calera de Tango', 7, NOW(), NOW()),
+(42, 'Paine', 7, NOW(), NOW()),
+
+-- Provincia Melipilla
+(43, 'Melipilla', 7, NOW(), NOW()),
+(44, 'Alhué', 7, NOW(), NOW()),
+(45, 'Curacaví', 7, NOW(), NOW()),
+(46, 'María Pinto', 7, NOW(), NOW()),
+(47, 'San Pedro', 7, NOW(), NOW()),
+
+-- Provincia Talagante
+(48, 'Talagante', 7, NOW(), NOW()),
+(49, 'El Monte', 7, NOW(), NOW()),
+(50, 'Isla de Maipo', 7, NOW(), NOW()),
+(51, 'Padre Hurtado', 7, NOW(), NOW()),
+(52, 'Peñaflor', 7, NOW(), NOW());
+
+
+ALTER TABLE quotation_request
+ALTER COLUMN client_id DROP NOT NULL;

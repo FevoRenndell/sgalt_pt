@@ -85,12 +85,12 @@ export const navigations = [
   {
     name: 'Solicitud de cotización',
     icon: duotone.Inbox, // o un icono de formulario/correo
-    path: '/cliente/solicitud-cotizacion',
+    path: '/public/solicitud-cotizacion',
   },
   {
     name: 'Estado de mi cotización',
     icon: duotone.DataTable,
-    path: '/cliente/mis-cotizaciones',
+    path: '/publicpublic/mis-cotizaciones',
   },
 
   // --- OTROS (SI QUIERES MANTENER SECCIONES GENERALES) ---

@@ -1,6 +1,5 @@
 import React, {
   createContext,
-  useCallback,
   useContext,
   useState,
 } from 'react';
@@ -11,7 +10,8 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  Typography,
+  Alert,
+  Box,
 } from '@mui/material';
 
 const ConfirmDialogContext = createContext(null);
@@ -21,19 +21,22 @@ export function ConfirmDialogProvider({ children }) {
     open: false,
     title: '',
     description: '',
+    severity: 'warning',
+    type: 'warning',
     confirmText: 'Aceptar',
     cancelText: 'Cancelar',
     resolve: null,
   });
 
+  // función que usarás en los componentes: const confirm = useConfirmDialog();
   const confirm = (options = {}) => {
-    console.log('confirm() description =>', options.description);
-
     return new Promise((resolve) => {
       setState({
         open: true,
         title: options.title || 'Confirmación',
-        description:  "hello there",
+        description: options.description || '',
+        severity: options.severity || 'warning',
+        type: options.type || 'warning', // 'warning' | 'error' | 'info' | 'success'
         confirmText: options.confirmText || 'Aceptar',
         cancelText: options.cancelText || 'Cancelar',
         resolve,
@@ -61,27 +64,36 @@ export function ConfirmDialogProvider({ children }) {
         maxWidth="xs"
       >
         {state.title && (
-          <DialogTitle>
+          <DialogTitle sx={{ m: 0, p: 2 }}>
             {state.title}
           </DialogTitle>
         )}
 
-        {state.description && (
-          <DialogContent dividers>
-            <Typography variant="body1">
-              {state.description}
-            </Typography>
-          </DialogContent>
-        )}
+        <DialogContent sx={{ m: 0, p: 2 }} dividers>
+          {state.description && (
+            <Box sx={{ bgcolor: 'background.paper', py: 2, borderRadius: 2 }}>
+              <Alert severity={state.severity} sx={{ m: 0 }}>
+                {state.description}
+              </Alert>
+            </Box>
+          )}
+        </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => handleClose(false)} variant="outlined" color="error">
+        <DialogActions sx={{ m: 0, p: 2 }}>
+          <Button
+            onClick={() => handleClose(false)}
+            variant="outlined"
+            color="error"
+            size="small"
+          >
             {state.cancelText}
           </Button>
+
           <Button
             onClick={() => handleClose(true)}
             variant="outlined"
             color="success"
+            size="small"
           >
             {state.confirmText}
           </Button>

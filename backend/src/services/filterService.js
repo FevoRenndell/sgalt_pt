@@ -35,3 +35,41 @@ export async function getState() {
         throw new AppError('Error fetching state options', 500);
     }
 }
+
+
+// filtros para cotizaciones
+
+export async function getRegions() {
+    try {
+        return await db.models.Region.findAll({
+            attributes: ['id',  'name',]
+        });
+    } catch (error) {
+        console.error('Error fetching regions:', error);
+        throw new AppError('Error fetching regions', 500);
+    }
+}
+
+export async function getCities(regionId) {
+    try {
+        return await db.models.City.findAll({
+            attributes: ['id',  'name',],
+            where: { region_id :  regionId }
+        });
+    } catch (error) {
+        console.error('Error fetching cities:', error);
+        throw new AppError('Error fetching cities', 500);
+    }
+}
+
+export async function getCommunes(cityId) {
+    try {
+        return await db.models.Commune.findAll({
+            attributes: ['id',  'name',],
+            where: { city_id :  cityId }
+        });
+    } catch (error) {
+        console.error('Error fetching communes:', error);
+        throw new AppError('Error fetching communes', 500);
+    }
+} 

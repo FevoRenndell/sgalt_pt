@@ -4,9 +4,7 @@ import { AuthRoutes } from './auth';
 import { DashboardRoutes } from './dashboard';
 import { PATH_AFTER_LOGIN } from '../config';
 import { Navigate } from 'react-router-dom';
-
-// GLOBAL ERROR PAGE
-// const ErrorPage = lazy(() => import('../pages/error/404'));
+import { Public } from './public';
 
 export const routes = () => {
     return [
@@ -17,10 +15,8 @@ export const routes = () => {
       },
       
     ...Users,
-    // AUTHENTICATION PAGES ROUTES & DIFFERENT AUTH DEMO PAGES ROUTES
     ...AuthRoutes,
-    // INSIDE DASHBOARD PAGES ROUTES
     ...DashboardRoutes,
-    // PAGES ROUTES
+    ...Public
   ];
 };
