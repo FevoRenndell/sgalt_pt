@@ -414,7 +414,9 @@ CREATE TABLE IF NOT EXISTS quotation_request (             -- Crea la tabla si n
   --   city_id    → cities.id
   --   commune_id → communes.id
   -- Estos campos permiten identificar con precisión dónde se realizará el trabajo solicitado.
-
+	competence_capacity VARCHAR(2)   NULL,
+	need_subcontracting_services VARCHAR(20)   NULL,
+	independence_issue VARCHAR(2)   NULL,
   status               VARCHAR(20) NOT NULL,
   -- Estado actual de la solicitud (obligatorio).
   -- Ejemplos posibles: 'recibida', 'revisada', 'en proceso', 'cerrada', 'rechazada'.
@@ -929,7 +931,8 @@ INSERT INTO communes (id, name, city_id, created_at, updated_at) VALUES
 (10,'76.700.000-5','Entel Chile S.A.','Contacto Entel','contacto@entel.cl','+56 2 xxxx xxxx',NOW(),NOW());
 
 
-INSERT INTO quotation_request (
+
+ INSERT INTO quotation_request (
   client_id,
   requester_full_name,
   requester_email,
@@ -939,6 +942,9 @@ INSERT INTO quotation_request (
   commune_id,
   city_id,
   region_id,
+  competence_capacity,
+  need_subcontracting_services,
+  independence_issue,
   status,
   received_at,
   reviewed_by,
@@ -953,139 +959,160 @@ INSERT INTO quotation_request (
 (1,'María Torres','m.torres@latam.com','+56 9 4455 1122',
  'Mantención eléctrica en bodega central',
  'Av. Américo Vespucio 901',
- 24, 7, 7,  -- Pudahuel, Santiago, Región Metropolitana
- 'pending', NOW() - INTERVAL '7 days', NULL, NULL, NULL, NOW(), NOW()),
+ 24, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '7 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- San Joaquín
 (1,'Pedro Soto','p.soto@latam.com','+56 9 8899 2211',
  'Revisión estructural área técnica',
  'Av. Departamental 2000',
- 29, 7, 7,  -- San Joaquín, Santiago, Región Metropolitana
- 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+ 29, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- Pedro Aguirre Cerda
 (1,'Ana Martínez','a.martinez@latam.com','+56 9 7722 1100',
  'Inspección de hangares',
  'Pedro Aguirre Cerda 4500',
- 21, 7, 7,  -- Pedro Aguirre Cerda, Santiago, Región Metropolitana
- 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
+ 21, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 2) Empresas CMPC S.A. (client_id = 2) - CONCEPCIÓN (Biobío)
 (2,'Juan Herrera','j.herrera@cmpc.cl','+56 9 8811 5599',
  'Revisión instalaciones forestales',
  'Camino a Laja 123',
- 103, 11, 11,  -- Concepción, ciudad Concepción, Región Biobío
- 'pending', NOW() - INTERVAL '6 days', NULL, NULL, NULL, NOW(), NOW()),
+ 103, 11, 11,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '6 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (2,'Daniela Vergara','d.vergara@cmpc.cl','+56 9 6611 3322',
  'Instalación eléctrica planta Nueva Imperial',
  'Ruta S-40 KM 12',
- 104, 11, 11,  -- Talcahuano, ciudad Concepción, Región Biobío
- 'pending', NOW() - INTERVAL '4 days', NULL, NULL, NULL, NOW(), NOW()),
+ 104, 11, 11,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '4 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (2,'Ricardo Silva','r.silva@cmpc.cl','+56 9 7711 8800',
  'Evaluación riesgos industriales',
  'Camino Los Boldos 500',
- 105, 11, 11,  -- San Pedro de la Paz, ciudad Concepción, Región Biobío
- 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+ 105, 11, 11,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 3) CODELCO (client_id = 3) - ANTOFAGASTA (Región 3)
 (3,'Claudio Muñoz','c.munoz@codelco.cl','+56 9 9911 5533',
  'Inspección mina subterránea',
  'Sector Chuquicamata S/N',
- 63, 3, 3,  -- Antofagasta
- 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+ 63, 3, 3,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (3,'Sofía Reyes','s.reyes@codelco.cl','+56 9 8222 1144',
  'Instalación nuevos tableros eléctricos',
  'Av. Minería 123',
- 64, 3, 3,  -- Mejillones
- 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+ 64, 3, 3,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 4) Banco de Chile (client_id = 4) - SANTIAGO (RM)
 (4,'Marcelo Pinto','m.pinto@bancochile.cl','+56 9 5511 7744',
  'Revisión de sucursal principal',
  'Paseo Ahumada 251',
- 1, 7, 7,  -- Santiago centro
- 'pending', NOW() - INTERVAL '5 days', NULL, NULL, NULL, NOW(), NOW()),
+ 1, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '5 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (4,'Valentina Araya','v.araya@bancochile.cl','+56 9 6611 8800',
  'Cambio de instalaciones HVAC',
  'Av. Apoquindo 1234',
- 14, 7, 7,  -- Las Condes
- 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
+ 14, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 5) Falabella (client_id = 5) - SANTIAGO (RM)
 (5,'Camila López','c.lopez@falabella.cl','+56 9 4411 9922',
  'Revisión tienda mall Alto Las Condes',
  'Av. Kennedy 9001',
- 14, 7, 7,  -- Las Condes
- 'pending', NOW() - INTERVAL '7 days', NULL, NULL, NULL, NOW(), NOW()),
+ 14, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '7 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (5,'Hernán Pino','h.pino@falabella.cl','+56 9 8811 1233',
  'Instalación paneles eléctricos',
  'Av. Vicuña Mackenna 300',
- 20, 7, 7,  -- Ñuñoa (aprox. zona V. Mackenna)
- 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+ 20, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 6) ENAP (client_id = 6) - VALPARAÍSO (Región 6)
 (6,'Andrea Ruiz','a.ruiz@enap.cl','+56 9 7722 5566',
  'Inspección planta petroquímica',
  'Ruta 5 Sur KM 16',
- 78, 6, 6,  -- Valparaíso
- 'pending', NOW() - INTERVAL '4 days', NULL, NULL, NULL, NOW(), NOW()),
+ 78, 6, 6,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '4 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (6,'Sebastián Parra','s.parra@enap.cl','+56 9 5511 6611',
  'Revisión compresores industriales',
  'Camino a Refinería 200',
- 80, 6, 6,  -- Concón
- 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
+ 80, 6, 6,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 7) Copec (client_id = 7) - SANTIAGO (RM)
 (7,'Jorge Contreras','j.contreras@copec.cl','+56 9 8811 9911',
  'Revisión estación de servicio',
  'Av. Matta 550',
- 19, 7, 7,  -- Maipú (ejemplo)
- 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+ 19, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (7,'Patricia Díaz','p.diaz@copec.cl','+56 9 7711 4411',
  'Mantención surtidores',
  'Av. Grecia 2001',
- 10, 7, 7,  -- La Florida
- 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+ 10, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 8) SQM (client_id = 8) - ANTOFAGASTA (Región 3)
 (8,'Tomás Villarroel','t.villarroel@sqm.com','+56 9 6611 8822',
  'Inspección planta Salar de Atacama',
  'Ruta B-355 KM 28',
- 65, 3, 3,  -- Sierra Gorda
- 'pending', NOW() - INTERVAL '6 days', NULL, NULL, NULL, NOW(), NOW()),
+ 65, 3, 3,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '6 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (8,'Fernanda Morales','f.morales@sqm.com','+56 9 7711 0099',
  'Instalación transformador',
  'Av. Los Volcanes 123',
- 63, 3, 3,  -- Antofagasta
- 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+ 63, 3, 3,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 9) CMPC Celulosa (client_id = 9) - CONCEPCIÓN (Biobío)
 (9,'Eduardo Campos','e.campos@cmpc.cl','+56 9 9911 4400',
  'Revisión planta Laja',
  'Camino Central 155',
- 104, 11, 11,  -- Talcahuano, ciudad Concepción
- 'pending', NOW() - INTERVAL '5 days', NULL, NULL, NULL, NOW(), NOW()),
+ 104, 11, 11,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '5 days', NULL, NULL, NULL, NOW(), NOW()),
 
 -- 10) Entel (client_id = 10) - SANTIAGO (RM)
 (10,'Gabriel Hidalgo','g.hidalgo@entel.cl','+56 9 8811 5566',
  'Instalación red eléctrica sala servidores',
  'Av. Providencia 111',
- 23, 7, 7,  -- Providencia
- 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+ 23, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
 
 (10,'Monserrat Jara','m.jara@entel.cl','+56 9 7711 8822',
  'Revisión torres de transmisión',
  'Camino Antena Norte',
- 36, 7, 7,  -- Colina
- 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW());
+ 36, 7, 7,
+ null,null,null,
+ 'PENDIENTE', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW());
 
 
 

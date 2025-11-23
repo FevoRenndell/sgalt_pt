@@ -1,5 +1,5 @@
 import { CardHeader, Card, CardContent, Box } from '@mui/material';
-import { RHFSelect, RHFTextField } from '../../../../shared/components/hook-form';
+import { RHFSelect, RHFTextField } from '../../../../shared/components/hook-form/index.jsx';
 
 export default function QuotationRequestForm() {
   return (

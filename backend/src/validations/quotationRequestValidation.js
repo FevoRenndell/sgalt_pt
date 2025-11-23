@@ -116,16 +116,20 @@ export const quotationRequestUpdateSchema = Joi.object({
     .trim()
     .max(255)
     .pattern(nameRegex)
+    .required()
     .messages({
+      'any.required': 'La región es obligatoria',
       'string.max': 'El nombre del contacto no puede superar los 255 caracteres',
       'string.pattern.base':
         'El nombre del contacto no debe contener números ni caracteres especiales',
+
     }),
 
   requester_email: Joi.string()
     .trim()
     .email()
     .max(255)
+     .required()
     .messages({
       'string.email': 'Correo electrónico inválido',
       'string.max': 'El correo del contacto no puede superar los 255 caracteres',
@@ -134,12 +138,14 @@ export const quotationRequestUpdateSchema = Joi.object({
   requester_phone: Joi.string()
     .trim()
     .max(20)
+     .required()
     .messages({
       'string.max': 'El teléfono de contacto no puede superar los 20 caracteres',
     }),
 
   service_description: Joi.string()
     .trim()
+     .required()
     .messages({
       'string.base': 'La descripción debe ser texto',
     }),
@@ -147,6 +153,7 @@ export const quotationRequestUpdateSchema = Joi.object({
   obra_direccion: Joi.string()
     .trim()
     .max(255)
+     .required()
     .messages({
       'string.max': 'La dirección de la obra no puede superar los 255 caracteres',
     }),
@@ -154,6 +161,7 @@ export const quotationRequestUpdateSchema = Joi.object({
   commune_id: Joi.number()
     .integer()
     .positive()
+     .required()
     .messages({
       'number.base': 'Debe seleccionar una comuna válida',
       'number.integer': 'La comuna debe ser un número entero',
@@ -163,6 +171,7 @@ export const quotationRequestUpdateSchema = Joi.object({
   city_id: Joi.number()
     .integer()
     .positive()
+     .required()
     .messages({
       'number.base': 'Debe seleccionar una ciudad válida',
       'number.integer': 'La ciudad debe ser un número entero',
@@ -172,6 +181,7 @@ export const quotationRequestUpdateSchema = Joi.object({
   region_id: Joi.number()
     .integer()
     .positive()
+     .required()
     .messages({
       'number.base': 'Debe seleccionar una región válida',
       'number.integer': 'La región debe ser un número entero',
@@ -373,4 +383,40 @@ export const quotationRequestPublicCreateSchema = Joi.object({
         'El nombre de la empresa no debe contener caracteres especiales no permitidos',
     }),
 })
+ 
+export const quotationRequestSaveReviewSchema = Joi.object({
+  competence_capacity: Joi.string()
+    .valid('SI', 'NO')
+    .required()
+    .messages({
+      'any.only': 'Debe indicar si cuenta con la competencia y capacidad necesarias',
+      'any.required': 'Debe indicar si cuenta con la competencia y capacidad necesarias',
+    }),
+
+  need_subcontracting_services: Joi.string()
+    .valid('SI', 'NO')
+    .required()
+    .messages({
+      'any.only': 'Debe indicar si es necesario subcontratar los servicios',
+      'any.required': 'Debe indicar si es necesario subcontratar los servicios',
+    }),
+
+  independence_issue: Joi.string()
+    .valid('SI', 'NO')
+    .required()
+    .messages({
+      'any.only': 'Debe indicar si existe problema de independencia',
+      'any.required': 'Debe indicar si existe problema de independencia',
+    }),
+
+  review_notes: Joi.string()
+    .trim()
+    .max(1000)
+    .allow('', null)
+    .messages({
+      'string.max': 'Las notas de revisión no pueden superar los 1000 caracteres',
+    }),
+});
+
+
  

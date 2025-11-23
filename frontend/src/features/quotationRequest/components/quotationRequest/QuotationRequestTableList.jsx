@@ -45,17 +45,12 @@ export default function QuotationRequestTableList({ details }) {
     { id: '', label: '', numeric: true, disablePadding: false },
 
     { id: 'solicitud_num', label: 'N° Solic.', align: 'left', minWidth: '120px' },
-    { id: 'cotizacion_num', label: 'N° Cot.', align: 'left', minWidth: '200px' },
-
+    { id: 'cotizacion_num', label: 'N° Cot.', align: 'left', },
+    { id: 'estado', label: 'Estado', align: 'left'  },
     { id: 'rut', label: 'Rut', align: 'left', minWidth: '200px' },
     { id: 'razon_social', label: 'Razón Social', align: 'left', minWidth: '200px' },
-
     { id: 'registrado_el', label: 'Registrado el', align: 'left', minWidth: '200px' },
-    { id: 'registrado_por', label: 'Registrado por', align: 'left', minWidth: '300px' },
-
-    { id: 'solicitado_por', label: 'Solicitado por', align: 'left', minWidth: '200px' },
-
-    { id: 'estado', label: 'Estado', align: 'left', minWidth: '150px' },
+   
   ];
 
 
@@ -115,8 +110,7 @@ export default function QuotationRequestTableList({ details }) {
     </Button>;
 
 
-  const onView = (row) => {
-    console.log(row)     
+  const onView = (row) => {    
     setState({
       isOpen: true,
       client: row

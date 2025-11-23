@@ -10,10 +10,11 @@ import {
 } from '../controllers/quoatationRequestQuoterController.js';
 
 import {
+  quotationRequestQuerySchema,
   quotationRequestCreateSchema,
   quotationRequestUpdateSchema,
   quotationRequestIdParamsSchema,
-  quotationRequestQuerySchema,
+  quotationRequestSaveReviewSchema,
 } from '../validations/quotationRequestValidation.js';
 
 import {
@@ -41,6 +42,15 @@ router.put('/update/:id',
   validateData(quotationRequestUpdateSchema),
   updateQuotationByQuoter
 );
+
+router.put('/save_review/update/:id',
+  validateParams(quotationRequestIdParamsSchema),
+  validateData(quotationRequestSaveReviewSchema),
+  updateQuotationByQuoter
+);
+
+ 
+ 
 
 router.delete('/delete/:id',
   validateParams(quotationRequestIdParamsSchema),

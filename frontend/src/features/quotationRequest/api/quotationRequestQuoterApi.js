@@ -50,6 +50,18 @@ export const quotationRequestApi = baseApi.injectEndpoints({
         { type: 'QuotationRequest', id: 'SELECTS' },
       ],
     }),
+    updateQuotationRequestSaveReview: builder.mutation({ // useUpdateQuotationRequestSaveReviewMutation: builder.mutation({ // useUpdateQuotationRequestSaveReviewMutation
+      query: ({ id, ...data }) => ({
+        url: `/quotation_requests/save_review/update/${id}`,
+        method: 'PUT',
+        body: data,
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'QuotationRequest', id },
+        { type: 'QuotationRequest', id: 'LIST' },
+        { type: 'QuotationRequest', id: 'SELECTS' },
+      ],
+    }),
   }),
   overrideExisting: false,
 });
@@ -60,4 +72,5 @@ export const {
   useCreateQuotationRequestMutation,
   useUpdateQuotationRequestMutation,
   useDeleteQuotationRequestMutation,
+  useUpdateQuotationRequestSaveReviewMutation
 } = quotationRequestApi;

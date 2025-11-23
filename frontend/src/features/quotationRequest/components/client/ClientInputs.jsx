@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import { RHFTextField } from "../../../../shared/components/hook-form";
+import { RHFTextField } from "../../../../shared/components/hook-form/index.jsx";
 
 export default function ClientInputs( { blocked = false } ) {
 

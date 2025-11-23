@@ -8,7 +8,7 @@ import Grid from '@mui/material/Grid';
 import { Button, CardContent, CardHeader } from '@mui/material';
 
 // CUSTOM
-import { FormProvider, RHFSelect, RHFTextField } from '../../../../shared/components/hook-form';
+import { FormProvider, RHFSelect, RHFTextField } from '../../../../shared/components/hook-form/index.jsx';
 import { quotationRequestCreateSchema } from '../../validations/quotationRequestCreateSchema';
 import { validate, clean, format } from 'rut.js';
 
@@ -328,7 +328,6 @@ const searchClient = (e) => {
               </Grid>
             </Grid>
 
-            
             <ClientInputs blocked={!!client} />   
             
 
