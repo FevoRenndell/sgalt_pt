@@ -4,7 +4,7 @@ import PublicLayout from '../layouts/layout-public';
  
 
 // ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
-const CreateQuoterPage = lazy(() => import('../features/quotes/pages/CreateQuoterPage'));
+const QuotationRequestClientCreatePage = lazy(() => import('../features/quotationRequest/pages/QuotationRequestClientCreatePage'));
 
 export const Public = [
   {
@@ -13,7 +13,7 @@ export const Public = [
                 <PublicLayout />
              </GuestGuard>,
     children: [
-      { path: '/public/solicitud-cotizacion'     , element: <CreateQuoterPage /> },
+      { path: '/public/solicitud-cotizacion'     , element: <QuotationRequestClientCreatePage /> },
 
     ],
   },

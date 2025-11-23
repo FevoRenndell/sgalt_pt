@@ -8,8 +8,6 @@
     "dev": "cross-env NODE_ENV=development node src/server.js",
     "start": "cross-env NODE_ENV=production node src/server.js",
     "server": "nodemon src/server.js",
-    "seed:admin": "node src/seed/createAdminUser.js",
-    "seed:reset": "node src/seed/resetAdminUser.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -24,6 +22,7 @@
     "express-list-endpoints": "^7.1.1",
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
+    "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.2",
     "logger": "^0.0.1",
     "pg": "^8.16.3",
@@ -34,7 +33,7 @@
   },
   "devDependencies": {
     "cross-env": "^10.1.0",
-    "nodemon": "^3.1.10",
+    "nodemon": "^3.1.11",
     "sequelize-cli": "^6.6.3"
   }
 }

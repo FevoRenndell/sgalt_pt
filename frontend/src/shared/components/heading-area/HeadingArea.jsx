@@ -40,7 +40,8 @@ const StyledAvatar = styled(Avatar)(({
 export default function HeadingArea({
   value,
   changeTab,
-  addButton
+  addButton,
+  tab_active = false
 }) {  
   return <FlexBetween flexWrap="wrap" gap={1}>
       <FlexBox alignItems="center" gap={1.5}>
@@ -52,7 +53,8 @@ export default function HeadingArea({
           Users
         </Typography>
       </FlexBox>
-
+      {tab_active && (
+        
       <TabContext value={value} >
         <TabListWrapper variant="scrollable"  onChange={changeTab}  >
           <Tab disableRipple label="All Users" value={0} />
@@ -61,6 +63,7 @@ export default function HeadingArea({
           <Tab disableRipple label="Cotizadores" value={3} />
         </TabListWrapper>
       </TabContext>
+      )}
       { addButton }
     </FlexBetween>;
 }

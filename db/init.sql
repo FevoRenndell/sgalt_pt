@@ -207,25 +207,19 @@ CREATE TABLE IF NOT EXISTS clients (                      -- Crea la tabla si no
   -- Razón social o nombre de la empresa del cliente.
   -- También obligatorio; se usa para mostrar el nombre en las cotizaciones.
 
-  contact_name      VARCHAR(255),
+  contact_name      VARCHAR(255)  NULL,
   -- Nombre del contacto principal del cliente (persona natural).
   -- Puede ser un encargado de adquisiciones, ingeniería o administración.
   -- No es obligatorio.
 
-  contact_email     VARCHAR(255),
+  contact_email     VARCHAR(255) NULL,
   -- Correo electrónico del contacto principal.
   -- No se marca como NOT NULL para permitir registrar clientes sin contacto definido aún.
   -- Se recomienda validar formato en el backend antes de insertar o actualizar.
 
-  contact_phone     VARCHAR(50),
+  contact_phone     VARCHAR(50) NULL,
   -- Teléfono del contacto principal (celular o fijo).
   -- Campo libre para incluir formatos como "+56 9 1234 5678" o "22 345 6789".
-
-  service_description TEXT,
-  -- Campo descriptivo que permite anotar observaciones generales
-  -- sobre los servicios que solicita o contrata el cliente.
-  -- Por ejemplo: “Ensayos de compactación y resistencia de hormigón”.
-  -- No es obligatorio, y se usa como información de referencia.
 
   created_at        TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora en que se registró el cliente.
@@ -242,7 +236,7 @@ CREATE TABLE IF NOT EXISTS clients (                      -- Crea la tabla si no
 );
 -- Fin definición tabla clients
 
--- =========================================================
+-- =========================================================poer
 -- Índices complementarios
 -- =========================================================
 CREATE INDEX IF NOT EXISTS ix_clients_company_name ON clients (LOWER(company_name));
@@ -251,7 +245,16 @@ CREATE INDEX IF NOT EXISTS ix_clients_company_name ON clients (LOWER(company_nam
 -- Ejemplo de uso beneficiado:
 --   SELECT * FROM clients WHERE LOWER(company_name) LIKE '%geocontrol%';
 
+DO $$
+DECLARE
+  seq_name TEXT;
+BEGIN
+  -- Detecta automáticamente la secuencia asociada a la columna ID
+  SELECT pg_get_serial_sequence('clients', 'id') INTO seq_name;
 
+  -- Ajusta para iniciar desde 100
+  EXECUTE 'ALTER SEQUENCE ' || seq_name || ' RESTART WITH 100;';
+END $$;
 
 -- =========================================================
 -- Tabla: services
@@ -914,3 +917,24 @@ INSERT INTO communes (id, name, city_id, created_at, updated_at) VALUES
 
 ALTER TABLE quotation_request
 ALTER COLUMN client_id DROP NOT NULL;
+
+INSERT INTO clients (
+  company_rut,
+  company_name,
+  contact_name,
+  contact_email,
+  contact_phone,
+  -- service_description,
+  created_at,
+  updated_at
+) VALUES
+('89.862.200-2','LATAM Airlines Group S.A.','Contacto LATAM','contacto@latam.com','+56 2 2579 8990',NOW(),NOW()),
+('90.222.000-3','Empresas CMPC S.A.','Contacto CMPC','contacto@cmpc.cl','+56 2 2441 2000',NOW(),NOW()),
+('61.704.000-K','Corporación Nacional del Cobre de Chile','Contacto CODELCO','contacto@codelco.cl','+56 2 2690 3000',NOW(),NOW()),
+('97.004.000-5','Banco de Chile','Contacto Banco de Chile','contacto@bancochile.cl','+56 2 2637 1111',NOW(),NOW()),
+('90.749.000-9','Falabella S.A.','Contacto Falabella','contacto@falabella.cl','+56 2 2380 2000',NOW(),NOW()),
+('92.604.000-6','Empresa Nacional del Petróleo','Contacto ENAP','contacto@enap.cl','+56 2 2729 7000',NOW(),NOW()),
+('97.006.000-1','Copec S.A.','Contacto Copec','contacto@copec.cl','+56 2 xxxxx xxxx',NOW(),NOW()),
+('96.940.000-7','SQM S.A.','Contacto SQM','contacto@sqm.com','+56 2 xxxxx xxxx',NOW(),NOW()),
+('76.600.628-0','CMPC Celulosa S.A.','Contacto CMPC Celulosa','contacto@cmpc.cl','+56 2 xxxx xxxx',NOW(),NOW()),
+('76.700.000-5','Entel Chile S.A.','Contacto Entel','contacto@entel.cl','+56 2 xxxx xxxx',NOW(),NOW());

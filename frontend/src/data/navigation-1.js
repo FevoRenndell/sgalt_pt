@@ -14,14 +14,9 @@ export const navigations = [
     icon: duotone.UserList, // o el icono que prefieras
     children: [
       {
-        name: 'administración de usuarios',
+        name: 'Adm. Usuarios',
         path: '/admin/users/list',
       },
-      {
-        name: 'Crear usuario',
-        path: '/admin/users/crear',
-      },
-
       {
         name: 'Roles y permisos',
         path: '/admin/users/roles',
@@ -35,24 +30,12 @@ export const navigations = [
     icon: duotone.Invoice, // reutilizo el de Invoice que ya traía el template
     children: [
       {
-        name: 'administración de cotizaciones',
-        path: '/dashboard/cotizaciones',
+        name: 'Adm. Cotizaciones',
+        path: '/quotation/list',
       },
       {
-        name: 'Crear cotización',
-        path: '/dashboard/cotizaciones/crear',
-      },
-      {
-        name: 'Cotizaciones en revisión',
-        path: '/dashboard/cotizaciones/en-revision',
-      },
-      {
-        name: 'Cotizaciones aceptadas',
-        path: '/dashboard/cotizaciones/aceptadas',
-      },
-      {
-        name: 'Cotizaciones rechazadas',
-        path: '/dashboard/cotizaciones/rechazadas',
+        name: 'Solicitudes de Cotizaciones',
+        path: '/quotation_request/list',
       },
     ],
   },
@@ -63,16 +46,8 @@ export const navigations = [
     icon: duotone.UserProfile, // similar a perfil / clientes
     children: [
       {
-        name: 'administración de clientes',
+        name: 'Adm. Clientes',
         path: '/dashboard/clientes',
-      },
-      {
-        name: 'Crear cliente',
-        path: '/dashboard/clientes/crear',
-      },
-      {
-        name: 'Historial de clientes',
-        path: '/dashboard/clientes/historial',
       },
     ],
   },

@@ -1,5 +1,7 @@
 // routes/paths.js
 
+ 
+
 export const paths = {
   root: '/dashboard',
 
@@ -12,11 +14,11 @@ export const paths = {
   users_roles:  '/admin/users/roles',
 
   // Cotizaciones
-  cotizaciones: '/dashboard/cotizaciones',
-  cotizacionesCrear: '/dashboard/cotizaciones/crear',
-  cotizacionesRevision: '/dashboard/cotizaciones/en-revision',
-  cotizacionesAceptadas: '/dashboard/cotizaciones/aceptadas',
-  cotizacionesRechazadas: '/dashboard/cotizaciones/rechazadas',
+  quotation_request_list: '/quotation_request/list',
+  quotation_create: '/quotation_request/create',
+  // cotizacionesRevision: '/dashboard/quotation/en-revision',
+  // cotizacionesAceptadas: '/dashboard/quotation/aceptadas',
+  // cotizacionesRechazadas: '/dashboard/quotation/rechazadas',
 
   // Clientes
   clientes: '/dashboard/clientes',

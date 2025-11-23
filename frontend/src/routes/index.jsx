@@ -5,6 +5,7 @@ import { DashboardRoutes } from './dashboard';
 import { PATH_AFTER_LOGIN } from '../config';
 import { Navigate } from 'react-router-dom';
 import { Public } from './public';
+import { QuotationRequest } from './quotationRequest';
 
 export const routes = () => {
     return [
@@ -17,6 +18,7 @@ export const routes = () => {
     ...Users,
     ...AuthRoutes,
     ...DashboardRoutes,
+    ...QuotationRequest,
     ...Public
   ];
 };

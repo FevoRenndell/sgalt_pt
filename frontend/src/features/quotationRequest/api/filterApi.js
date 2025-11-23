@@ -1,7 +1,7 @@
 // src/features/users/api/userApi.js
 import { baseApi } from '@/app/api/baseApi';
 
-export const userApi = baseApi.injectEndpoints({
+export const filterApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     fetchRegions: builder.query({
       query: () => 'quoter/regions',
@@ -15,6 +15,10 @@ export const userApi = baseApi.injectEndpoints({
       query: (cityId) => `quoter/communes/${cityId}`,
       providesTags: [{ type: 'Quote', id: 'filters_quotes' }],
     }),
+    fetchClientByRut: builder.query({
+      query: (rut) => `quoter/rut/${rut}`,
+      providesTags: [{ type: 'Client', id: 'by_rut' }],
+    }),
   }),
   overrideExisting: false,
 });
@@ -22,5 +26,6 @@ export const userApi = baseApi.injectEndpoints({
 export const {
   useFetchRegionsQuery,
   useFetchCityByIdQuery,  
-  useFetchCommuneByIdQuery
-} = userApi;
+  useFetchCommuneByIdQuery,
+  useFetchClientByRutQuery ,
+} = filterApi;

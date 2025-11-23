@@ -10,7 +10,6 @@ export default (sequelize) => {
       contact_name: { type: DataTypes.STRING(255) },
       contact_email: { type: DataTypes.STRING(255) },
       contact_phone: { type: DataTypes.STRING(50) },
-      service_description: { type: DataTypes.TEXT },
       created_at: { type: DataTypes.DATE(6), allowNull: false },
       updated_at: { type: DataTypes.DATE(6), allowNull: false },
     },

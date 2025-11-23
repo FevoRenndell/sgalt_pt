@@ -1,46 +1,47 @@
-services:  # Aquí se definen todos los contenedores del proyecto.
-
-
-
-  ### 🟢 BACKEND SERVICE ###
+services:
+  # 🟢 BACKEND SERVICE
   backend:
-    build: ./backend  # Construye la imagen desde el Dockerfile en ./backend
-    container_name: sgalt-backend  # Nombre personalizado del contenedor
+    build: ./backend
+    container_name: sgalt-backend
     ports:
-      - "4000:4000"  # Expone el puerto 3000 del contenedor al 3000 del host
+      - "4000:4000"
     depends_on:
-      - db  # Este servicio espera que 'db' (PostgreSQL) esté iniciado
+      - db
     environment:
-      - PORT=4000  # Puerto en el que corre el backend dentro del contenedor
-      - DB_HOST=db  # Nombre del servicio (host) de PostgreSQL en esta red
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=sgalt
+      NODE_ENV: production
+      PORT: 4000
+
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: sgalt
+
     volumes:
-      - ./backend:/app  # Sincroniza los archivos del backend al contenedor
-    networks:
-      - sgalt-network  # Lo conecta a una red interna personalizada
-
-
-
-  ### 🔵 FRONTEND SERVICE ###
-  frontend:
-    build: ./frontend  # Construye la imagen desde el Dockerfile en ./frontend
-    container_name: sgalt-frontend
-    ports:
-      - "5173:5173"  # Vite usa el puerto 5173 por defecto
-    volumes:
-      - ./frontend:/app  # Sincroniza archivos locales con el contenedor
-      - /app/node_modules
-    depends_on:
-      - backend  # Espera que el backend esté arriba
+      - ./backend:/app        # Monta tu proyecto
+      - /app/node_modules     # Protege node_modules del host
     networks:
       - sgalt-network
 
 
 
-  ### 🟣 POSTGRES DATABASE SERVICE ###
+  # 🔵 FRONTEND SERVICE
+  frontend:
+    build: ./frontend
+    container_name: sgalt-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - sgalt-network
+
+
+
+  # 🟣 POSTGRES DATABASE
   db:
     image: postgres:16
     container_name: sgalt-db
@@ -53,17 +54,17 @@ services:  # Aquí se definen todos los contenedores del proyecto.
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql  # ← solo estructura
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - sgalt-network
 
 
 
-# Define la red interna personalizada para que todos los servicios se comuniquen entre sí
+# 🔗 RED
 networks:
   sgalt-network:
     driver: bridge
 
-# Define un volumen persistente para la base de datos
+# 💾 VOLUMEN
 volumes:
   db_data:

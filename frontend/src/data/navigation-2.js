@@ -32,10 +32,6 @@ export const navigation = [
         path: '/admin/users',
       },
       {
-        name: 'Crear usuario',
-        path: '/admin/users/crear',
-      },
-      {
         name: 'Roles y permisos',
         path: '/admin/users/roles',
       },
@@ -48,24 +44,12 @@ export const navigation = [
     Icon: duotone.Invoice,
     children: [
       {
-        name: 'Administrar cotizaciones',
-        path: '/dashboard/cotizaciones',
+        name: 'Adm. Cotizaciones',
+        path: '/quotation/list',
       },
       {
-        name: 'Crear cotización',
-        path: '/dashboard/cotizaciones/crear',
-      },
-      {
-        name: 'Cotizaciones en revisión',
-        path: '/dashboard/cotizaciones/en-revision',
-      },
-      {
-        name: 'Cotizaciones aceptadas',
-        path: '/dashboard/cotizaciones/aceptadas',
-      },
-      {
-        name: 'Cotizaciones rechazadas',
-        path: '/dashboard/cotizaciones/rechazadas',
+        name: 'Solicitudes de Cotizaciones',
+        path: '/quotation_request/list',
       },
     ],
   },

@@ -1,6 +1,15 @@
+import { clean, validate } from 'rut.js';
 import * as yup from 'yup';
 
+
 export const quotationRequestCreateSchema = yup.object({
+  company_rut: yup
+    .string()
+    .required("El RUT es obligatorio")
+    .test("rut-valido", "RUT inválido", (value) => {
+      if (!value) return false;
+      return validate(clean(value));
+    }),
   requester_full_name: yup
     .string()
     .max(255, 'Máximo 255 caracteres')
@@ -26,6 +35,11 @@ export const quotationRequestCreateSchema = yup.object({
     .max(255, 'Máximo 255 caracteres')
     .required('La dirección de la obra es obligatoria'),
 
+  company_name: yup
+    .string()
+    .max(255, 'Máximo 255 caracteres')
+    .required('La razón social es obligatoria'),
+    
   commune_id: yup
     .object()
     .typeError('Debe seleccionar una comuna')

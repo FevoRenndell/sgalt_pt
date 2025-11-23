@@ -53,7 +53,7 @@ const headCells = [{
 }
 //   { id: "" },
 ];
-export default function UserTableHead({
+export default function QuotationRequestTableHead({
   order,
   orderBy,
   rowCount,

@@ -4,7 +4,9 @@ import testRoutes from './testRoutes.js';
 import authRoutes from './authRoutes.js';
 import filterRoutes from './filterRoutes.js';
 import userRoutes from './userRoutes.js';
-import quoterRoutes from './quoterRoutes.js';
+import quatitionRequestClientRoutes from './quatitionRequestClientRoutes.js';
+import quatitionRequestQuoterRoutes from './quatitionRequestQuoterRoutes.js';
+
 import { errorHandler } from '../middlewares/errorHandler.js';
 
 const middlewares = [
@@ -14,14 +16,14 @@ const middlewares = [
 const initRoutes = (apiName, app) =>  {
 
   //ruta publica
-  app.use(`/${apiName}/auth`  , authRoutes  );
-  app.use(`/${apiName}/quoter`  , quoterRoutes  );
+  app.use(`/${apiName}/auth`   , authRoutes  );
+  app.use(`/${apiName}/quoter` , quatitionRequestClientRoutes  );
   //ruta privadas
   app.use(`/${apiName}/test`   , middlewares, testRoutes  );
   app.use(`/${apiName}/users`  , middlewares, userRoutes  );
   app.use(`/${apiName}/clients`, middlewares, clientRoutes);
   app.use(`/${apiName}/filters`, middlewares, filterRoutes);
-
+  app.use(`/${apiName}/quotation_requests`, middlewares, quatitionRequestQuoterRoutes);
 
   app.use(errorHandler);
 };

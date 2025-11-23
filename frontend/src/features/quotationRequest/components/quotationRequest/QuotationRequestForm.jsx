@@ -1,7 +1,7 @@
 import { CardHeader, Card, CardContent, Box } from '@mui/material';
 import { RHFSelect, RHFTextField } from '../../../../shared/components/hook-form';
 
-export default function UserForm() {
+export default function QuotationRequestForm() {
   return (
     <Card>
       <CardHeader title="Formulario de Usuario" />
