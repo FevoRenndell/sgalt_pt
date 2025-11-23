@@ -2,7 +2,12 @@ import { AppError } from '../error/AppError.js';
 import db from '../models/index.js';
 
 export async function getQuotationRequests() {
-  return await db.models.QuotationRequest.findAll({});
+  return await db.models.QuotationRequest.findAll({
+    include : [{
+      as : 'client',
+      model : db.models.Client
+    }]
+  });
 }
 
 export async function createQuotation(quotationRequestData) {

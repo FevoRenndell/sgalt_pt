@@ -21,11 +21,13 @@ import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteQuotationRequestMutation } from '../../api/quotationRequestQuoterApi.js';
 import { paths } from '../../../../routes/paths.js';
+import QuotationRequestDetailDialog from './QuotationRequestDetailDialog.jsx';
  
 export default function QuotationRequestTableList({ details }) {
 
   const navigate = useNavigate();
 
+  const [state , setState] = useState(false);
   const [QuotationRequests, setQuotationRequests] = useState([]);
 
   const [deleteQuotationRequest, { isLoading, error }] = useDeleteQuotationRequestMutation();
@@ -40,7 +42,7 @@ export default function QuotationRequestTableList({ details }) {
   });
 
   const TABLE_HEAD = [
-    { id: 'actions', label: 'Acciones', numeric: true, disablePadding: false, minWidth: '60px' },
+    { id: '', label: '', numeric: true, disablePadding: false },
 
     { id: 'solicitud_num', label: 'N° Solic.', align: 'left', minWidth: '120px' },
     { id: 'cotizacion_num', label: 'N° Cot.', align: 'left', minWidth: '200px' },
@@ -112,8 +114,26 @@ export default function QuotationRequestTableList({ details }) {
       Nueva Solicitud
     </Button>;
 
+
+  const onView = (row) => {
+    console.log(row)     
+    setState({
+      isOpen: true,
+      client: row
+    });
+  } 
+
+  const onClose = () => {
+    setState({
+      isOpen: false,
+      client: null
+    });
+  }
+
   return <div className="pt-2 pb-4">
     <Card>
+      <QuotationRequestDetailDialog state={state} onClose={onClose}/>
+
 
       <Box px={2} pt={2} mb={3}>
         <HeadingArea addButton={addButton} />
@@ -126,7 +146,7 @@ export default function QuotationRequestTableList({ details }) {
           <Table>
             <TableHeadCustom order={order} orderBy={orderBy} numSelected={selected.length} rowCount={filteredQuotationRequests.length} onRequestSort={handleRequestSort} onSelectAllRows={handleSelectAllRows(allQuotationRequestIds)} headCells={TABLE_HEAD} />
             <TableBody>
-              { paginatedQuotationRequests.length === 0 ? <TableDataNotFound /> : paginatedQuotationRequests.map(quotationRequest => <QuotationRequestTableRow key={quotationRequest.id} quotationRequest={quotationRequest}  handleDeleteQuotationRequest={handleDeleteQuotationRequest} />)}
+              { paginatedQuotationRequests.length === 0 ? <TableDataNotFound /> : paginatedQuotationRequests.map(quotationRequest => <QuotationRequestTableRow handleView={onView} key={quotationRequest.id} quotationRequest={quotationRequest}  handleDeleteQuotationRequest={handleDeleteQuotationRequest} />)}
             </TableBody>
           </Table>
         </Scrollbar>

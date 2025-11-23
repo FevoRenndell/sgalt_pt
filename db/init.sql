@@ -8,6 +8,21 @@
 
 BEGIN;
 
+-- 1) Tablas que dependen de otras
+DROP TABLE IF EXISTS quotation_items CASCADE;
+DROP TABLE IF EXISTS quotations CASCADE;
+DROP TABLE IF EXISTS quotation_request CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- 2) Tablas maestras del sistema
+DROP TABLE IF EXISTS services CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS clients CASCADE;
+
+-- 3) Ubicación geográfica (dependencias)
+DROP TABLE IF EXISTS communes CASCADE;
+DROP TABLE IF EXISTS cities CASCADE;
+DROP TABLE IF EXISTS regions CASCADE;
 -- =========================================================
 -- Tablas maestras: regiones, ciudades, comunas, roles
 -- (Catálogos jerárquicos para ubicar obras/solicitudes y
@@ -16,6 +31,29 @@ BEGIN;
 --   regions(1) ──< cities(*) ──< communes(*)
 --   roles es independiente y se referenciará desde users.role
 -- =========================================================
+
+
+-- ==========================================
+--  DROP TABLES (ORDEN CORRECTO POR FKs)
+-- ==========================================
+
+-- 1) Tablas que dependen de otras
+DROP TABLE IF EXISTS quotation_items CASCADE;
+DROP TABLE IF EXISTS quotations CASCADE;
+DROP TABLE IF EXISTS quotation_request CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- 2) Tablas maestras del sistema
+DROP TABLE IF EXISTS services CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS clients CASCADE;
+
+-- 3) Ubicación geográfica (dependencias)
+DROP TABLE IF EXISTS communes CASCADE;
+DROP TABLE IF EXISTS cities CASCADE;
+DROP TABLE IF EXISTS regions CASCADE;
+
+
 
 -- Crea la tabla de regiones administrativas del país (nivel 1)
 CREATE TABLE IF NOT EXISTS regions (            -- Si no existe, la crea; evita error en re-ejecuciones
@@ -91,7 +129,7 @@ INSERT INTO roles (id, description, created_at, updated_at) VALUES
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabla solo si no existe
-    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
 
   -- Identificador único autoincremental para cada usuario.
   -- Se utiliza como clave primaria (PK) y como referencia en otras tablas (por ejemplo: quotations.user_id).
@@ -193,7 +231,7 @@ INSERT INTO users (first_name, last_name_1, last_name_2, email, password_hash, r
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS clients (                      -- Crea la tabla si no existe
-  id                INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id                SERIAL PRIMARY KEY,
   -- Identificador único autoincremental (clave primaria).
   -- Este valor es interno y no se muestra al cliente.
   -- Otras tablas (como quotation_request) usarán este campo como FK (client_id).
@@ -266,7 +304,7 @@ END $$;
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS services (                       -- Crea la tabla si no existe
-  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id            SERIAL PRIMARY KEY,
   -- Identificador único autoincremental del servicio.
   -- Se utiliza como clave primaria (PK) y también se referencia
   -- desde otras tablas (por ejemplo: quotation_items.service_id).
@@ -339,7 +377,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_services_name ON services (LOWER(name));
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS quotation_request (             -- Crea la tabla si no existe
-  id                   INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id                   SERIAL PRIMARY KEY,
   -- Identificador único autoincremental de la solicitud de cotización.
   -- Es la clave primaria (PK) y será referenciada en la tabla 'quotations.request_id'.
 
@@ -466,7 +504,7 @@ CREATE INDEX IF NOT EXISTS ix_qreq_client_id ON quotation_request(client_id);
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS quotations (                      -- Crea la tabla si no existe
-  id               INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id               SERIAL PRIMARY KEY,
   -- Identificador único autoincremental para cada cotización (clave primaria).
   -- Referenciado por 'quotation_items.quotation_id'.
 
@@ -564,7 +602,7 @@ CREATE INDEX IF NOT EXISTS ix_quotations_status ON quotations(status);
 -- =========================================================
 
 CREATE TABLE IF NOT EXISTS quotation_items (                 -- Crea la tabla si no existe
-  id            INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  id            SERIAL PRIMARY KEY,
   -- Identificador único autoincremental del ítem (clave primaria).
 
   quotation_id  INTEGER NOT NULL,
@@ -630,6 +668,424 @@ CREATE TABLE IF NOT EXISTS quotation_items (                 -- Crea la tabla si
 CREATE INDEX IF NOT EXISTS ix_qitems_quotation_id ON quotation_items(quotation_id);
 -- Índice que mejora el rendimiento al listar los ítems de una cotización.
 -- Ejemplo: SELECT * FROM quotation_items WHERE quotation_id = 45;
+
+
+INSERT INTO regions (id, name, created_at, updated_at) VALUES
+(1,  'Arica y Parinacota',                          NOW(), NOW()),
+(2,  'Tarapacá',                                    NOW(), NOW()),
+(3,  'Antofagasta',                                 NOW(), NOW()),
+(4,  'Atacama',                                     NOW(), NOW()),
+(5,  'Coquimbo',                                    NOW(), NOW()),
+(6,  'Valparaíso',                                  NOW(), NOW()),
+(7,  'Metropolitana de Santiago',                   NOW(), NOW()),
+(8,  'Libertador General Bernardo O’Higgins',       NOW(), NOW()),
+(9,  'Maule',                                       NOW(), NOW()),
+(10, 'Ñuble',                                       NOW(), NOW()),
+(11, 'Biobío',                                      NOW(), NOW()),
+(12, 'La Araucanía',                                NOW(), NOW()),
+(13, 'Los Ríos',                                    NOW(), NOW()),
+(14, 'Los Lagos',                                   NOW(), NOW()),
+(15, 'Aysén del General Carlos Ibáñez del Campo',   NOW(), NOW()),
+(16, 'Magallanes y de la Antártica Chilena',        NOW(), NOW());
+
+ 
+
+INSERT INTO cities (id, name, region_id, created_at, updated_at) VALUES
+-- Región 1: Arica y Parinacota
+(1,  'Arica',        1,  NOW(), NOW()),
+
+-- Región 2: Tarapacá
+(2,  'Iquique',      2,  NOW(), NOW()),
+
+-- Región 3: Antofagasta
+(3,  'Antofagasta',  3,  NOW(), NOW()),
+
+-- Región 4: Atacama
+(4,  'Copiapó',      4,  NOW(), NOW()),
+
+-- Región 5: Coquimbo
+(5,  'La Serena',    5,  NOW(), NOW()),
+
+-- Región 6: Valparaíso
+(6,  'Valparaíso',   6,  NOW(), NOW()),
+
+-- Región 7: Metropolitana de Santiago
+(7,  'Santiago',     7,  NOW(), NOW()),
+
+-- Región 8: Libertador General Bernardo O’Higgins
+(8,  'Rancagua',     8,  NOW(), NOW()),
+
+-- Región 9: Maule
+(9,  'Talca',        9,  NOW(), NOW()),
+
+-- Región 10: Ñuble
+(10, 'Chillán',      10, NOW(), NOW()),
+
+-- Región 11: Biobío
+(11, 'Concepción',   11, NOW(), NOW()),
+
+-- Región 12: La Araucanía
+(12, 'Temuco',       12, NOW(), NOW()),
+
+-- Región 13: Los Ríos
+(13, 'Valdivia',     13, NOW(), NOW()),
+
+-- Región 14: Los Lagos
+(14, 'Puerto Montt', 14, NOW(), NOW()),
+
+-- Región 15: Aysén
+(15, 'Coyhaique',    15, NOW(), NOW()),
+
+-- Región 16: Magallanes y de la Antártica Chilena
+(16, 'Punta Arenas', 16, NOW(), NOW());
+
+ 
+INSERT INTO communes (id, name, city_id, created_at, updated_at) VALUES
+(1, 'Santiago', 7, NOW(), NOW()),
+(2, 'Cerrillos', 7, NOW(), NOW()),
+(3, 'Cerro Navia', 7, NOW(), NOW()),
+(4, 'Conchalí', 7, NOW(), NOW()),
+(5, 'El Bosque', 7, NOW(), NOW()),
+(6, 'Estación Central', 7, NOW(), NOW()),
+(7, 'Huechuraba', 7, NOW(), NOW()),
+(8, 'Independencia', 7, NOW(), NOW()),
+(9, 'La Cisterna', 7, NOW(), NOW()),
+(10, 'La Florida', 7, NOW(), NOW()),
+(11, 'La Granja', 7, NOW(), NOW()),
+(12, 'La Pintana', 7, NOW(), NOW()),
+(13, 'La Reina', 7, NOW(), NOW()),
+(14, 'Las Condes', 7, NOW(), NOW()),
+(15, 'Lo Barnechea', 7, NOW(), NOW()),
+(16, 'Lo Espejo', 7, NOW(), NOW()),
+(17, 'Lo Prado', 7, NOW(), NOW()),
+(18, 'Macul', 7, NOW(), NOW()),
+(19, 'Maipú', 7, NOW(), NOW()),
+(20, 'Ñuñoa', 7, NOW(), NOW()),
+(21, 'Pedro Aguirre Cerda', 7, NOW(), NOW()),
+(22, 'Peñalolén', 7, NOW(), NOW()),
+(23, 'Providencia', 7, NOW(), NOW()),
+(24, 'Pudahuel', 7, NOW(), NOW()),
+(25, 'Quilicura', 7, NOW(), NOW()),
+(26, 'Quinta Normal', 7, NOW(), NOW()),
+(27, 'Recoleta', 7, NOW(), NOW()),
+(28, 'Renca', 7, NOW(), NOW()),
+(29, 'San Joaquín', 7, NOW(), NOW()),
+(30, 'San Miguel', 7, NOW(), NOW()),
+(31, 'San Ramón', 7, NOW(), NOW()),
+(32, 'Vitacura', 7, NOW(), NOW()),
+
+-- Provincia Cordillera (también RM, si quieres que dependan del mismo city_id)
+(33, 'Puente Alto', 7, NOW(), NOW()),
+(34, 'Pirque', 7, NOW(), NOW()),
+(35, 'San José de Maipo', 7, NOW(), NOW()),
+
+-- Provincia Chacabuco
+(36, 'Colina', 7, NOW(), NOW()),
+(37, 'Lampa', 7, NOW(), NOW()),
+(38, 'Tiltil', 7, NOW(), NOW()),
+
+-- Provincia Maipo
+(39, 'San Bernardo', 7, NOW(), NOW()),
+(40, 'Buin', 7, NOW(), NOW()),
+(41, 'Calera de Tango', 7, NOW(), NOW()),
+(42, 'Paine', 7, NOW(), NOW()),
+
+-- Provincia Melipilla
+(43, 'Melipilla', 7, NOW(), NOW()),
+(44, 'Alhué', 7, NOW(), NOW()),
+(45, 'Curacaví', 7, NOW(), NOW()),
+(46, 'María Pinto', 7, NOW(), NOW()),
+(47, 'San Pedro', 7, NOW(), NOW()),
+
+-- Provincia Talagante
+(48, 'Talagante', 7, NOW(), NOW()),
+(49, 'El Monte', 7, NOW(), NOW()),
+(50, 'Isla de Maipo', 7, NOW(), NOW()),
+(51, 'Padre Hurtado', 7, NOW(), NOW()),
+(52, 'Peñaflor', 7, NOW(), NOW()),
+
+(53,  'Arica',                   1, NOW(), NOW()),
+(54,  'Camarones',               1, NOW(), NOW()),
+(55,  'Putre',                   1, NOW(), NOW()),
+(56,  'General Lagos',           1, NOW(), NOW()),
+(57,  'Valle de Lluta',          1, NOW(), NOW()),
+
+-- Región 2: Iquique
+(58,  'Iquique',                 2, NOW(), NOW()),
+(59,  'Alto Hospicio',           2, NOW(), NOW()),
+(60,  'Pozo Almonte',            2, NOW(), NOW()),
+(61,  'Camiña',                  2, NOW(), NOW()),
+(62, 'Huara',                   2, NOW(), NOW()),
+-- Región 3: Antofagasta
+(63, 'Antofagasta',             3, NOW(), NOW()),
+(64, 'Mejillones',              3, NOW(), NOW()),
+(65, 'Sierra Gorda',            3, NOW(), NOW()),
+(66, 'Taltal',                  3, NOW(), NOW()),
+(67, 'La Chimba',               3, NOW(), NOW()),
+
+-- Región 4: Copiapó
+(68, 'Copiapó',                 4, NOW(), NOW()),
+(69, 'Tierra Amarilla',         4, NOW(), NOW()),
+(70, 'Caldera',                 4, NOW(), NOW()),
+(71, 'Paipote',                 4, NOW(), NOW()),
+(72, 'San Fernando (Copiapó)',  4, NOW(), NOW()),
+
+-- Región 5: La Serena
+(73, 'La Serena',               5, NOW(), NOW()),
+(74, 'Coquimbo',                5, NOW(), NOW()),
+(75, 'Vicuña',                  5, NOW(), NOW()),
+(76, 'La Higuera',              5, NOW(), NOW()),
+(77, 'Tongoy',                  5, NOW(), NOW()),
+
+-- Región 6: Valparaíso
+(78, 'Valparaíso',              6, NOW(), NOW()),
+(79, 'Viña del Mar',            6, NOW(), NOW()),
+(80, 'Concón',                  6, NOW(), NOW()),
+(81, 'Quilpué',                 6, NOW(), NOW()),
+(82, 'Villa Alemana',           6, NOW(), NOW()),
+
+-- Región 8: Rancagua
+(88, 'Rancagua',                8, NOW(), NOW()),
+(89, 'Machalí',                 8, NOW(), NOW()),
+(90, 'Graneros',                8, NOW(), NOW()),
+(91, 'Olivar',                  8, NOW(), NOW()),
+(92, 'Requínoa',                8, NOW(), NOW()),
+
+-- Región 9: Talca
+(93, 'Talca',                   9, NOW(), NOW()),
+(94, 'Maule',                   9, NOW(), NOW()),
+(95, 'San Clemente',            9, NOW(), NOW()),
+(96, 'Río Claro',               9, NOW(), NOW()),
+(97, 'Pelarco',                 9, NOW(), NOW()),
+
+-- Región 10: Chillán
+(98, 'Chillán',                 10, NOW(), NOW()),
+(99, 'Chillán Viejo',           10, NOW(), NOW()),
+(100, 'Bulnes',                  10, NOW(), NOW()),
+(101, 'San Carlos',              10, NOW(), NOW()),
+(102, 'Coihueco',                10, NOW(), NOW()),
+
+-- Región 11: Concepción
+(103, 'Concepción',              11, NOW(), NOW()),
+(104, 'Talcahuano',              11, NOW(), NOW()),
+(105, 'San Pedro de la Paz',     11, NOW(), NOW()),
+(106, 'Chiguayante',             11, NOW(), NOW()),
+(107, 'Hualpén',                 11, NOW(), NOW()),
+
+-- Región 12: Temuco
+(108, 'Temuco',                  12, NOW(), NOW()),
+(109, 'Padre Las Casas',         12, NOW(), NOW()),
+(110, 'Villarrica',              12, NOW(), NOW()),
+(111, 'Pitrufquén',              12, NOW(), NOW()),
+(112, 'Gorbea',                  12, NOW(), NOW()),
+
+-- Región 13: Valdivia
+(113, 'Valdivia',                13, NOW(), NOW()),
+(114, 'Los Lagos',               13, NOW(), NOW()),
+(115, 'Panguipulli',             13, NOW(), NOW()),
+(116, 'Corral',                  13, NOW(), NOW()),
+(117, 'Mariquina',               13, NOW(), NOW()),
+
+-- Región 14: Puerto Montt
+(118, 'Puerto Montt',            14, NOW(), NOW()),
+(119, 'Puerto Varas',            14, NOW(), NOW()),
+(120, 'Llanquihue',              14, NOW(), NOW()),
+(121, 'Frutillar',               14, NOW(), NOW()),
+(122, 'Alerce',                  14, NOW(), NOW()),
+
+-- Región 15: Coyhaique
+(123, 'Coyhaique',               15, NOW(), NOW()),
+(124, 'Balmaceda',               15, NOW(), NOW()),
+(125, 'Puerto Aysén',            15, NOW(), NOW()),
+(126, 'Villa Ortega',            15, NOW(), NOW()),
+(127, 'Ñirehuao',                15, NOW(), NOW()),
+
+-- Región 16: Punta Arenas
+(128, 'Punta Arenas',            16, NOW(), NOW()),
+(129, 'Puerto Natales',          16, NOW(), NOW()),
+(130, 'Porvenir',                16, NOW(), NOW()),
+(131, 'Cabo de Hornos',          16, NOW(), NOW()),
+(132, 'Laguna Blanca',           16, NOW(), NOW());
+
+ INSERT INTO clients (
+  id,
+  company_rut,
+  company_name,
+  contact_name,
+  contact_email,
+  contact_phone,
+  created_at,
+  updated_at
+) VALUES
+(1, '89.862.200-2','LATAM Airlines Group S.A.','Contacto LATAM','contacto@latam.com','+56 2 2579 8990',NOW(),NOW()),
+(2, '90.222.000-3','Empresas CMPC S.A.','Contacto CMPC','contacto@cmpc.cl','+56 2 2441 2000',NOW(),NOW()),
+(3, '61.704.000-K','Corporación Nacional del Cobre de Chile','Contacto CODELCO','contacto@codelco.cl','+56 2 2690 3000',NOW(),NOW()),
+(4, '97.004.000-5','Banco de Chile','Contacto Banco de Chile','contacto@bancochile.cl','+56 2 2637 1111',NOW(),NOW()),
+(5, '90.749.000-9','Falabella S.A.','Contacto Falabella','contacto@falabella.cl','+56 2 2380 2000',NOW(),NOW()),
+(6, '92.604.000-6','Empresa Nacional del Petróleo','Contacto ENAP','contacto@enap.cl','+56 2 2729 7000',NOW(),NOW()),
+(7, '97.006.000-1','Copec S.A.','Contacto Copec','contacto@copec.cl','+56 2 xxxxx xxxx',NOW(),NOW()),
+(8, '96.940.000-7','SQM S.A.','Contacto SQM','contacto@sqm.com','+56 2 xxxxx xxxx',NOW(),NOW()),
+(9, '76.600.628-0','CMPC Celulosa S.A.','Contacto CMPC Celulosa','contacto@cmpc.cl','+56 2 xxxx xxxx',NOW(),NOW()),
+(10,'76.700.000-5','Entel Chile S.A.','Contacto Entel','contacto@entel.cl','+56 2 xxxx xxxx',NOW(),NOW());
+
+
+INSERT INTO quotation_request (
+  client_id,
+  requester_full_name,
+  requester_email,
+  requester_phone,
+  service_description,
+  obra_direccion,
+  commune_id,
+  city_id,
+  region_id,
+  status,
+  received_at,
+  reviewed_by,
+  reviewed_at,
+  review_notes,
+  created_at,
+  updated_at
+) VALUES
+
+-- 1) LATAM Airlines Group S.A. (client_id = 1) - SANTIAGO (RM)
+-- Pudahuel
+(1,'María Torres','m.torres@latam.com','+56 9 4455 1122',
+ 'Mantención eléctrica en bodega central',
+ 'Av. Américo Vespucio 901',
+ 24, 7, 7,  -- Pudahuel, Santiago, Región Metropolitana
+ 'pending', NOW() - INTERVAL '7 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- San Joaquín
+(1,'Pedro Soto','p.soto@latam.com','+56 9 8899 2211',
+ 'Revisión estructural área técnica',
+ 'Av. Departamental 2000',
+ 29, 7, 7,  -- San Joaquín, Santiago, Región Metropolitana
+ 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- Pedro Aguirre Cerda
+(1,'Ana Martínez','a.martinez@latam.com','+56 9 7722 1100',
+ 'Inspección de hangares',
+ 'Pedro Aguirre Cerda 4500',
+ 21, 7, 7,  -- Pedro Aguirre Cerda, Santiago, Región Metropolitana
+ 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 2) Empresas CMPC S.A. (client_id = 2) - CONCEPCIÓN (Biobío)
+(2,'Juan Herrera','j.herrera@cmpc.cl','+56 9 8811 5599',
+ 'Revisión instalaciones forestales',
+ 'Camino a Laja 123',
+ 103, 11, 11,  -- Concepción, ciudad Concepción, Región Biobío
+ 'pending', NOW() - INTERVAL '6 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(2,'Daniela Vergara','d.vergara@cmpc.cl','+56 9 6611 3322',
+ 'Instalación eléctrica planta Nueva Imperial',
+ 'Ruta S-40 KM 12',
+ 104, 11, 11,  -- Talcahuano, ciudad Concepción, Región Biobío
+ 'pending', NOW() - INTERVAL '4 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(2,'Ricardo Silva','r.silva@cmpc.cl','+56 9 7711 8800',
+ 'Evaluación riesgos industriales',
+ 'Camino Los Boldos 500',
+ 105, 11, 11,  -- San Pedro de la Paz, ciudad Concepción, Región Biobío
+ 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 3) CODELCO (client_id = 3) - ANTOFAGASTA (Región 3)
+(3,'Claudio Muñoz','c.munoz@codelco.cl','+56 9 9911 5533',
+ 'Inspección mina subterránea',
+ 'Sector Chuquicamata S/N',
+ 63, 3, 3,  -- Antofagasta
+ 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(3,'Sofía Reyes','s.reyes@codelco.cl','+56 9 8222 1144',
+ 'Instalación nuevos tableros eléctricos',
+ 'Av. Minería 123',
+ 64, 3, 3,  -- Mejillones
+ 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 4) Banco de Chile (client_id = 4) - SANTIAGO (RM)
+(4,'Marcelo Pinto','m.pinto@bancochile.cl','+56 9 5511 7744',
+ 'Revisión de sucursal principal',
+ 'Paseo Ahumada 251',
+ 1, 7, 7,  -- Santiago centro
+ 'pending', NOW() - INTERVAL '5 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(4,'Valentina Araya','v.araya@bancochile.cl','+56 9 6611 8800',
+ 'Cambio de instalaciones HVAC',
+ 'Av. Apoquindo 1234',
+ 14, 7, 7,  -- Las Condes
+ 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 5) Falabella (client_id = 5) - SANTIAGO (RM)
+(5,'Camila López','c.lopez@falabella.cl','+56 9 4411 9922',
+ 'Revisión tienda mall Alto Las Condes',
+ 'Av. Kennedy 9001',
+ 14, 7, 7,  -- Las Condes
+ 'pending', NOW() - INTERVAL '7 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(5,'Hernán Pino','h.pino@falabella.cl','+56 9 8811 1233',
+ 'Instalación paneles eléctricos',
+ 'Av. Vicuña Mackenna 300',
+ 20, 7, 7,  -- Ñuñoa (aprox. zona V. Mackenna)
+ 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 6) ENAP (client_id = 6) - VALPARAÍSO (Región 6)
+(6,'Andrea Ruiz','a.ruiz@enap.cl','+56 9 7722 5566',
+ 'Inspección planta petroquímica',
+ 'Ruta 5 Sur KM 16',
+ 78, 6, 6,  -- Valparaíso
+ 'pending', NOW() - INTERVAL '4 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(6,'Sebastián Parra','s.parra@enap.cl','+56 9 5511 6611',
+ 'Revisión compresores industriales',
+ 'Camino a Refinería 200',
+ 80, 6, 6,  -- Concón
+ 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 7) Copec (client_id = 7) - SANTIAGO (RM)
+(7,'Jorge Contreras','j.contreras@copec.cl','+56 9 8811 9911',
+ 'Revisión estación de servicio',
+ 'Av. Matta 550',
+ 19, 7, 7,  -- Maipú (ejemplo)
+ 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(7,'Patricia Díaz','p.diaz@copec.cl','+56 9 7711 4411',
+ 'Mantención surtidores',
+ 'Av. Grecia 2001',
+ 10, 7, 7,  -- La Florida
+ 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 8) SQM (client_id = 8) - ANTOFAGASTA (Región 3)
+(8,'Tomás Villarroel','t.villarroel@sqm.com','+56 9 6611 8822',
+ 'Inspección planta Salar de Atacama',
+ 'Ruta B-355 KM 28',
+ 65, 3, 3,  -- Sierra Gorda
+ 'pending', NOW() - INTERVAL '6 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(8,'Fernanda Morales','f.morales@sqm.com','+56 9 7711 0099',
+ 'Instalación transformador',
+ 'Av. Los Volcanes 123',
+ 63, 3, 3,  -- Antofagasta
+ 'pending', NOW() - INTERVAL '2 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 9) CMPC Celulosa (client_id = 9) - CONCEPCIÓN (Biobío)
+(9,'Eduardo Campos','e.campos@cmpc.cl','+56 9 9911 4400',
+ 'Revisión planta Laja',
+ 'Camino Central 155',
+ 104, 11, 11,  -- Talcahuano, ciudad Concepción
+ 'pending', NOW() - INTERVAL '5 days', NULL, NULL, NULL, NOW(), NOW()),
+
+-- 10) Entel (client_id = 10) - SANTIAGO (RM)
+(10,'Gabriel Hidalgo','g.hidalgo@entel.cl','+56 9 8811 5566',
+ 'Instalación red eléctrica sala servidores',
+ 'Av. Providencia 111',
+ 23, 7, 7,  -- Providencia
+ 'pending', NOW() - INTERVAL '3 days', NULL, NULL, NULL, NOW(), NOW()),
+
+(10,'Monserrat Jara','m.jara@entel.cl','+56 9 7711 8822',
+ 'Revisión torres de transmisión',
+ 'Camino Antena Norte',
+ 36, 7, 7,  -- Colina
+ 'pending', NOW() - INTERVAL '1 days', NULL, NULL, NULL, NOW(), NOW());
 
 
 
@@ -773,168 +1229,4 @@ SET DEFAULT nextval('quotations_quote_number_seq');
 -- =========================================================
 -- INSERT INTO roles(description) VALUES ('Administrador'), ('Vendedor') ON CONFLICT DO NOTHING;
 -- INSERT INTO regions(name) VALUES ('Región de Arica y Parinacota') ON CONFLICT DO NOTHING;
-
-
-DELETE FROM communes;
-delete from cities;
-delete from regions;
-
-
-INSERT INTO regions (id, name, created_at, updated_at) VALUES
-(1,  'Arica y Parinacota',                          NOW(), NOW()),
-(2,  'Tarapacá',                                    NOW(), NOW()),
-(3,  'Antofagasta',                                 NOW(), NOW()),
-(4,  'Atacama',                                     NOW(), NOW()),
-(5,  'Coquimbo',                                    NOW(), NOW()),
-(6,  'Valparaíso',                                  NOW(), NOW()),
-(7,  'Metropolitana de Santiago',                   NOW(), NOW()),
-(8,  'Libertador General Bernardo O’Higgins',       NOW(), NOW()),
-(9,  'Maule',                                       NOW(), NOW()),
-(10, 'Ñuble',                                       NOW(), NOW()),
-(11, 'Biobío',                                      NOW(), NOW()),
-(12, 'La Araucanía',                                NOW(), NOW()),
-(13, 'Los Ríos',                                    NOW(), NOW()),
-(14, 'Los Lagos',                                   NOW(), NOW()),
-(15, 'Aysén del General Carlos Ibáñez del Campo',   NOW(), NOW()),
-(16, 'Magallanes y de la Antártica Chilena',        NOW(), NOW());
-
  
-
-INSERT INTO cities (id, name, region_id, created_at, updated_at) VALUES
--- Región 1: Arica y Parinacota
-(1,  'Arica',        1,  NOW(), NOW()),
-
--- Región 2: Tarapacá
-(2,  'Iquique',      2,  NOW(), NOW()),
-
--- Región 3: Antofagasta
-(3,  'Antofagasta',  3,  NOW(), NOW()),
-
--- Región 4: Atacama
-(4,  'Copiapó',      4,  NOW(), NOW()),
-
--- Región 5: Coquimbo
-(5,  'La Serena',    5,  NOW(), NOW()),
-
--- Región 6: Valparaíso
-(6,  'Valparaíso',   6,  NOW(), NOW()),
-
--- Región 7: Metropolitana de Santiago
-(7,  'Santiago',     7,  NOW(), NOW()),
-
--- Región 8: Libertador General Bernardo O’Higgins
-(8,  'Rancagua',     8,  NOW(), NOW()),
-
--- Región 9: Maule
-(9,  'Talca',        9,  NOW(), NOW()),
-
--- Región 10: Ñuble
-(10, 'Chillán',      10, NOW(), NOW()),
-
--- Región 11: Biobío
-(11, 'Concepción',   11, NOW(), NOW()),
-
--- Región 12: La Araucanía
-(12, 'Temuco',       12, NOW(), NOW()),
-
--- Región 13: Los Ríos
-(13, 'Valdivia',     13, NOW(), NOW()),
-
--- Región 14: Los Lagos
-(14, 'Puerto Montt', 14, NOW(), NOW()),
-
--- Región 15: Aysén
-(15, 'Coyhaique',    15, NOW(), NOW()),
-
--- Región 16: Magallanes y de la Antártica Chilena
-(16, 'Punta Arenas', 16, NOW(), NOW());
-
- 
-INSERT INTO communes (id, name, city_id, created_at, updated_at) VALUES
-(1, 'Santiago', 7, NOW(), NOW()),
-(2, 'Cerrillos', 7, NOW(), NOW()),
-(3, 'Cerro Navia', 7, NOW(), NOW()),
-(4, 'Conchalí', 7, NOW(), NOW()),
-(5, 'El Bosque', 7, NOW(), NOW()),
-(6, 'Estación Central', 7, NOW(), NOW()),
-(7, 'Huechuraba', 7, NOW(), NOW()),
-(8, 'Independencia', 7, NOW(), NOW()),
-(9, 'La Cisterna', 7, NOW(), NOW()),
-(10, 'La Florida', 7, NOW(), NOW()),
-(11, 'La Granja', 7, NOW(), NOW()),
-(12, 'La Pintana', 7, NOW(), NOW()),
-(13, 'La Reina', 7, NOW(), NOW()),
-(14, 'Las Condes', 7, NOW(), NOW()),
-(15, 'Lo Barnechea', 7, NOW(), NOW()),
-(16, 'Lo Espejo', 7, NOW(), NOW()),
-(17, 'Lo Prado', 7, NOW(), NOW()),
-(18, 'Macul', 7, NOW(), NOW()),
-(19, 'Maipú', 7, NOW(), NOW()),
-(20, 'Ñuñoa', 7, NOW(), NOW()),
-(21, 'Pedro Aguirre Cerda', 7, NOW(), NOW()),
-(22, 'Peñalolén', 7, NOW(), NOW()),
-(23, 'Providencia', 7, NOW(), NOW()),
-(24, 'Pudahuel', 7, NOW(), NOW()),
-(25, 'Quilicura', 7, NOW(), NOW()),
-(26, 'Quinta Normal', 7, NOW(), NOW()),
-(27, 'Recoleta', 7, NOW(), NOW()),
-(28, 'Renca', 7, NOW(), NOW()),
-(29, 'San Joaquín', 7, NOW(), NOW()),
-(30, 'San Miguel', 7, NOW(), NOW()),
-(31, 'San Ramón', 7, NOW(), NOW()),
-(32, 'Vitacura', 7, NOW(), NOW()),
-
--- Provincia Cordillera (también RM, si quieres que dependan del mismo city_id)
-(33, 'Puente Alto', 7, NOW(), NOW()),
-(34, 'Pirque', 7, NOW(), NOW()),
-(35, 'San José de Maipo', 7, NOW(), NOW()),
-
--- Provincia Chacabuco
-(36, 'Colina', 7, NOW(), NOW()),
-(37, 'Lampa', 7, NOW(), NOW()),
-(38, 'Tiltil', 7, NOW(), NOW()),
-
--- Provincia Maipo
-(39, 'San Bernardo', 7, NOW(), NOW()),
-(40, 'Buin', 7, NOW(), NOW()),
-(41, 'Calera de Tango', 7, NOW(), NOW()),
-(42, 'Paine', 7, NOW(), NOW()),
-
--- Provincia Melipilla
-(43, 'Melipilla', 7, NOW(), NOW()),
-(44, 'Alhué', 7, NOW(), NOW()),
-(45, 'Curacaví', 7, NOW(), NOW()),
-(46, 'María Pinto', 7, NOW(), NOW()),
-(47, 'San Pedro', 7, NOW(), NOW()),
-
--- Provincia Talagante
-(48, 'Talagante', 7, NOW(), NOW()),
-(49, 'El Monte', 7, NOW(), NOW()),
-(50, 'Isla de Maipo', 7, NOW(), NOW()),
-(51, 'Padre Hurtado', 7, NOW(), NOW()),
-(52, 'Peñaflor', 7, NOW(), NOW());
-
-
-ALTER TABLE quotation_request
-ALTER COLUMN client_id DROP NOT NULL;
-
-INSERT INTO clients (
-  company_rut,
-  company_name,
-  contact_name,
-  contact_email,
-  contact_phone,
-  -- service_description,
-  created_at,
-  updated_at
-) VALUES
-('89.862.200-2','LATAM Airlines Group S.A.','Contacto LATAM','contacto@latam.com','+56 2 2579 8990',NOW(),NOW()),
-('90.222.000-3','Empresas CMPC S.A.','Contacto CMPC','contacto@cmpc.cl','+56 2 2441 2000',NOW(),NOW()),
-('61.704.000-K','Corporación Nacional del Cobre de Chile','Contacto CODELCO','contacto@codelco.cl','+56 2 2690 3000',NOW(),NOW()),
-('97.004.000-5','Banco de Chile','Contacto Banco de Chile','contacto@bancochile.cl','+56 2 2637 1111',NOW(),NOW()),
-('90.749.000-9','Falabella S.A.','Contacto Falabella','contacto@falabella.cl','+56 2 2380 2000',NOW(),NOW()),
-('92.604.000-6','Empresa Nacional del Petróleo','Contacto ENAP','contacto@enap.cl','+56 2 2729 7000',NOW(),NOW()),
-('97.006.000-1','Copec S.A.','Contacto Copec','contacto@copec.cl','+56 2 xxxxx xxxx',NOW(),NOW()),
-('96.940.000-7','SQM S.A.','Contacto SQM','contacto@sqm.com','+56 2 xxxxx xxxx',NOW(),NOW()),
-('76.600.628-0','CMPC Celulosa S.A.','Contacto CMPC Celulosa','contacto@cmpc.cl','+56 2 xxxx xxxx',NOW(),NOW()),
-('76.700.000-5','Entel Chile S.A.','Contacto Entel','contacto@entel.cl','+56 2 xxxx xxxx',NOW(),NOW());
