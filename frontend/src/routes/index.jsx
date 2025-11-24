@@ -6,6 +6,8 @@ import { PATH_AFTER_LOGIN } from '../config';
 import { Navigate } from 'react-router-dom';
 import { Public } from './public';
 import { QuotationRequest } from './quotationRequest';
+import { Quotation } from './quotation';
+
 
 export const routes = () => {
     return [
@@ -16,9 +18,11 @@ export const routes = () => {
       },
       
     ...Users,
+    ...Public,
     ...AuthRoutes,
+    ...Quotation,
     ...DashboardRoutes,
     ...QuotationRequest,
-    ...Public
+
   ];
 };

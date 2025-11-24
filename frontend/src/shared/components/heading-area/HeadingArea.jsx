@@ -12,6 +12,8 @@ import { FlexBetween, FlexBox } from '../../../shared/components/FlexBox';
 // CUSTOM ICON COMPONENTS
 import GroupSenior from '../../../shared/icons/GroupSenior';
  
+
+
 // STYLED COMPONENT
 const TabListWrapper = styled(TabList)(({
   theme
@@ -41,16 +43,18 @@ export default function HeadingArea({
   value,
   changeTab,
   addButton,
+  icon,
+  title,
   tab_active = false
 }) {  
   return <FlexBetween flexWrap="wrap" gap={1}>
       <FlexBox alignItems="center" gap={1.5}>
         <StyledAvatar variant="rounded">
-          <GroupSenior className="icon" />
+          {icon ? icon : <GroupSenior className="icon" />}
         </StyledAvatar>
 
         <Typography variant="body1" fontWeight={500}>
-          Users
+          {title ? title : 'ingresa el titulo de la tabla'}
         </Typography>
       </FlexBox>
       {tab_active && (
