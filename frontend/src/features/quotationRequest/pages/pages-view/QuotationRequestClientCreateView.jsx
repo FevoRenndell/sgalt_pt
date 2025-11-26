@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 // MUI
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
-import { Button, CardContent, CardHeader } from '@mui/material';
+import { Box, Button, CardContent, CardHeader } from '@mui/material';
 
 // CUSTOM
 import { FormProvider, RHFSelect, RHFTextField } from '../../../../shared/components/hook-form/index.jsx';
@@ -19,17 +19,24 @@ import {
   useFetchClientByRutQuery
 } from '../../../quotationRequest/api/filterApi';
 
-import { filterApi } from  '../../../quotationRequest/api/filterApi';
+import { filterApi } from '../../../quotationRequest/api/filterApi';
 
 import {
   useCreateQuoteRequestMutation
 } from '../../../quotationRequest/api/quotationRequestClientApi';
- 
+
 import { handleApiError } from '../../../../shared/utils/handleApiError';
 import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
 import { useEffect, useState } from 'react';
 import ClientInputs from '../../components/client/ClientInputs';
 import { useDispatch } from 'react-redux';
+import HeadingArea from '../../../../shared/components/heading-area/HeadingArea.jsx';
+import CreateIcon from '@mui/icons-material/Create';
+import { paths } from '../../../../routes/paths.js';
+
+import SendIcon from '@mui/icons-material/Send';
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+
 
 // ---------------- COMPONENT ----------------
 export default function QuotationRequestClientCreateView({ isPublic = true }) {
@@ -39,26 +46,24 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
   const dispatch = useDispatch();
 
   const initialValues = {
-    requester_full_name: '',
-    requester_email: '',
-    requester_phone: '',
-    service_description: '',
-    obra_direccion: '',
-    commune_id: null,
     city_id: null,
     region_id: null,
-
+    commune_id: null,
     company_rut: '',
     company_name: '',
     contact_name: '',
     contact_email: '',
     contact_phone: '',
-  
+    obra_direccion: '',
+    requester_email: '',
+    requester_phone: '',
+    requester_full_name: '',
+    service_description: '',
   };
 
   //estado locales
   const [isRutValid, setIsRutValid] = useState(false);
-  const [client , setClient] = useState(null);
+  const [client, setClient] = useState(null);
 
   const confirm = useConfirmDialog();
 
@@ -155,33 +160,33 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
     }
   });
 
-const searchClient = (e) => {
+  const searchClient = (e) => {
 
-  if( newValues.company_rut === '' ) {
-    setIsRutValid(false);
-    return;
-  }
+    if (newValues.company_rut === '') {
+      setIsRutValid(false);
+      return;
+    }
 
-  const inputValue = newValues.company_rut || '';
-  const rutCleaned = clean(inputValue);
-  const isValid = validate(rutCleaned); 
-  if (!isValid) {
-    console.log("RUT inválido, no buscar");
-    //error en company_rut
-    return;
-  }
-  setIsRutValid(isValid);
-};
+    const inputValue = newValues.company_rut || '';
+    const rutCleaned = clean(inputValue);
+    const isValid = validate(rutCleaned);
+    if (!isValid) {
+      console.log("RUT inválido, no buscar");
+      //error en company_rut
+      return;
+    }
+    setIsRutValid(isValid);
+  };
 
   const handleMask = (e) => {
     const inputValue = e.target.value || '';
     const rutCleaned = clean(inputValue);
-    const rutFormateado = format(rutCleaned); 
+    const rutFormateado = format(rutCleaned);
     setValue('company_rut', rutFormateado, { shouldValidate: true });
   };
 
   useEffect(() => {
-    if(dataClient) {
+    if (dataClient) {
       setClient(dataClient);
       setValue('company_name', dataClient.company_name);
       setValue('contact_name', dataClient.contact_name);
@@ -191,33 +196,45 @@ const searchClient = (e) => {
   }, [dataClient]);
 
   const handleClean = () => {
-  
+
     setClient(null);
-    dispatch( filterApi.util.invalidateTags([{ type: "Client", id: "by_rut" }]));
+    dispatch(filterApi.util.invalidateTags([{ type: "Client", id: "by_rut" }]));
     reset();
   }
 
+
+
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
-      <Card>
-        <CardHeader title='Solicitud de Cotización' />
-        <CardContent sx={{ pt: 0, pl: 10, pr: 10 }}>
-          <div className="pt-2 pb-4">
+      <div className="pt-2 pb-4" >
+        <Card className="p-3" >
+          <Box px={2} pt={2} mb={3}>
+            <HeadingArea
+              title='Nueva Solicitud de Cotización'
+              addButton={
+                <Button variant="outlined" color='primary' size="medium" onClick={() => navigate(paths.quotation_request_list)}>
+                  Volver
+                </Button>
+              }
+              icon={<CreateIcon className="icon" />
+              } />
+          </Box>
+          <CardContent >
             <Grid container spacing={3} sx={{ mt: 2 }}>
               <Grid size={{ sm: 6, xs: 12 }}>
                 {isPublic && (
                   <RHFTextField
-                      size="small"
-                      fullWidth
-                      name="company_rut"
-                      label="Rut Cotizante"
-                      sizeParam="small"
-                      search_rut={true}
-                      onClick={(e) => searchClient(e)} 
-                      onKeyUp={(e) => handleMask(e)}
-                      disabled={!!client}
-                    />
-                  
+                    size="small"
+                    fullWidth
+                    name="company_rut"
+                    label="Rut Cotizante"
+                    sizeParam="small"
+                    search_rut={true}
+                    onClick={(e) => searchClient(e)}
+                    onKeyUp={(e) => handleMask(e)}
+                    disabled={!!client}
+                  />
+
                 )}
 
                 {!isPublic && (
@@ -240,7 +257,6 @@ const searchClient = (e) => {
                 />
               </Grid>
             </Grid>
-
             <Grid container spacing={3} sx={{ mt: 2 }}>
               {/* Teléfono contacto */}
               <Grid size={{ sm: 6, xs: 12 }}>
@@ -264,7 +280,6 @@ const searchClient = (e) => {
                 />
               </Grid>
             </Grid>
-
             <Grid container spacing={3} sx={{ mt: 2 }}>
               {/* Obra / Dirección de la obra */}
               <Grid size={{ sm: 12, xs: 12 }}>
@@ -277,7 +292,6 @@ const searchClient = (e) => {
                 />
               </Grid>
             </Grid>
-
             <Grid container spacing={3} sx={{ mt: 2 }}>
               {/* Región */}
               <Grid size={{ sm: 4, xs: 12 }}>
@@ -312,7 +326,6 @@ const searchClient = (e) => {
                 />
               </Grid>
             </Grid>
-
             <Grid container spacing={3} sx={{ mt: 2 }}>
               {/* Descripción del servicio */}
               <Grid size={{ sm: 12, xs: 12 }}>
@@ -327,18 +340,15 @@ const searchClient = (e) => {
                 />
               </Grid>
             </Grid>
-
-            <ClientInputs blocked={!!client} />   
-            
-
+            <ClientInputs blocked={!!client} />
             <Grid container spacing={3} sx={{ pt: 3 }}>
               <Grid size={{ sm: 3, xs: 12 }}>
                 <Button
                   size='small'
                   type="submit"
-
+                  startIcon={<SendIcon />} 
                   variant="outlined"
-                  outlined={true}
+                  
                   color="success"
                   fullWidth
                   disabled={isSubmitting || isCreating}
@@ -350,9 +360,9 @@ const searchClient = (e) => {
               <Grid size={{ sm: 3, xs: 12 }}>
                 <Button
                   size='small'
-         
+                  startIcon={<CleaningServicesIcon />} 
                   variant="outlined"
-                  outlined={true}
+                  
                   color="warning"
                   fullWidth
                   onClick={() => handleClean()}
@@ -361,9 +371,11 @@ const searchClient = (e) => {
                 </Button>
               </Grid>
             </Grid>
-          </div>
-        </CardContent>
-      </Card>
+
+          </CardContent>
+        </Card>
+      </div>
     </FormProvider>
+
   );
 }

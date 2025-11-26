@@ -125,9 +125,8 @@ export default function UserTableList({ details }) {
   return <div className="pt-2 pb-4">
     <Card>
 
-      <Box px={2} pt={2}>
-        <HeadingArea value={userFilter.role} changeTab={handleChangeTab} addButton={addButton} />
-        <SearchArea value={userFilter.search} onChange={handleSearchChange} gridRoute="/dashboard/user-grid" listRoute="/dashboard/user-list" />
+      <Box px={2} pt={2} mb={3}>
+        <HeadingArea title='Listado de Cotizaciones' addButton={addButton} icon={null} />
       </Box>
 
       {/* TABLE HEAD & BODY ROWS */}

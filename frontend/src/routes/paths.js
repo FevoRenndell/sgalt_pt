@@ -15,12 +15,11 @@ export const paths = {
 
   // Cotizaciones
   quotation_request_list: '/quotation_request/list',
-  quotation_create: '/quotation_request/create',
+  quotation_request_create: '/quotation_request/create',
   quotation_view: (id) => `/quotation_request/${id}/view`,
-  // cotizacionesRevision: '/dashboard/quotation/en-revision',
-  // cotizacionesAceptadas: '/dashboard/quotation/aceptadas',
-  // cotizacionesRechazadas: '/dashboard/quotation/rechazadas',
-
+  quotation_list : '/quotation/list',
+  quotation_create: '/quotation/create',
+  quotation_create_from_request: (id) => `/quotation/${id}/quotation_create`,
   // Clientes
   clientes: '/dashboard/clientes',
   clientesCrear: '/dashboard/clientes/crear',

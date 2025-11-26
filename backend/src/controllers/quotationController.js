@@ -6,7 +6,7 @@ import {
     getQuotationById,
 } from '../services/quotationService.js';
 
-export const fetchQuotations = async (req, res) => {
+export const fetchQuotations = async (req, res, next) => {
     try {
         const quotationControllers = await getQuotations();
         res.status(200).json(quotationControllers);
@@ -24,28 +24,26 @@ export const addQuotation = async (req, res, next) => {
     }
 };
 
-export const fetchQuotationById = async (req, res) => {
+export const fetchQuotationById = async (req, res, next) => {
     try {
         const quotationController = await getQuotationById(req.params.id);
-        if (!quotationController) {
-            return res.status(404).json({ message: 'Quotation not found' });
-        }
+ 
         res.status(200).json(quotationController);
     } catch (error) {
         next(error);
     }
 };
 
-export const modifyQuotation = async (req, res) => {
+export const modifyQuotation = async (req, res, next) => {
     try {
         const updatedQuotation = await updateQuotation(req.params.id, req.body);
         res.status(200).json(updatedQuotation);
     } catch (error) {
-        res.status(500).json({ message: 'Error updating quotationController', error });
+        next(error);
     }
 };
 
-export const removeQuotation = async (req, res) => {
+export const removeQuotation = async (req, res, next) => {
     try {
         const deletedQuotation = await deleteQuotation(req.params.id);
         res.status(200).json(deletedQuotation);
@@ -53,4 +51,3 @@ export const removeQuotation = async (req, res) => {
         next(error);
     }
 };
-

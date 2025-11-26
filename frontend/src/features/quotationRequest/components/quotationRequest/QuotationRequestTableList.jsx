@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDeleteQuotationRequestMutation } from '../../api/quotationRequestQuoterApi.js';
 import { paths } from '../../../../routes/paths.js';
 import QuotationRequestDetailDialog from './QuotationRequestDetailDialog.jsx';
- 
+import SubjectIcon from '@mui/icons-material/Subject';
 export default function QuotationRequestTableList({ details }) {
 
   const navigate = useNavigate();
@@ -105,7 +105,7 @@ export default function QuotationRequestTableList({ details }) {
   const allQuotationRequestIds     = useMemo(() => filteredQuotationRequests.map(row => row.id), [filteredQuotationRequests]);
 
   const addButton =
-    <Button variant="outlined" color='success' startIcon={<Add />} size='small' onClick={() => navigate(paths.quotation_create)}>
+    <Button variant="outlined" color='success' startIcon={<Add />} size='medium' onClick={() => navigate(paths.quotation_request_create)}>
       Nueva Solicitud
     </Button>;
 
@@ -127,16 +127,13 @@ export default function QuotationRequestTableList({ details }) {
   return <div className="pt-2 pb-4">
     <Card>
       <QuotationRequestDetailDialog state={state} onClose={onClose}/>
-
-
       <Box px={2} pt={2} mb={3}>
-        <HeadingArea addButton={addButton} />
+        <HeadingArea title='Solicitudes de Cotizaciones' addButton={addButton} icon={<SubjectIcon className="icon" />} />
       </Box>
 
       {/* TABLE HEAD & BODY ROWS */}
       <TableContainer>
         <Scrollbar autoHide={false}>
-
           <Table>
             <TableHeadCustom order={order} orderBy={orderBy} numSelected={selected.length} rowCount={filteredQuotationRequests.length} onRequestSort={handleRequestSort} onSelectAllRows={handleSelectAllRows(allQuotationRequestIds)} headCells={TABLE_HEAD} />
             <TableBody>
@@ -144,7 +141,6 @@ export default function QuotationRequestTableList({ details }) {
             </TableBody>
           </Table>
         </Scrollbar>
-
       </TableContainer>
 
       {/* PAGINATION SECTION */}

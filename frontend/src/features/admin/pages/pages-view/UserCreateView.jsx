@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
- 
+
 // MUI
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import { CardContent, CardHeader, Snackbar } from '@mui/material';
+import { Box, CardContent, CardHeader, Snackbar } from '@mui/material';
 
 // CUSTOM
 import { FormProvider, RHFSelect, RHFSwitch, RHFTextField } from '../../../../shared/components/hook-form';
@@ -22,7 +22,10 @@ import { useFetchUsersFiltersQuery } from '../../api/filterApi';
 import { enqueueSnackbar } from 'notistack';
 import { handleApiError } from '../../../../shared/utils/handleApiError';
 import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
-
+import HeadingArea from '../../../../shared/components/heading-area/HeadingArea';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import SendIcon from '@mui/icons-material/Send';
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 // ---------------- COMPONENT ----------------
 export default function UserCreateView() {
 
@@ -40,7 +43,7 @@ export default function UserCreateView() {
     password_hash: '',
     repeat_password: '',
   };
- 
+
   const confirm = useConfirmDialog();
 
   const isEdit = location.pathname.includes('edit');
@@ -156,118 +159,109 @@ export default function UserCreateView() {
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
-      <Card>
-        <CardHeader title={isEdit ? `Editar Usuario ${watch('first_name')}` : 'Crear Usuario'}
-          action={
-            <RHFSwitch
-              fullWidth
-              name="is_active"
-              label="Activo"
-              options={options?.state || []}
-              sizeParam="small"
-            />
-          }
-        />
-        <CardContent sx={{ pt: 0 , pl:10, pr:10}}>
-          <div className="pt-2 pb-4">
-            <Card className="p-3">
-              <Grid container spacing={3} sx={{ mt: 2 }}>
-                <Grid size={{ sm: 6, xs: 12 }}>
-                  <RHFSelect
-                    fullWidth
-                    name="role"
-                    label="Rol"
-                    options={options?.roles || []}
-                    sizeParam="small"
-                  />
-                </Grid>
-                <Grid size={{ sm: 6, xs: 12 }}>
-                  <RHFTextField  size='small' fullWidth name="email" label="Email" sizeParam="small" />
-                </Grid>
-
-
+      <div className="pt-2 pb-4" >
+        <Card className="p-3"  >
+          <Box px={2} pt={2} mb={3}>
+            <HeadingArea
+              title={isEdit ? `Editar Usuario ${watch('first_name')}` : 'Crear Usuario'}
+              addButton={
+                <Button variant="outlined" color='primary' size="medium" onClick={() => navigate(paths.users_list)}>
+                  Volver
+                </Button>
+              }
+              icon={<PersonAddIcon className="icon" />
+              } />
+          </Box>
+          <CardContent >
+            <Grid container spacing={3} sx={{ mt: 2 }}>
+              <Grid size={{ sm: 6, xs: 12 }}>
+                <RHFSelect
+                  fullWidth
+                  name="role"
+                  label="Rol"
+                  options={options?.roles || []}
+                  sizeParam="small"
+                />
               </Grid>
-              <Grid container spacing={3} sx={{ mt: 2 }}>
-                <Grid size={{ sm: 4, xs: 12 }}>
-                  <RHFTextField  size='small' fullWidth name="first_name" label="Nombre" sizeParam="small" />
-                </Grid>
-                <Grid size={{ sm: 4, xs: 12 }}>
-                  <RHFTextField
-                    fullWidth
-                     size='small'
-                    name="last_name_1"
-                    label="Apellido Paterno"
-                    sizeParam="small"
-                  />
-                </Grid>
-                <Grid size={{ sm: 4, xs: 12 }}>
-                  <RHFTextField
-                    size='small'
-                    fullWidth
-                    name="last_name_2"
-                    label="Apellido Materno"
-                    sizeParam="small"
-                  />
-                </Grid>
-              </Grid>
-              <Grid container spacing={3} sx={{ mt: 2 }}>
-
-                <Grid size={{ sm: 6, xs: 12 }}>
-                  <RHFTextField  size='small' fullWidth name="password_hash" label="Password" sizeParam="small" />
-                </Grid>
-
-                <Grid size={{ sm: 6, xs: 12 }}>
-                  <RHFTextField
-                    fullWidth
-                     size='small'
-                    name="repeat_password"
-                    label="Repita Contraseña"
-                    sizeParam="small"
-                  />
-                </Grid>
+              <Grid size={{ sm: 6, xs: 12 }}>
+                <RHFTextField size='small' fullWidth name="email" label="Email" sizeParam="small" />
               </Grid>
 
-              <Grid container spacing={3} sx={{ pt: 3 }}>
-                <Grid size={{ sm: 3, xs: 12 }}>
-                  <Button
-                    size='small'
-                    type="submit"
-                    
-                    variant="outlined"
-                    outlined={true}
-                    color="success"
-                    fullWidth
-                    disabled={isSubmitting || isCreating || isUpdating}
-                  >
-                    {isEdit ? 'Actualizar Usuario' : 'Crear Usuario'}
-                  </Button>
-                </Grid>
-                {isEdit ? (
-                  <Grid size={{ sm: 3, xs: 12 }}>
 
-                    <Button
-                      size='small'
-                      variant="outlined"
-                      fullWidth
-                      color="error"
-                      disabled={isSubmitting || isCreating || isUpdating}
-                      onClick={handleDelete}
-                    >
-                      Eliminar usuario
-                    </Button>
-                  </Grid>
-                ) : null}
-
-                <Grid size={{ sm: 1, xs: 12 }}>
-                  <Button size='small' variant="outlined" color="primary" fullWidth onClick={handleGoBack}>
-                    Volver
-                  </Button>
-                </Grid>
+            </Grid>
+            <Grid container spacing={3} sx={{ mt: 2 }}>
+              <Grid size={{ sm: 4, xs: 12 }}>
+                <RHFTextField size='small' fullWidth name="first_name" label="Nombre" sizeParam="small" />
               </Grid>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
+              <Grid size={{ sm: 4, xs: 12 }}>
+                <RHFTextField
+                  fullWidth
+                  size='small'
+                  name="last_name_1"
+                  label="Apellido Paterno"
+                  sizeParam="small"
+                />
+              </Grid>
+              <Grid size={{ sm: 4, xs: 12 }}>
+                <RHFTextField
+                  size='small'
+                  fullWidth
+                  name="last_name_2"
+                  label="Apellido Materno"
+                  sizeParam="small"
+                />
+              </Grid>
+            </Grid>
+            <Grid container spacing={3} sx={{ mt: 2 }}>
+
+              <Grid size={{ sm: 6, xs: 12 }}>
+                <RHFTextField size='small' fullWidth name="password_hash" label="Password" sizeParam="small" />
+              </Grid>
+
+              <Grid size={{ sm: 6, xs: 12 }}>
+                <RHFTextField
+                  fullWidth
+                  size='small'
+                  name="repeat_password"
+                  label="Repita Contraseña"
+                  sizeParam="small"
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container spacing={3} sx={{ pt: 3 }}>
+              <Grid size={{ sm: 3, xs: 12 }}>
+                <Button
+                  size='small'
+                  type="submit"
+                  startIcon={<SendIcon />}
+                  variant="outlined"
+
+                  color="success"
+                  fullWidth
+                  disabled={isSubmitting || isCreating}
+                >
+                  {isCreating ? 'Enviando...' : 'Enviar Solicitud'}
+                </Button>
+              </Grid>
+
+              <Grid size={{ sm: 3, xs: 12 }}>
+                <Button
+                  size='small'
+                  startIcon={<CleaningServicesIcon />}
+                  variant="outlined"
+
+                  color="warning"
+                  fullWidth
+                  onClick={() => handleClean()}
+                >
+                  Limpiar
+                </Button>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </Card>
+      </div>
     </FormProvider>
   );
 }

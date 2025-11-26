@@ -14,6 +14,7 @@ export default (sequelize) => {
       is_active: { type: DataTypes.BOOLEAN, defaultValue: true },
       created_at: { type: DataTypes.DATE(6), allowNull: false },
       updated_at: { type: DataTypes.DATE(6), allowNull: false },
+      soft_delete: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
     {
       tableName: 'users',

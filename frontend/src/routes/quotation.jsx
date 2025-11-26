@@ -28,6 +28,7 @@ export const Quotation = [
     children: [
       { path: '/quotation/list'    , element: <QuotationPage          /> },
       { path: '/quotation/create'  , element: <QuotationCreatePage    /> },
+      { path: '/quotation/:id/quotation_create' , element: <QuotationCreatePage /> },
     ],
   },
 ];

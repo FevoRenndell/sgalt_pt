@@ -1,7 +1,5 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, CardHeader, Box, Container } from "@mui/material";
-import { Card, Chip, Grid, Stack, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
-import { styled } from '@mui/material/styles';
+import { Dialog, DialogContent, DialogActions, Button, Box, Container } from "@mui/material";
+import { Card, Chip, Grid, Typography } from "@mui/material";
 import { fDateTime } from "../../../../shared/utils/formatTime";
 import { useConfirmDialog } from "../../../../contexts/ConfirmDialogContext";
 import { FormProvider, RHFRadioGroup, RHFTextField } from '../../../../shared/components/hook-form';
@@ -14,22 +12,20 @@ import {
   useUpdateQuotationRequestSaveReviewMutation,
 } from '../../api/quotationRequestQuoterApi';
 import { enqueueSnackbar } from "notistack";
-import { useEffect, useState } from "react";
-
-
-export const StyledBox = styled('div')(({ theme }) => ({
-  padding: 24,
-  borderRadius: 12,
-  backgroundColor: theme.palette.background.paper,
-  backdropFilter: 'blur(4px)',
-  border: `1px solid ${theme.palette.divider}`,
-}));
-;
+import { useEffect } from "react";
+import HeadingArea from "../../../../shared/components/heading-area/HeadingArea";
+import GradingIcon from '@mui/icons-material/Grading';
+import { StyledBox } from "../../../../shared/components/style-box";
+import { paths } from "../../../../routes/paths";
+ 
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 
 export default function QuotationRequestDetailDialog({ state: { isOpen = false, client = {} }, onClose }) {
 
   const confirm = useConfirmDialog();
+
+  const navigate = useNavigate();
 
   const [updateQuotationRequestSaveReview, { isLoading: isUpdating, error: updateError }] = useUpdateQuotationRequestSaveReviewMutation();
 
@@ -39,7 +35,6 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
     independence_issue: '',
     review_notes: '',
   };
-
 
   const methods = useForm({
     defaultValues: initialValues,
@@ -62,7 +57,6 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
         review_notes: client.review_notes || '',
       });
     }
-
   }, [client?.id, isUpdating]);
 
   const {
@@ -115,8 +109,6 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
       <span>{description}</span>
     </Typography>;
   }
-
-
 
   const onSubmit = handleSubmit(async (values) => {
 
@@ -178,8 +170,8 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
 
     if (competence_capacity && need_subcontracting_services && independence_issue && status === 'REVISADA') {
       return (
-        <Button variant="outlined" color='info' size="small" onClick={() => onSubmit()}>
-           Crear Cotización
+        <Button variant="outlined" color='info' size="small" onClick={() => navigate(paths.quotation_create_from_request(id))}>
+          Crear Cotización
         </Button>);
     }
   }
@@ -200,22 +192,19 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
 
   return (
     <Container>
-
       <Dialog open={isOpen} maxWidth="md" fullWidth>
         <DialogContent dividers>
           <div className="pt-2 pb-4">
             <Card className="p-3">
-
-              <CardHeader action={
-
-                <Box sx={{ gap: 1, display: 'flex' }}>
+              <Box pt={1} mb={3}>
+                <HeadingArea title={`Solicitud de Cotización  # ${id}`} addButton={<Box sx={{ gap: 1, display: 'flex' }}>
                   <Button variant="outlined" color='primary' size="small" onClick={onClose}>Cerrar</Button>
-                    {editButton}
-                    {actionButton}
-                </Box>
+                  {editButton}
+                  {actionButton}
+                </Box>} icon={<GradingIcon className="icon" />} />
+              </Box>
 
-              } />
-              <Scrollbar autoHide={true}>
+              <Scrollbar autoHide={false}>
                 <StyledBox>
                   <Grid container spacing={4}>
                     {/* Columna Izquierda: Solicitud */}
@@ -429,8 +418,8 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
           <DialogActions>
             <Box sx={{ gap: 1, display: 'flex' }}>
               <Button variant="outlined" color='primary' size="small" onClick={onClose}>Cerrar</Button>
-                {editButton}
-                {actionButton}
+              {editButton}
+              {actionButton}
             </Box>
           </DialogActions>
         </DialogContent>

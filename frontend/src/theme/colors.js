@@ -32,18 +32,19 @@ export const primary = {
   main: '#6868EB'
 };
 export const success = {
-  25: '#F0FDF5',
-  50: '#DCFCE8',
-  100: '#BBF7D1',
-  200: '#86EFAD',
-  300: '#4ADE80',
-  400: '#22C55E',
-  500: '#16A34A',
-  600: '#15803D',
-  700: '#166534',
-  800: '#14532D',
-  900: '#052E16',
-  main: '#22C55E'
+  25:  '#E8FBEA',     // más claro que lighter
+  50:  '#D3FCD2',     // lighter
+  100: '#A9F3B5',     // entre lighter y light
+  200: '#77ED8B',     // light
+  300: '#4CD372',     // entre light y main
+  400: '#22C55E',     // main
+  500: '#199F4E',     // entre main y dark
+  600: '#118D57',     // dark
+  700: '#0C6F4A',     // entre dark y darker
+  800: '#065E49',     // darker
+  900: '#03382C',     // más oscuro que darker
+  main: '#22C55E',
+  contrastText: '#ffffff',
 };
 export const warning = {
   25: '#FFFBEB',
@@ -57,11 +58,11 @@ export const warning = {
   700: '#92400E',
   800: '#78350F',
   900: '#451A03',
-  main: '#F59E0B'
+  main: '#D97706'
 };
 export const error = {
   25: '#FEF2F2',
-  50: '#FEE2E2',
+  50: '#110808ff',
   100: '#FECACA',
   200: '#FCA5A5',
   300: '#F87171',
@@ -77,10 +78,17 @@ export const secondary = {
   ...grey,
   main: '#F6F7F8'
 };
-export const info = {
+/*export const info = {
   light: '#EAEAFE',
   main: '#8282FB',
   dark: '#5151D3'
+};*/
+
+export const info = {
+  light: '#EAEAFE',
+  main: '#4DA1FF',
+  dark: '#4DA1FF'
+ 
 };
 
 // FOR LIGHT THEME TEXT COLORS

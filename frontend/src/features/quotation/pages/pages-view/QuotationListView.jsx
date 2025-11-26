@@ -1,7 +1,7 @@
 
 
 import { Container, Card, CardContent, Box } from '@mui/material';
-import QuotationRequestTableList from '../../components/quotationRequest/QuotationTableList';
+import QuotationTableList from '../../components/quotation/QuotationTableList';
 import { useFetchQuotationRequestsQuery } from '../../api/quotationRequestQuoterApi';
 
  
@@ -14,7 +14,7 @@ export default function QuotationListView({ }) {
             <Box sx={{ mt: 4, mb: 4 }}>
                 <Card>
                     <CardContent>
-                        <QuotationRequestTableList details={quotationRequestsData || []} />
+                        <QuotationTableList details={quotationRequestsData || []} />
                     </CardContent>
                 </Card>
             </Box>

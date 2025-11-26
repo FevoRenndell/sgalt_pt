@@ -1,10 +1,10 @@
-import QuotationRequestClientCreateView from './pages-view/QuotationRequestClientCreateView';
+import QuotationCreateView from './pages-view/QuotationCreateView';
 
-export default function QuotationRequestCreatePage() {
+export default function QuotationCreatePage() {
   return (
     <>
-      <title> Crear Usuarios </title>
-      <QuotationRequestClientCreateView />
+      <title> Solicitar Cotización </title>
+      <QuotationCreateView />
     </>
   );
 }

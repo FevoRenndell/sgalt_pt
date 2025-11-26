@@ -28,9 +28,8 @@ export default function QuotationRequestTableRow({
       <TableCell padding="normal">
         <IconButton
           color="primary"
-          size="small"
           onClick={() => handleView(quotationRequest)}>
-          <PageviewIcon fontSize="small" />
+          <PageviewIcon />
         </IconButton>
       </TableCell>
       <TableCell padding="normal" >{id} </TableCell>

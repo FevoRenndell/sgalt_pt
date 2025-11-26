@@ -3,7 +3,7 @@ import QuotationRequestClientCreateView from './pages-view/QuotationRequestClien
 export default function QuotationRequestCreatePage() {
   return (
     <>
-      <title> Crear Usuarios </title>
+      <title> Solicitar Cotización </title>
       <QuotationRequestClientCreateView />
     </>
   );

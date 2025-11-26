@@ -5,3 +5,4 @@ export { default as RHFSwitch } from './RHFSWitch';
 export { default as RHFSelect } from './RHFSelect';
 export { default as RHFDatePicker } from './RHFDatePicker';
 export { default as RHFRadioGroup } from './RHFRadioGroup';
+export { default as RHFMultiSelect } from './RHFMultiSelect';

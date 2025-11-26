@@ -1,11 +1,12 @@
 import { AppError } from '../error/AppError.js';
 import db from '../models/index.js';
 
+// filtros para usuarios
 export async function getUserFilters() {
     try {
-        return { 
-          roles : await getRoles(),
-          state : await getState()
+        return {
+            roles: await getRoles(),
+            state: await getState()
         };
     } catch (error) {
         console.error('Error fetching user selects:', error);
@@ -16,7 +17,7 @@ export async function getUserFilters() {
 export async function getRoles() {
     try {
         return await db.models.Role.findAll({
-            attributes: ['id',   [db.sequelize.fn("TRIM", db.sequelize.col("description")), "name"],]
+            attributes: ['id', [db.sequelize.fn("TRIM", db.sequelize.col("description")), "name"],]
         });
     } catch (error) {
         console.error('Error fetching roles:', error);
@@ -37,12 +38,11 @@ export async function getState() {
 }
 
 
-// filtros para cotizaciones
-
+// filtros para solicitudes de  cotizaciones
 export async function getRegions() {
     try {
         return await db.models.Region.findAll({
-            attributes: ['id',  'name',]
+            attributes: ['id', 'name',]
         });
     } catch (error) {
         console.error('Error fetching regions:', error);
@@ -53,8 +53,8 @@ export async function getRegions() {
 export async function getCities(regionId) {
     try {
         return await db.models.City.findAll({
-            attributes: ['id',  'name',],
-            where: { region_id :  regionId }
+            attributes: ['id', 'name',],
+            where: { region_id: regionId }
         });
     } catch (error) {
         console.error('Error fetching cities:', error);
@@ -65,11 +65,25 @@ export async function getCities(regionId) {
 export async function getCommunes(cityId) {
     try {
         return await db.models.Commune.findAll({
-            attributes: ['id',  'name',],
-            where: { city_id :  cityId }
+            attributes: ['id', 'name',],
+            where: { city_id: cityId }
         });
     } catch (error) {
         console.error('Error fetching communes:', error);
         throw new AppError('Error fetching communes', 500);
     }
-} 
+}
+
+
+// filtros para cotizaciones
+export async function getQuotationFilters() {
+    return {
+        services: await getServices(),
+    }
+}
+
+export async function getServices() {
+    return await db.models.Service.findAll({
+        attributes: ['id', [db.sequelize.fn("TRIM", db.sequelize.col("description")), "name"],]
+    });
+}

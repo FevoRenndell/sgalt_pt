@@ -170,7 +170,7 @@ CREATE TABLE IF NOT EXISTS users (                            -- Se crea la tabl
   updated_at     TIMESTAMP DEFAULT NOW(),  
   -- Fecha y hora de la última actualización.
   -- Se actualiza automáticamente mediante el trigger global `set_updated_at`.
-  soft_deleted  BOOLEAN DEFAULT FALSE,
+  soft_delete  BOOLEAN  NULL DEFAULT FALSE,
 
   CONSTRAINT fk_users_role
     FOREIGN KEY (role_id)
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS clients (                      -- Crea la tabla si no
   updated_at        TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora de la última actualización del registro.
   -- Este campo se actualiza automáticamente mediante el trigger global `set_updated_at`.
-
+  soft_delete  BOOLEAN  NULL DEFAULT FALSE,
   CONSTRAINT ux_clients_rut UNIQUE (company_rut)
   -- Restricción de unicidad para evitar clientes duplicados con el mismo RUT.
   -- PostgreSQL no distingue mayúsculas/minúsculas en VARCHAR,
@@ -343,7 +343,8 @@ CREATE TABLE IF NOT EXISTS services (                       -- Crea la tabla si 
   -- Fecha y hora de creación del registro.
   -- Se completa automáticamente al insertar el servicio.
 
-  updated_at    TIMESTAMP DEFAULT NOW()
+  updated_at    TIMESTAMP DEFAULT NOW(),
+  soft_delete  BOOLEAN  NULL DEFAULT FALSE
   -- Fecha y hora de la última actualización del servicio.
   -- Se actualiza automáticamente mediante el trigger global `set_updated_at`.
 );
@@ -441,7 +442,7 @@ CREATE TABLE IF NOT EXISTS quotation_request (             -- Crea la tabla si n
   created_at           TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora en que el registro fue creado en la base de datos.
   -- Puede coincidir con received_at, pero se mantiene por consistencia con otras tablas.
-
+ soft_delete  BOOLEAN  NULL DEFAULT FALSE,
   updated_at           TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora de la última actualización del registro.
   -- Se actualiza automáticamente mediante el trigger global 'set_updated_at'.
@@ -525,41 +526,34 @@ CREATE TABLE IF NOT EXISTS quotations (                      -- Crea la tabla si
   -- Identifica al usuario (vendedor, secretaria o encargado técnico)
   -- que elaboró la cotización.
 
-  request_summary  TEXT NOT NULL,
+  request_summary  TEXT NULL,
   -- Resumen del contenido o alcance de la solicitud que dio origen a la cotización.
   -- Este campo se rellena al momento de emitirla, describiendo brevemente los servicios ofrecidos.
 
-  issue_date       DATE,
+  issue_date       DATE NULL,
   -- Fecha de emisión de la cotización.
   -- Se usa para el control de vigencia y registro histórico.
 
-  status           VARCHAR(20) NOT NULL,
+  status           VARCHAR(20) NOT NULL DEFAULT 'CREADA',
   -- Estado de la cotización (obligatorio).
   -- Ejemplos: 'borrador', 'emitida', 'enviada', 'aceptada', 'rechazada', 'vencida'.
   -- Permite controlar su ciclo de vida dentro del sistema.
 
+  discount  NUMERIC(12,2) NULL DEFAULT 0,
+
   subtotal         NUMERIC(12,2) NOT NULL DEFAULT 0,
   -- Monto total sin impuestos, calculado como la suma de los subtotales de cada ítem.
-
-  tax_rate         NUMERIC(5,4)  NOT NULL DEFAULT 0,   -- p.ej. 0.19 = 19%
-  -- Tasa de impuesto aplicada a la cotización (por ejemplo, IVA).
-  -- Se almacena en formato decimal (0.19 = 19%).
-  -- Permite recalcular fácilmente el monto total si cambia el valor del IVA.
-
-  tax_amount       NUMERIC(12,2) NOT NULL DEFAULT 0,
-  -- Valor del impuesto calculado: subtotal * tax_rate.
-  -- Guardarlo facilita reportes sin tener que recalcular cada vez.
 
   total            NUMERIC(12,2) NOT NULL DEFAULT 0,
   -- Monto total con impuestos incluidos: subtotal + tax_amount.
 
-  pdf_url          TEXT,
+  pdf_url          TEXT NULL,
   -- Ruta o enlace al archivo PDF generado para la cotización.
   -- Puede ser un archivo almacenado en el servidor o en un bucket de Object Storage.
 
   created_at       TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora de creación del registro.
-
+  soft_delete  BOOLEAN  NULL DEFAULT FALSE,
   updated_at       TIMESTAMP DEFAULT NOW(),
   -- Fecha y hora de la última actualización del registro.
 
@@ -617,10 +611,6 @@ CREATE TABLE IF NOT EXISTS quotation_items (                 -- Crea la tabla si
   -- Permite vincular el ítem con un servicio registrado en el catálogo general.
   -- Puede ser NULL si se trata de un servicio no estándar o personalizado.
 
-  description   TEXT NOT NULL,
-  -- Descripción libre del ítem (obligatoria).
-  -- Generalmente corresponde al nombre del servicio,
-  -- pero se deja abierta para adaptaciones específicas (ej. “Control de compactación en obra X”).
 
   quantity      INTEGER NOT NULL DEFAULT 1,
   -- Cantidad del servicio cotizado (por defecto 1).
@@ -631,9 +621,6 @@ CREATE TABLE IF NOT EXISTS quotation_items (                 -- Crea la tabla si
 
   unit_price    NUMERIC(12,2) NOT NULL DEFAULT 0,
   -- Precio unitario del servicio (sin impuesto).
-
-  line_discount NUMERIC(12,2) DEFAULT 0,
-  -- Descuento aplicado a esta línea, si corresponde (en moneda, no en porcentaje).
 
   subtotal      NUMERIC(12,2) NOT NULL DEFAULT 0,
   -- Subtotal de la línea, calculado como:
@@ -1256,4 +1243,70 @@ SET DEFAULT nextval('quotations_quote_number_seq');
 -- =========================================================
 -- INSERT INTO roles(description) VALUES ('Administrador'), ('Vendedor') ON CONFLICT DO NOTHING;
 -- INSERT INTO regions(name) VALUES ('Región de Arica y Parinacota') ON CONFLICT DO NOTHING;
- 
+ INSERT INTO services (id, name, area, norma, unit, description, base_price)
+VALUES
+-- ======================
+--     SUELOS
+-- ======================
+(1, 'Granulometría por tamizado', 'Suelos', 'NCh165/1', 'muestra',
+ 'Determinación de la distribución granulométrica en suelos mediante tamizado.', 18000),
+
+(2, 'Límites de Atterberg (LL, LP)', 'Suelos', 'NCh1515', 'muestra',
+ 'Determinación del límite líquido y plástico para clasificación de suelos.', 22000),
+
+(3, 'Proctor Modificado', 'Suelos', 'NCh1536/2', 'muestra',
+ 'Determinación de la relación humedad–densidad y densidad máxima.', 35000),
+
+(4, 'Densidad “in situ” método de arena', 'Suelos', 'NCh1516', 'unidad',
+ 'Control de compactación mediante el método del cono de arena.', 28000),
+
+(5, 'Densidad “in situ” método nuclear', 'Suelos', 'ASTM D6938', 'unidad',
+ 'Medición instantánea de densidad y humedad con densímetro nuclear.', 32000),
+
+(6, 'CBR – Índice de soporte California', 'Suelos', 'ASTM D1883', 'muestra',
+ 'Ensayo para determinar la capacidad soporte del suelo.', 48000),
+
+-- ======================
+--     HORMIGÓN
+-- ======================
+(7, 'Ensayo de compresión de probetas de hormigón', 'Hormigón', 'NCh1037/1', 'unidad',
+ 'Ensayo de resistencia a la compresión de probetas cilíndricas.', 4500),
+
+(8, 'Toma de probetas en terreno', 'Hormigón', 'NCh1019', 'unidad',
+ 'Moldeo, curado inicial y etiquetado de probetas en obra.', 6500),
+
+(9, 'Revenimiento (Slump Test)', 'Hormigón', 'NCh2256', 'unidad',
+ 'Determinación del asentamiento del hormigón fresco.', 6000),
+
+(10, 'Contenido de aire en hormigón', 'Hormigón', 'NCh1561', 'unidad',
+ 'Medición del aire ocluido en hormigón mediante método de presión.', 9000),
+
+-- ======================
+--     ASFALTOS
+-- ======================
+(11, 'Contenido de ligante asfáltico', 'Asfalto', 'NCh1514', 'muestra',
+ 'Determinación del contenido de ligante en mezcla asfáltica.', 45000),
+
+(12, 'Granulometría de mezclas asfálticas', 'Asfalto', 'NCh1534', 'muestra',
+ 'Determinación granulométrica mediante extracción y tamizado.', 42000),
+
+(13, 'Ensayo Marshall (Estabilidad y Flujo)', 'Asfalto', 'NCh1537', 'muestra',
+ 'Determinación de estabilidad y flujo Marshall.', 55000),
+
+-- ======================
+-- CONTROL EN TERRENO
+-- ======================
+(14, 'Placa de carga', 'Control en Terreno', 'ASTM D1196', 'unidad',
+ 'Ensayo de placa para determinar el módulo de reacción del suelo.', 120000),
+
+(15, 'Control de compactación superficial', 'Control en Terreno', 'NCh1546', 'unidad',
+ 'Densidad superficial para verificar compactación en capas.', 25000),
+
+-- ======================
+-- OTROS SERVICIOS
+-- ======================
+(16, 'Ensayo de densidad nuclear (visita)', 'Ensayo/Control', 'ASTM D6938', 'visita',
+ 'Visita a terreno con densímetro nuclear, incluye operador.', 45000),
+
+(17, 'Retiro de muestras en terreno', 'Logística', '-', 'visita',
+ 'Retiro y traslado de muestras desde obra al laboratorio.', 15000);

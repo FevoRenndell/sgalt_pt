@@ -12,6 +12,7 @@ export default (sequelize) => {
       contact_phone: { type: DataTypes.STRING(50) },
       created_at: { type: DataTypes.DATE(6), allowNull: false },
       updated_at: { type: DataTypes.DATE(6), allowNull: false },
+      soft_delete: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
     {
       tableName: 'clients',

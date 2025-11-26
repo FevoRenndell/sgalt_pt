@@ -7,6 +7,7 @@ export default (sequelize) => {
       id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       name: { type: DataTypes.STRING(150), allowNull: false },
       area: { type: DataTypes.STRING(150) },
+      unit: { type: DataTypes.STRING(150) },
       norma: { type: DataTypes.STRING(150) },
       description: { type: DataTypes.TEXT },
       base_price: { type: DataTypes.DECIMAL(12, 2) },
