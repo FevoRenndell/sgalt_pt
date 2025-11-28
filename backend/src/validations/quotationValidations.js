@@ -15,12 +15,21 @@ export const quotationCreateSchema = Joi.object({
       'number.integer': 'El request_id debe ser un número entero',
       'number.positive': 'El request_id debe ser un ID válido',
     }),
-
+  discount: Joi.number()
+    .integer()
+    .positive()
+    .required()
+    .messages({
+      'any.required': 'El descuento es obligatorio',
+      'number.base': 'El descuento debe ser un número',
+      'number.integer': 'El descuento debe ser un número entero',
+      'number.positive': 'El descuento debe ser mayor a 0',
+    }),
   // Arreglo de ítems de la cotización
   items: Joi.array()
     .items(
       Joi.object({
-        service_id: Joi.number()
+        id: Joi.number()
           .integer()
           .positive()
           .required()
@@ -30,7 +39,6 @@ export const quotationCreateSchema = Joi.object({
             'number.integer': 'El ID del servicio debe ser entero',
             'number.positive': 'El ID del servicio debe ser un número positivo',
           }),
-
         quantity: Joi.number()
           .integer()
           .positive()
@@ -41,32 +49,13 @@ export const quotationCreateSchema = Joi.object({
             'number.integer': 'La cantidad debe ser un número entero',
             'number.positive': 'La cantidad debe ser mayor a 0',
           }),
-
-        unit_price: Joi.number()
-          .precision(2)
-          .min(0)
-          .required()
-          .messages({
-            'any.required': 'El valor unitario es obligatorio',
-            'number.base': 'El valor unitario debe ser un número',
-            'number.min': 'El valor unitario no puede ser negativo',
-          }),
-
-        total: Joi.number()
-          .precision(2)
-          .min(0)
-          .required()
-          .messages({
-            'any.required': 'El total es obligatorio',
-            'number.base': 'El total debe ser un número',
-            'number.min': 'El total no puede ser negativo',
-          }),
-
-        is_active: Joi.boolean()
-          .default(true)
-          .messages({
-            'boolean.base': 'El estado del ítem debe ser verdadero o falso',
-          }),
+        base_price: Joi.number().allow('', null).messages({
+          'number.base': 'El precio base debe ser un número',
+        }),
+        name: Joi.string().allow('', null).messages({
+          'string.base': 'El nombre del servicio debe ser una cadena de texto',
+        }),
+     
       })
     )
     .min(1)

@@ -5,10 +5,6 @@ export const quotationValidationCreateSchema = yup.object({
     .array()
     .of(
       yup.object({
-        service_id: yup
-          .number()
-          .typeError('Debe seleccionar un servicio')
-          .required('El servicio es obligatorio'),
 
         quantity: yup
           .number()

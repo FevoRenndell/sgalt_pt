@@ -1,4 +1,4 @@
-import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import { Box, CardActions, CardContent, Fab, Tab } from '@mui/material';
+import { Box, CardActions, CardContent, Fab } from '@mui/material';
 
 // CUSTOM
 import { FormProvider } from '../../../../shared/components/hook-form';
@@ -28,23 +28,20 @@ import HeadingArea from '../../../../shared/components/heading-area/HeadingArea'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import SaveIcon from '@mui/icons-material/Save';
-import QuotationSummary from '../../components/totalize-quotation/QuotationSummary';
+import QuotationSummary from './QuotationSummary';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetQuotationDraft, setQuotationDraft } from '../../quotationSlice/quotationSlice';
 import { StyledBox } from '../../../../shared/components/style-box/StyledBox';
-import QuotationServiceTableList from '../../components/add-quotation-items/QuotationServiceTableList';
-import QuotationSummaryDrawer from '../../components/totalize-quotation/QuotationSummaryDrawer';
-import TabList from '@mui/lab/TabList';
-import TabContext from '@mui/lab/TabContext';
-import { HeadingWrapper } from '../../../../shared/components/heading-wrapper/HeadingWrapper';
-
+import QuotationServiceTableList from '../add-quotation-items/QuotationServiceTableList';
+import FloatingButton from '../../../../shared/components/buttons/FloatingButton';
+import QuotationSummaryDrawer from './QuotationSummaryDrawer';
 // ---------------- COMPONENT ----------------
 export default function QuotationCreateView() {
 
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [selectTab, setSelectTab] = useState('');
+
   const dispatch = useDispatch();
 
   //objeto que sera el borradfor de la cotización
@@ -56,15 +53,28 @@ export default function QuotationCreateView() {
 
   const isEdit = location.pathname.includes('quotation_create');
 
+
+
+  // const { data: options } = useFetchQuotationRequestFiltersQuery();
+
+  /*const {
+    data: quotation_existing,
+    isLoading: isQuotationRequestLoading,
+    error,
+  } = useFetchQuotationRequestByIdQuery(id, {
+    skip: !isEdit || !id,
+  });*/
+
+  const quotation_existing = null; // temporal mientras se arregla lo de arriba
+
   useEffect(() => {
-    if (id) {
+    if (isEdit && quotation_existing) {
       dispatch(setQuotationDraft({
-        ...draft,
-        request_id: parseInt(id),
+        ...quotation_existing,
+        items: quotation_existing.items?.map((i) => ({ ...i })),
       }));
     }
-  }, [id, dispatch]);
-  
+  }, [isEdit, quotation_existing, dispatch]);
 
   const [createQuotation, { isLoading: isCreating, error: createError }] = useCreateQuotationMutation();
 
@@ -77,10 +87,15 @@ export default function QuotationCreateView() {
     handleSubmit,
     reset,
     watch,
-    trigger,
     control,
     formState: { isSubmitting, isValid },
   } = methods;
+
+  const newValues = useWatch({ control });
+
+  useEffect(() => {
+
+  }, [newValues]);
 
   const {
     fields,
@@ -91,27 +106,39 @@ export default function QuotationCreateView() {
     control
   });
 
-
+  // sincroniza los cambios del formulario con el draft (borrador de cotización) en el store
   useEffect(() => {
-    const subscription = watch((value) => {
- 
+    console.log("D:;")
+    const subscription = watch((values) => {
+      dispatch(
+        setQuotationDraft({
+          ...values,
+          items: values.items?.map((i) => ({ ...i })),
+        })
+      );
     });
+    return () => subscription.unsubscribe();
+  }, [watch, dispatch]);
 
-    console.log(subscription)
-  }, [watch]);
+  /*useEffect(() => {
+    if (isEdit && quotation_existing) {
+      reset({
+        first_name: quotation_existing.first_name ?? '',
+        last_name_1: quotation_existing.last_name_1 ?? '',
+        last_name_2: quotation_existing.last_name_2 ?? '',
+        role: quotation_existing.role ?? null,
+        is_active: quotation_existing.is_active ?? null,
+        email: quotation_existing.email ?? '',
+        password_hash: '',
+        repeat_password: '',
+      });
+    }
+  }, [isEdit, quotation_existing, reset]);*/
+
 
   const onSubmit = handleSubmit(async (values) => {
 
-    console.log()
 
-    const isValidForm = await trigger();
-
-    console.log(isValidForm)
-
-    if (!isValidForm) {
-      enqueueSnackbar('Por favor completa los campos requeridos', { variant: 'error' });
-      return;
-    }
 
     try {
       const ok = await confirm({
@@ -121,18 +148,14 @@ export default function QuotationCreateView() {
         cancelText: 'Cancelar',
       });
 
-
-
       if (!ok) {
         return;
       }
 
       const data = {
-        ...draft,
-        request_id: parseInt(id),
+        items: values.items,
+        request_id: id,
       }
-
-
 
       // f (isEdit) {
       await createQuotation(data).unwrap();
@@ -157,10 +180,6 @@ export default function QuotationCreateView() {
 
   });
 
-  const handleChangeTab = useCallback((_, newTab) => {
-    setSelectTab(newTab);
-  }, []);
-
   const handleGoBack = () => {
     navigate(paths.quotationRequests_list);
   };
@@ -176,110 +195,92 @@ export default function QuotationCreateView() {
     if (!ok) {
       return;
     }
-
+    console.log("lleguie")
     dispatch(resetQuotationDraft(defaultValues));
   };
 
-  const addItemToSlice = (items) => {
-    const itemArray = Object.values(items);
-    dispatch(setQuotationDraft({
-      ...draft,
-      items: itemArray,
-    }));
+  const handleAddItem = () => {
+    append({
+      service_id: null,
+      quantity: 0,
+      unit_price: 0,
+      total: 0,
+      is_active: true,
+    });
   };
 
-  const handleDiscount = (discount) => {
-    dispatch(setQuotationDraft({
-      ...draft,
-      discount,
-    }));
-  }
-
-
-
-  const buttons = (<Grid container spacing={3} sx={{ pt: 3 }}>
-    <Grid size={{ sm: 8, xs: 12 }}>
-      <Button
-        type="submit"
-        startIcon={<SaveIcon />}
-        variant="outlined"
-        color="success"
-        fullWidth
-
-      >
-        {isCreating ? 'Guardando...' : 'Guardar Cotización'}
-      </Button>
-    </Grid>
-
-    <Grid size={{ sm: 4, xs: 12 }}>
-      <Button
-        type="button"
-        startIcon={<CleaningServicesIcon />}
-        variant="outlined"
-        color="warning"
-        fullWidth
-        onClick={handleClean}
-      >
-        Limpiar
-      </Button>
-    </Grid>
-  </Grid>);
-
-
-  const quotationSymmary = <QuotationSummary draft={draft} handleDiscount={handleDiscount} buttons={buttons} />;
-    console.log("DRAFT:", draft)
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <div className="pt-2 pb-4">
-        <TabContext value={selectTab}>
-          <HeadingWrapper>
+        <Card className="p-3" size="xl">
+          <Box px={2} pt={2}  >
+            <HeadingArea
+              title="Nueva Cotización"
+              addButton={
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="medium"
+                  onClick={() => navigate(paths.quotation_list)}
+                >
+                  Volver
+                </Button>
+              }
+              icon={<AttachMoneyIcon className="icon" />}
+            />
+          </Box>
 
-            <TabList onChange={handleChangeTab}>
-              <Tab disableRipple label="Todos" value="" />
-              <Tab disableRipple label="Seleccionados" value="seleccionado" />
-            </TabList>
+          <CardContent>
 
-          </HeadingWrapper>
-          <Card className="p-3" size="xl">
-            <Box px={2} pt={2}  >
-              <HeadingArea
-                title="Nueva Cotización"
-                addButton={
+            <QuotationServiceTableList />
+
+            <Grid container spacing={3} >
+              <Grid size={{ sm: 8, xs: 12 }}> </Grid>
+              <Grid size={{ sm: 4, xs: 12 }}>
+                <StyledBox>
+                  <QuotationSummary /*items={items} */ />
+                </StyledBox>
+              </Grid>
+            </Grid>
+            
+            <QuotationSummaryDrawer
+              subtotal={0}
+              discount={0}
+              tax={0}
+            />
+
+            <CardActions sx={{ justifyContent: 'flex-end', mt: 3 }}>
+
+              <Grid container spacing={3} sx={{ pt: 3 }}>
+                <Grid size={{ sm: 8, xs: 12 }}>
                   <Button
+                    type="submit"
+                    startIcon={<SaveIcon />}
                     variant="outlined"
-                    color="primary"
-                    size="medium"
-                    onClick={() => navigate(paths.quotation_list)}
+                    color="success"
+                    fullWidth
+                    disabled={isSubmitting || isCreating}
                   >
-                    Volver
+                    {isCreating ? 'Guardando...' : 'Guardar Cotización'}
                   </Button>
-                }
-                icon={<AttachMoneyIcon className="icon" />}
-              />
-            </Box>
-            <CardContent>
+                </Grid>
 
-              <QuotationServiceTableList 
-                draft={draft}
-                addItem={addItemToSlice} 
-                selectTab={selectTab} 
-                setSelectTab={setSelectTab}
-               />
-
-              <Grid container spacing={3} >
-                <Grid size={{ sm: 7 }}> </Grid>
-                <Grid size={{ sm: 5 }}>
-                  <StyledBox>
-                    {quotationSymmary}
-                  </StyledBox>
+                <Grid size={{ sm: 4, xs: 12 }}>
+                  <Button
+                    type="button"
+                    startIcon={<CleaningServicesIcon />}
+                    variant="outlined"
+                    color="warning"
+                    fullWidth
+                    onClick={handleClean}
+                  >
+                    Limpiar
+                  </Button>
                 </Grid>
               </Grid>
-
-              <QuotationSummaryDrawer children={quotationSymmary} />
-            </CardContent>
-          </Card>
-
-        </TabContext>
+            </CardActions>
+          </CardContent>
+        </Card>
       </div>
     </FormProvider>
   );

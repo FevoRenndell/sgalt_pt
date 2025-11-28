@@ -74,6 +74,21 @@ export const error = {
   900: '#450A0A',
   main: '#EF4444'
 };
+
+export const custom1 = {
+  25: '#FEF2F2',
+  50: '#110808ff',
+  100: '#FECACA',
+  200: '#FCA5A5',
+  300: '#F87171',
+  400: '#EF4444',
+  500: '#DC2626',
+  600: '#B91C1C',
+  700: '#991B1B',
+  800: '#7F1D1D',
+  900: '#450A0A',
+  main: '#EF4444'
+};
 export const secondary = {
   ...grey,
   main: '#F6F7F8'
@@ -143,7 +158,8 @@ const basePalette = {
   primary,
   success,
   warning,
-  secondary
+  secondary,
+  custom1
 };
 
 // LIGHT THEME COLOR PALETTE

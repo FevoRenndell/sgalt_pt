@@ -19,7 +19,6 @@ import { useMuiTable, getComparator, stableSort } from '../../../../shared/hooks
 import Add from '../../../../shared/icons/Add.jsx';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useDeleteQuotationRequestMutation } from '../../api/quotationRequestQuoterApi.js';
 import { paths } from '../../../../routes/paths.js';
  import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
  
@@ -28,8 +27,6 @@ export default function QuotationTableList({ details }) {
   const navigate = useNavigate();
 
   const [QuotationRequests, setQuotationRequests] = useState([]);
-
-  const [deleteQuotationRequest, { isLoading, error }] = useDeleteQuotationRequestMutation();
 
   useEffect(() => {
     setQuotationRequests(details);
@@ -73,18 +70,7 @@ export default function QuotationTableList({ details }) {
     setPage(0);
   }, [quotationRequestFilter, setPage]);
 
-  const handleDeleteQuotationRequest = useCallback(async id => {
-    try {
-      const result = await deleteQuotationRequest(id).unwrap();
-      if (result) {
-        setQuotationRequests(prevQuotationRequests => prevQuotationRequests.filter(quotationRequest => quotationRequest.id !== id));
-      }
-      console.log("Usuario eliminado correctamente");
-      // navigate(paths.QuotationRequests_list);
-    } catch (err) {
-      console.error("Error eliminando usuario", err);
-    }   
-  }, []);
+ 
 
   const filteredQuotationRequests = useMemo(() => {
 
@@ -123,7 +109,7 @@ export default function QuotationTableList({ details }) {
           <Table>
             <TableHeadCustom order={order} orderBy={orderBy} numSelected={selected.length} rowCount={filteredQuotationRequests.length} onRequestSort={handleRequestSort} onSelectAllRows={handleSelectAllRows(allQuotationRequestIds)} headCells={TABLE_HEAD} />
             <TableBody>
-              { paginatedQuotationRequests.length === 0 ? <TableDataNotFound /> : paginatedQuotationRequests.map(quotationRequest => <QuotationTableRow handleView={null} key={quotationRequest.id} quotationRequest={quotationRequest}  handleDeleteQuotationRequest={handleDeleteQuotationRequest} />)}
+              { paginatedQuotationRequests.length === 0 ? <TableDataNotFound /> : paginatedQuotationRequests.map(quotationRequest => <QuotationTableRow handleView={null} key={quotationRequest.id} quotationRequest={quotationRequest}   />)}
             </TableBody>
           </Table>
         </Scrollbar>

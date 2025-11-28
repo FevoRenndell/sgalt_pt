@@ -13,7 +13,6 @@ export default (sequelize) => {
       subtotal: { type: DataTypes.DECIMAL(12, 2), allowNull: false },
       created_at: { type: DataTypes.DATE(6), allowNull: false },
       updated_at: { type: DataTypes.DATE(6), allowNull: false },
-      soft_delete: { type: DataTypes.BOOLEAN, defaultValue: false },
     },
     {
       tableName: 'quotation_items',

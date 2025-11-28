@@ -83,7 +83,5 @@ export async function getQuotationFilters() {
 }
 
 export async function getServices() {
-    return await db.models.Service.findAll({
-        attributes: ['id', [db.sequelize.fn("TRIM", db.sequelize.col("description")), "name"],]
-    });
+    return await db.models.Service.findAll({});
 }

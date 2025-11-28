@@ -27,7 +27,8 @@ export async function createQuotation(data) {
 
   try {
 
-    const flatService = items.map(i => i.service_id);
+    //aplanar y obtener solo las id de los servicios seleccionado
+    const flatService = items.map(i => i.id);
 
     const services = await db.models.Service.findAll({
       raw: true,
@@ -36,60 +37,53 @@ export async function createQuotation(data) {
       }
     });
 
-
     const newItems = items.map(item => {
 
-      const matchedItem = services.find(s => s.id === item.service_id);
+      const matchedItem = services.find(service => service.id === item.id);
 
       console.log(matchedItem)
 
-      if (matchedItem) {
-        return {
-          ...item,
-          unit: matchedItem.unit,
-          service_id: matchedItem.id,
-          unit_price: matchedItem.base_price,
-          sub_total: item.quantity * parseInt(matchedItem.base_price),
+        if (matchedItem) {
+          return {
+            ...item,
+            unit: matchedItem.unit,
+            service_id: matchedItem.id,
+            unit_price: matchedItem.base_price,
+            sub_total: item.quantity * parseInt(matchedItem.base_price),
+          }
         }
-      }
-      return item;
-    });
+        return item;
+      });
 
-    const subTotal = newItems.reduce((acc, curr) => acc + curr.sub_total, 0);
-    const total = parseFloat(subTotal.toFixed(2)) - discount;
+      const subTotal = newItems.reduce((acc, curr) => acc + curr.sub_total, 0);
+      const total = parseFloat(subTotal.toFixed(2)) - discount;
 
-    console.log({ ...data, items: newItems, total, subTotal, user_id : 1 })
+      quotation = await db.models.Quotation.create({
+        ...data,
+        items: newItems,
+        subtotal: subTotal,
+        total: total,
+        user_id : 1,
+      },
+        { transaction }
+      )
 
+      await db.models.QuotationItem.bulkCreate(
+        newItems.map(item => ({
+          quotation_id: quotation.id,
+          service_id: item.service_id,
+          quantity: item.quantity,
+          unit: item.unit,
+          unit_price: item.unit_price,
+          sub_total: item.sub_total,
+        })),
+        { transaction }
+      );
 
-    quotation = await db.models.Quotation.create({
-      ...data,
-      items: newItems,
-      subtotal: subTotal,
-      total: total,
-      user_id : 1,
-    },
-      { transaction }
-    )
+      await transaction.commit();
+      return quotation;
 
-
-    /*const quotation = await db.models.QuotationRequest.create({
-      client_id: client ? client.id : existingClient.id,
-      requester_full_name: data.requester_full_name,
-      requester_email: data.requester_email,
-      requester_phone: data.requester_phone ?? null,
-      service_description: data.service_description ?? '',
-      obra_direccion: data.obra_direccion ?? '',
-      commune_id: data.commune_id ?? null,
-      city_id: data.city_id ?? null,
-      region_id: data.region_id ?? null,
-    },
-      { transaction }
-    );*/
-
-    await transaction.commit();
-    return quotation;
-
-  } catch (error) {console.log(error)
+  } catch (error) {
     await transaction.rollback();
     throw error;
   }

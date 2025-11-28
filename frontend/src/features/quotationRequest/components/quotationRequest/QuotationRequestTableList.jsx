@@ -10,7 +10,6 @@ import TablePagination from '@mui/material/TablePagination';
 import { Scrollbar } from '../../../../shared/components/scrollbar/index.js';
 import { TableDataNotFound } from '../../../../shared/components/table/index.js';
 // CUSTOM PAGE SECTION COMPONENTS
-import SearchArea from '../../../../shared/components/search-area/SearchArea.jsx';
 import HeadingArea from '../../../../shared/components/heading-area/HeadingArea.jsx';
 import QuotationRequestTableRow from './QuotationRequestTableRow.jsx';
 import TableHeadCustom from '../../../../shared/components/table/TableHeadCustom.jsx';
@@ -123,6 +122,7 @@ export default function QuotationRequestTableList({ details }) {
       client: null
     });
   }
+  
 
   return <div className="pt-2 pb-4">
     <Card>

@@ -36,7 +36,7 @@ import { paths } from '../../../../routes/paths.js';
 
 import SendIcon from '@mui/icons-material/Send';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
-
+import QuotationRequestCreateSuccessDialog from '../../components/quotationRequest/QuotationRequestCreateSuccessDialog.jsx';
 
 // ---------------- COMPONENT ----------------
 export default function QuotationRequestClientCreateView({ isPublic = true }) {
@@ -44,6 +44,11 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [state , setState] = useState({
+    isOpen : true,
+    data : {}
+  });
 
   const initialValues = {
     city_id: null,
@@ -118,8 +123,6 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
 
   const onSubmit = handleSubmit(async (values) => {
 
-    const { role, ...rest } = values;
-
     const data = {
       ...values,
       region_id: newValues.region_id.id,
@@ -142,7 +145,14 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
       }
 
 
-      await createQuoteRequest(data).unwrap();
+      const result = await createQuoteRequest(data).unwrap();
+
+      if(result){
+        setState({
+          isOpen: true,
+          data: result
+        });
+      }
 
       /*enqueueSnackbar(
        'Solicitud de cotización enviada correctamente',
@@ -206,6 +216,10 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
 
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
+      <QuotationRequestCreateSuccessDialog 
+        state={state} 
+        onClose={() => setState({ isOpen: false, data: {} })} 
+      />
       <div className="pt-2 pb-4" >
         <Card className="p-3" >
           <Box px={2} pt={2} mb={3}>

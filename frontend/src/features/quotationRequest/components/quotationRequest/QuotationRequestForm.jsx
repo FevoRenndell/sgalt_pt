@@ -4,7 +4,7 @@ import { RHFSelect, RHFTextField } from '../../../../shared/components/hook-form
 export default function QuotationRequestForm() {
   return (
     <Card>
-      <CardHeader title="Formulario de Usuario" />
+      <CardHeader title="Formulario de Cotización" />
       <CardContent>
         <Box
           sx={{

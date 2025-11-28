@@ -4,6 +4,7 @@ import TableCell from '@mui/material/TableCell';
 
 import { Chip, IconButton } from '@mui/material';
 import PageviewIcon from '@mui/icons-material/Pageview';
+import { getStatusChipColorRequestQuotation } from '../../../../shared/utils/chipColor';
 // ==============================================================
 
 export default function QuotationRequestTableRow({
@@ -22,6 +23,7 @@ export default function QuotationRequestTableRow({
     company_name,
   } = quotationRequest?.client || {};
 
+  const getStatusChipColor =  getStatusChipColorRequestQuotation;
 
   return (
     <TableRow hover>
@@ -29,17 +31,15 @@ export default function QuotationRequestTableRow({
         <IconButton
           color="primary"
           onClick={() => handleView(quotationRequest)}>
-          <PageviewIcon />
+          <PageviewIcon fontSize="medium" />
         </IconButton>
       </TableCell>
       <TableCell padding="normal" >{id} </TableCell>
       <TableCell padding="normal" >{cotizacion_id ? cotizacion_id : ''} </TableCell>
-       <TableCell padding="normal" >{status} </TableCell>
+      <TableCell padding="normal" ><Chip sx={{ width : '100px'}} size="small" label={status} color={getStatusChipColor(status)} /> </TableCell>
       <TableCell padding="normal" >{company_rut ? company_rut : ' Sin Rut Asociado'} </TableCell>
       <TableCell padding="normal" >{company_name ? company_name : ' Sin Razón Social Asociada'} </TableCell>
       <TableCell padding="normal" >{received_at ? received_at : ' Sin Nombre Registrador Asociado'} </TableCell>
- 
-     
     </TableRow>
   );
 }

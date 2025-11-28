@@ -6,7 +6,8 @@ export async function getQuotationRequests() {
     include : [{
       as : 'client',
       model : db.models.Client
-    }]
+    }],
+    order: [['updated_at', 'DESC']],
   });
 }
 

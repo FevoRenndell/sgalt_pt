@@ -19,6 +19,7 @@ import { StyledBox } from "../../../../shared/components/style-box";
 import { paths } from "../../../../routes/paths";
  
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { getStatusChipColorRequestQuotation } from "../../../../shared/utils/chipColor";
 
 
 export default function QuotationRequestDetailDialog({ state: { isOpen = false, client = {} }, onClose }) {
@@ -146,19 +147,7 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
     }
   });
 
-
-  const getStatusChipColor = (status) => {
-    switch (status) {
-      case 'REVISADA':
-        return 'success';
-      case 'RECHAZADA':
-        return 'error';
-      case 'PENDIENTE':
-        return 'sencodary';
-      default:
-        return 'default';
-    }
-  }
+  const getStatusChipColor =  getStatusChipColorRequestQuotation;
 
   const renderButton = () => {
     if (!competence_capacity && !need_subcontracting_services && !independence_issue && status === 'PENDIENTE') {

@@ -1,6 +1,4 @@
-import { styled } from '@mui/material/styles';
-
-export const StyledBox = styled('div')(({ theme }) => ({
+export const StyledBoxSuccess = styled('div')(({ theme }) => ({
   padding: 24,
   borderRadius: 12,
   backgroundColor: theme.palette.background.paper,

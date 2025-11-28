@@ -5,22 +5,14 @@ const DRAFT_STORAGE_KEY = 'quotationDraft';
 
 // dato iniciales por defecto que relaciona la tabla solicitud de cotizacion y cotización
 const defaultDraft = {
-  client_id: null,
-  requester_full_name: '',
-  requester_email: '',
-  requester_phone: '',
-  service_description: '',
-  obra_direccion: '',
-  commune_id: null,
-  city_id: null,
-  region_id: null,
+  request_id : null,
+  discount: 0,
   items: [
     {
       service_id: null,
       quantity: 0,
       unit_price: 0,
       total: 0,
-      is_active: true,
     },
   ],
 };
