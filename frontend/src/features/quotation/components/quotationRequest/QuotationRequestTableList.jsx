@@ -44,7 +44,7 @@ export default function QuotationRequestTableList({ details }) {
     { id: '', label: '', numeric: true, disablePadding: false },
 
     { id: 'solicitud_num', label: 'N° Solic.', align: 'left', minWidth: '120px' },
-    { id: 'cotizacion_num', label: 'N° Cot.', align: 'left', },
+    // { id: 'cotizacion_num', label: 'N° Cot.', align: 'left', },
     { id: 'estado', label: 'Estado', align: 'left'  },
     { id: 'rut', label: 'Rut', align: 'left', minWidth: '200px' },
     { id: 'razon_social', label: 'Razón Social', align: 'left', minWidth: '200px' },
