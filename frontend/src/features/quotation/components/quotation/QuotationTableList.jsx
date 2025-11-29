@@ -104,7 +104,7 @@ export default function QuotationTableList({ details }) {
 
 
       <Box px={2} pt={2} mb={3}>
-        <HeadingArea title='Listado de Cotizaciones' addButton={addButton} icon={<RequestQuoteIcon className="icon" />} />
+        <HeadingArea title='Listado de Cotizaciones' addButton={null} icon={<RequestQuoteIcon className="icon" />} />
       </Box>
 
       {/* TABLE HEAD & BODY ROWS */}

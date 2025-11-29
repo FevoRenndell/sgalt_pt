@@ -42,7 +42,7 @@ export default function QuotationTableRow({
       </TableCell>
       <TableCell padding="normal" >{quotationRequest?.request.id} </TableCell>
       <TableCell padding="normal" >{id ? id : ''} </TableCell>
-<TableCell padding="normal" ><Chip sx={{ width : '100px'}} size="small" label={status} color={getStatusChipColor(status)} /> </TableCell>
+      <TableCell padding="normal" ><Chip sx={{ width : '100px'}} size="small" label={status} color={getStatusChipColor(status)} /> </TableCell>
       <TableCell padding="normal" >{company_rut ? company_rut : ' Sin Rut Asociado'} </TableCell>
       <TableCell padding="normal" >{company_name ? company_name : ' Sin Razón Social Asociada'} </TableCell>
       <TableCell padding="normal" >{received_at ? fDateLogic(received_at) : ' Sin Nombre Registrador Asociado'} </TableCell>
