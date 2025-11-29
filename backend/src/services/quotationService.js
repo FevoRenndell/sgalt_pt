@@ -11,10 +11,15 @@ export async function getQuotations() {
       {
         model: db.models.QuotationRequest,
         as: 'request',
+        include: [
+          {
+            model: db.models.Client,
+            as: 'client',
+          },
+        ],
       },
     ],
   });
-
 }
 
 export async function createQuotation(data) {
@@ -190,7 +195,7 @@ request_id)
 
     const token = signUrlToken(cotID, requesterEmail);
 
-    const url = `http://192.168.1.90:5173/public/cotizacion/${cotID}?token=${token}`;
+    const url = `http://localhost:5173/public/cotizacion/${cotID}?token=${token}`;
 
     await sendEmail({
       to: requesterEmail,

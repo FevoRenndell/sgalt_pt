@@ -23,3 +23,19 @@ export function getStatusChipColorQuotation(status) {
             return 'default';
     }
 }
+
+
+export function getStatusChipColorQuotation2(status) {
+    switch (status) {
+        case 'ACEPTADA':
+            return 'success';
+        case 'RECHAZADA':
+            return 'error';
+        case 'CREADA':
+            return 'secondary';
+        case 'ENVIADA':
+            return 'primary';
+        default:
+            return 'default';
+    }
+}

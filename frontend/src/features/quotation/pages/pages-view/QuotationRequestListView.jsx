@@ -2,12 +2,13 @@
 
 import { Container, Card, CardContent, Box } from '@mui/material';
 import QuotationRequestTableList from '../../components/quotationRequest/QuotationRequestTableList';
-import { useFetchQuotationRequestsQuery } from '../../api/quotationRequestQuoterApi';
+ 
+import { useFetchQuotationsQuery } from '../../api/quotationApi';
 
  
 export default function QuotationRequestListView({ }) {
 
-    const { data: quotationRequestsData, isLoading } = useFetchQuotationRequestsQuery();
+    const { data: quotationRequestsData, isLoading } = useFetchQuotationsQuery();
 
     return (
         <Container>

@@ -12,17 +12,21 @@ export default function QuotationRequestTableRow({
   quotationRequest,
   handleView = () => { console.log("falta parametro función handleView") }
 }) {
+ 
   const {
     id,
-    received_at,
-    cotizacion_id,
-    status,
   } = quotationRequest;
+
+  const {
+    id: cotizacion_id,
+    received_at,
+    status
+  } = quotationRequest.request;
 
   const {
     company_rut,
     company_name,
-  } = quotationRequest?.client || {};
+  } = quotationRequest?.request?.client || {};
 
   const getStatusChipColor =  getStatusChipColorRequestQuotation;
 
@@ -31,12 +35,12 @@ export default function QuotationRequestTableRow({
       <TableCell padding="normal">
         <IconButton
           color="primary"
-          onClick={() => handleView(quotationRequest)}>
+          onClick={() => handleView(quotationRequest.request)}>
           <PageviewIcon fontSize="medium" />
         </IconButton>
       </TableCell>
-      <TableCell padding="normal" >{id} </TableCell>
-      <TableCell padding="normal" >{cotizacion_id ? cotizacion_id : ''} </TableCell>
+      <TableCell padding="normal" >{cotizacion_id} </TableCell>
+      <TableCell padding="normal" >{id ? id : ''} </TableCell>
       <TableCell padding="normal" ><Chip sx={{ width : '100px'}} size="small" label={status} color={getStatusChipColor(status)} /> </TableCell>
       <TableCell padding="normal" >{company_rut ? company_rut : ' Sin Rut Asociado'} </TableCell>
       <TableCell padding="normal" >{company_name ? company_name : ' Sin Razón Social Asociada'} </TableCell>
