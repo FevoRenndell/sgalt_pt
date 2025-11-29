@@ -5,6 +5,7 @@ import TableCell from '@mui/material/TableCell';
 import { Chip, IconButton } from '@mui/material';
 import PageviewIcon from '@mui/icons-material/Pageview';
 import { getStatusChipColorRequestQuotation } from '../../../../shared/utils/chipColor';
+import { fDateLogic } from '../../../../shared/utils/formatTime';
 // ==============================================================
 
 export default function QuotationRequestTableRow({
@@ -39,7 +40,7 @@ export default function QuotationRequestTableRow({
       <TableCell padding="normal" ><Chip sx={{ width : '100px'}} size="small" label={status} color={getStatusChipColor(status)} /> </TableCell>
       <TableCell padding="normal" >{company_rut ? company_rut : ' Sin Rut Asociado'} </TableCell>
       <TableCell padding="normal" >{company_name ? company_name : ' Sin Razón Social Asociada'} </TableCell>
-      <TableCell padding="normal" >{received_at ? received_at : ' Sin Nombre Registrador Asociado'} </TableCell>
+      <TableCell padding="normal" >{received_at ? fDateLogic(received_at) : ' Sin Nombre Registrador Asociado'} </TableCell>
     </TableRow>
   );
 }

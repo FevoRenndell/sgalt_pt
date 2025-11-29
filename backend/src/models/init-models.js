@@ -111,14 +111,14 @@ export function initModels(sequelize) {
   });
 
   // (Opcional) User 1 - N Quotations (si decides guardar quién la emite)
-  // UserModel.hasMany(QuotationModel, {
-  //   foreignKey: 'user_id',
-  //   as: 'quotations',
-  // });
-  // QuotationModel.belongsTo(UserModel, {
-  //   foreignKey: 'user_id',
-  //   as: 'user',
-  // });
+  UserModel.hasMany(QuotationModel, {
+    foreignKey: 'user_id',
+    as: 'quotations',
+  });
+  QuotationModel.belongsTo(UserModel, {
+    foreignKey: 'user_id',
+    as: 'user',
+  });
 
   // ----- QUOTATION ITEMS & SERVICES -----
 

@@ -9,19 +9,6 @@ import { styled } from '@mui/material/styles';
 import { TextField } from '@mui/material';
 import { formatThousands } from '../../../../shared/utils/formatNumber';
 
-// STYLED COMPONENTS
-const ProductName = styled(Typography)(({
-  theme
-}) => ({
-  fontWeight: 500,
-  marginBottom: '0.25rem',
-  color: theme.palette.text.primary,
-  ':hover': {
-    cursor: 'pointer',
-    textDecoration: 'underline'
-  }
-}));
-
 function QuotationServiceTableRow({
   service,
   isSelected,
@@ -37,7 +24,6 @@ function QuotationServiceTableRow({
     name,
     norma,
     base_price,
-    description,
   } = service;
   
   const onChangeQuantity = useCallback((event) => {

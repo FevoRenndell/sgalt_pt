@@ -1,6 +1,8 @@
 import {
+    getQuotationClient,
     createQuotationRequest,
-    AcceptQuotationRequest
+    AcceptQuotationRequest,
+    RejectQuotationRequest
 } from '../services/quoterService.js';
 
 import { 
@@ -22,6 +24,15 @@ export const AcceptQuotationRequestByClient = async (req, res, next) => {
     try {
         const newQuote = await AcceptQuotationRequest(req.body);
         res.status(201).json(newQuote);
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const RejectQuotationRequestByClient = async (req, res, next) => {
+    try {
+        const rejectedQuote = await RejectQuotationRequest(req.body);
+        res.status(200).json(rejectedQuote);
     } catch (error) {
         next(error);
     }
@@ -54,4 +65,14 @@ export const getCommunesFilter = async (req, res, next) => {
     catch (error) {             
         next(error);            
     }               
+}
+
+export const fetchQuotationClient = async (req, res, next) => {    
+    try {
+        const quotationId = req.params.id;
+        const quotation = await getQuotationClient(quotationId, true);
+        res.status(200).json(quotation);
+    } catch (error) {
+        next(error);
+    }
 }

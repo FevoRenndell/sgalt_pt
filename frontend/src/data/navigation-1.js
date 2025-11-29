@@ -65,7 +65,7 @@ export const navigations = [
   {
     name: 'Estado de mi cotización',
     icon: duotone.DataTable,
-    path: '/publicpublic/mis-cotizaciones',
+    path: '/public/cotizacion/:id',
   },
 
   // --- OTROS (SI QUIERES MANTENER SECCIONES GENERALES) ---

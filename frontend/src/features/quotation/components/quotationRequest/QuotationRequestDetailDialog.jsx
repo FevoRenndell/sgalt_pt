@@ -188,7 +188,7 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
               <Box pt={1} mb={3}>
                 <HeadingArea title={`Solicitud de Cotización  # ${id}`} addButton={<Box sx={{ gap: 1, display: 'flex' }}>
                   <Button variant="outlined" color='primary' size="small" onClick={onClose}>Cerrar</Button>
-                  {editButton}
+                  { status === 'FINALIZADA' ? null : editButton}
                   {actionButton}
                 </Box>} icon={<GradingIcon className="icon" />} />
               </Box>
@@ -355,6 +355,7 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
                                 { value: 'SI', label: 'Sí' },
                                 { value: 'NO', label: 'No' },
                               ]}
+                              disabled={status === 'FINALIZADA'}
                             />
                           </Grid>
                           <Grid size={{ sm: 6, xs: 12 }}>
@@ -366,6 +367,7 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
                                 { value: 'SI', label: 'Sí' },
                                 { value: 'NO', label: 'No' },
                               ]}
+                              disabled={status === 'FINALIZADA'}
                             />
                           </Grid>
 
@@ -381,6 +383,7 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
                                 { value: 'SI', label: 'Sí' },
                                 { value: 'NO', label: 'No' },
                               ]}
+                              disabled={status === 'FINALIZADA'}
                             />
                           </Grid>
                         </Grid>
@@ -396,6 +399,7 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
                           name="review_notes"
                           label="Descripción del servicio"
                           sizeParam="small"
+                          disabled={status === 'FINALIZADA'}
                         />
                       </Grid>
                     </Grid>
@@ -407,7 +411,7 @@ export default function QuotationRequestDetailDialog({ state: { isOpen = false, 
           <DialogActions>
             <Box sx={{ gap: 1, display: 'flex' }}>
               <Button variant="outlined" color='primary' size="small" onClick={onClose}>Cerrar</Button>
-              {editButton}
+              { status === 'FINALIZADA' ? null : editButton}
               {actionButton}
             </Box>
           </DialogActions>

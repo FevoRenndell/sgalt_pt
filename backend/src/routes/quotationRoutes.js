@@ -7,6 +7,7 @@ import {
   removeQuotation,
   fetchQuotations,
   fetchQuotationById,
+  senderEmailQuotation
 } from '../controllers/quotationController.js';
 
 import {
@@ -25,7 +26,7 @@ const router = express.Router();
 router.get('/all',  fetchQuotations);
 router.get('/:id',  fetchQuotationById);
 router.post('/create', validateData(quotationCreateSchema), addQuotation);
-
+router.post('/send_email',  senderEmailQuotation);
 
 /*
 import {

@@ -17,13 +17,12 @@ export const quotationCreateSchema = Joi.object({
     }),
   discount: Joi.number()
     .integer()
-    .positive()
-    .required()
+ 
+    .allow('', null)
     .messages({
       'any.required': 'El descuento es obligatorio',
       'number.base': 'El descuento debe ser un número',
       'number.integer': 'El descuento debe ser un número entero',
-      'number.positive': 'El descuento debe ser mayor a 0',
     }),
   // Arreglo de ítems de la cotización
   items: Joi.array()

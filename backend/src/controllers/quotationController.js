@@ -4,6 +4,7 @@ import {
     deleteQuotation,
     createQuotation,
     getQuotationById,
+    sendQuotationEmail
 } from '../services/quotationService.js';
 
 export const fetchQuotations = async (req, res, next) => {
@@ -50,4 +51,15 @@ export const removeQuotation = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+export const senderEmailQuotation = async (req, res, next) => {
+    try {
+
+        const result = await sendQuotationEmail(req.body);  
+
+        res.status(200).json({ message: `Correo enviado a con la cotización ${req.body.quotation_id}` , data : result });
+    } catch (error) {   
+        next(error);
+    }       
 };

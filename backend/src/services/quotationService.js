@@ -1,5 +1,8 @@
 import { AppError } from '../error/AppError.js';
 import db from '../models/index.js';
+import { signUrlToken } from './authService.js';
+import { sendEmail } from './emailService.js';
+
 
 export async function getQuotations() {
 
@@ -41,47 +44,45 @@ export async function createQuotation(data) {
 
       const matchedItem = services.find(service => service.id === item.id);
 
-      console.log(matchedItem)
-
-        if (matchedItem) {
-          return {
-            ...item,
-            unit: matchedItem.unit,
-            service_id: matchedItem.id,
-            unit_price: matchedItem.base_price,
-            sub_total: item.quantity * parseInt(matchedItem.base_price),
-          }
+      if (matchedItem) {
+        return {
+          ...item,
+          unit: matchedItem.unit,
+          service_id: matchedItem.id,
+          unit_price: matchedItem.base_price,
+          sub_total: item.quantity * parseInt(matchedItem.base_price),
         }
-        return item;
-      });
+      }
+      return item;
+    });
 
-      const subTotal = newItems.reduce((acc, curr) => acc + curr.sub_total, 0);
-      const total = parseFloat(subTotal.toFixed(2)) - discount;
+    const subTotal = newItems.reduce((acc, curr) => acc + curr.sub_total, 0);
+    const total = parseFloat(subTotal.toFixed(2)) - discount;
 
-      quotation = await db.models.Quotation.create({
-        ...data,
-        items: newItems,
-        subtotal: subTotal,
-        total: total,
-        user_id : 1,
-      },
-        { transaction }
-      )
+    quotation = await db.models.Quotation.create({
+      ...data,
+      items: newItems,
+      subtotal: subTotal,
+      total: total,
+      user_id: 1,
+    },
+      { transaction }
+    )
 
-      await db.models.QuotationItem.bulkCreate(
-        newItems.map(item => ({
-          quotation_id: quotation.id,
-          service_id: item.service_id,
-          quantity: item.quantity,
-          unit: item.unit,
-          unit_price: item.unit_price,
-          sub_total: item.sub_total,
-        })),
-        { transaction }
-      );
+    await db.models.QuotationItem.bulkCreate(
+      newItems.map(item => ({
+        quotation_id: quotation.id,
+        service_id: item.service_id,
+        quantity: item.quantity,
+        unit: item.unit,
+        unit_price: item.unit_price,
+        sub_total: item.sub_total,
+      })),
+      { transaction }
+    );
 
-      await transaction.commit();
-      return quotation;
+    await transaction.commit();
+    return quotation;
 
   } catch (error) {
     await transaction.rollback();
@@ -89,15 +90,38 @@ export async function createQuotation(data) {
   }
 }
 
-export async function getQuotationById(userId) {
+export async function getQuotationById(quotationId, raw = false) {
   try {
-    return await db.models.Quotation.findByPk(userId, {
+    return await db.models.Quotation.findByPk(quotationId, {
+      raw: raw,
       include: [
         {
           model: db.models.QuotationRequest,
           as: 'request',
+          include: [
+            {
+              model: db.models.Client,
+              as: 'client',
+            },
+          ],
         },
+        {
+          model: db.models.QuotationItem,
+          as: 'items',
+          include: [
+            {
+              model: db.models.Service,
+              as: 'service',
+            },
+          ],
+        },
+        {
+          model: db.models.User,
+          as: 'user',
+          attributes: ['id', 'first_name', 'last_name_1', 'last_name_2', 'email'],
+        }
       ],
+
     });
   } catch (error) {
     console.error('Error fetching user by ID:', error);
@@ -130,5 +154,86 @@ export async function deleteQuotation(userId) {
     console.error('Error deleting user:', error);
     throw new AppError('Error deleting user', 500);
   }
+}
+
+
+export async function sendQuotationEmail({ quotation_id = null, request_id }) {
+
+  const transaction = await db.sequelize.transaction();
+  console.log( " la od son " , quotation_id , 
+request_id)
+  try {
+
+    const quotationByID = await getQuotationById(quotation_id, false);
+
+    const quotation = await destructureQuotationData(quotationByID);
+
+    const updatedRequest = await db.models.QuotationRequest.update(
+      { status: 'FINALIZADA' },
+      { raw: true, where: { id: request_id } },
+      { transaction }
+    );
+
+    if (updatedRequest[0] !== 1) {
+      throw new AppError('No se pudo actualizar el estado de la solicitud de cotización', 500);
+    }
+
+    const updateQuotation = await db.models.Quotation.update(
+      { status: 'ENVIADA' },
+      { where: { id: quotation_id } },
+      { transaction }
+    );
+
+    const cotID = quotation.quotation.id;
+
+    const requesterEmail = quotation.request.requester_email;
+
+    const token = signUrlToken(cotID, requesterEmail);
+
+    const url = `http://192.168.1.90:5173/public/cotizacion/${cotID}?token=${token}`;
+
+    await sendEmail({
+      to: requesterEmail,
+      subject: 'Su cotización ha sido creada',
+      template: '<>Hola</>',
+      text: `Puede ver su cotización en el siguiente enlace: ${url}`,
+    });
+
+    await transaction.commit();
+
+    return {
+      quotation,
+      token,
+      url
+    };
+
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+}
+
+
+async function destructureQuotationData(quotationInstance) {
+ 
+  const data = quotationInstance.get({ plain: true });
+ 
+  const {
+    request,
+    items,
+    user,
+    ...quotationData
+  } = data;
+
+ 
+  const client = request?.client;
+
+  return {
+    quotation: {...quotationData,  items },    
+    request,                     
+    client,                     
+    user,                       
+                         
+  };
 }
 

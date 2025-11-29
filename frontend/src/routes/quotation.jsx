@@ -8,6 +8,7 @@ import { useSettings } from '../shared/hooks/useSettings';
 // ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
 const QuotationPage = lazy(() => import('../features/quotation/pages/QuotationPage'));
 const QuotationCreatePage = lazy(() => import('../features/quotation/pages/QuotationCreatePage'));
+const QuotationCreatedPage = lazy(() => import('../features/quotation/pages/QuotationCreatedPage'));
 
 const ActiveLayout = () => {
   const { settings } = useSettings();
@@ -29,6 +30,7 @@ export const Quotation = [
       { path: '/quotation/list'    , element: <QuotationPage          /> },
       { path: '/quotation/create'  , element: <QuotationCreatePage    /> },
       { path: '/quotation/:id/quotation_create' , element: <QuotationCreatePage /> },
+      { path: '/quotation/:id/quotation_created' , element: <QuotationCreatedPage /> },
     ],
   },
 ];

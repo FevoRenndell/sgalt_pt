@@ -17,13 +17,13 @@ import {
   useFetchCityByIdQuery,
   useFetchCommuneByIdQuery,
   useFetchClientByRutQuery
-} from '../../../quotationRequest/api/filterApi';
+} from '../../../quotation/api/filterApi';
 
-import { filterApi } from '../../../quotationRequest/api/filterApi';
+import { filterApi } from '../../../quotation/api/filterApi';
 
 import {
   useCreateQuoteRequestMutation
-} from '../../../quotationRequest/api/quotationRequestClientApi';
+} from '../../../quotation/api/quotationRequestClientApi';
 
 import { handleApiError } from '../../../../shared/utils/handleApiError';
 import { useConfirmDialog } from '../../../../contexts/ConfirmDialogContext';
@@ -46,7 +46,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
   const dispatch = useDispatch();
 
   const [state , setState] = useState({
-    isOpen : true,
+    isOpen : false,
     data : {}
   });
 
@@ -143,8 +143,6 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
       if (!ok) {
         return;
       }
-
-
       const result = await createQuoteRequest(data).unwrap();
 
       if(result){
@@ -152,18 +150,8 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
           isOpen: true,
           data: result
         });
+       
       }
-
-      /*enqueueSnackbar(
-       'Solicitud de cotización enviada correctamente',
-        {
-          variant: 'success',
-          autoHideDuration: 1500,
-          onExited: () => {
-            navigate(public_paths.quote_request_view);
-          }
-        }
-      );*/
 
     } catch (err) {
       handleApiError(err);
@@ -217,14 +205,15 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
   return (
     <FormProvider methods={methods} onSubmit={onSubmit}>
       <QuotationRequestCreateSuccessDialog 
-        state={state} 
+        state={state}
         onClose={() => setState({ isOpen: false, data: {} })} 
+        clean={handleClean}
       />
       <div className="pt-2 pb-4" >
         <Card className="p-3" >
           <Box px={2} pt={2} mb={3}>
             <HeadingArea
-              title='Nueva Solicitud de Cotización'
+              title='Nueva Solicitud de Cotización '
               addButton={
                 <Button variant="outlined" color='primary' size="medium" onClick={() => navigate(paths.quotation_request_list)}>
                   Volver
@@ -241,7 +230,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                     size="small"
                     fullWidth
                     name="company_rut"
-                    label="Rut Cotizante"
+                    label="Rut Cotizante (*) "
                     sizeParam="small"
                     search_rut={true}
                     onClick={(e) => searchClient(e)}
@@ -255,7 +244,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                   <RHFSelect
                     fullWidth
                     name="rut_cliente"
-                    label="Cliente"
+                    label="Cliente (*)"
                     options={[]}
                     sizeParam="small"
                   />
@@ -266,7 +255,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                   size="small"
                   fullWidth
                   name="requester_full_name"
-                  label="Nombre contacto"
+                  label="Nombre contacto (*)"
                   sizeParam="small"
                 />
               </Grid>
@@ -278,7 +267,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                   size="small"
                   fullWidth
                   name="requester_phone"
-                  label="Teléfono contacto"
+                  label="Teléfono contacto (*)"
                   sizeParam="small"
                 />
               </Grid>
@@ -289,7 +278,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                   size="small"
                   fullWidth
                   name="requester_email"
-                  label="Email contacto"
+                  label="Email contacto (*)"
                   sizeParam="small"
                 />
               </Grid>
@@ -301,7 +290,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                   size="small"
                   fullWidth
                   name="obra_direccion"
-                  label="Nombre / Dirección de la Obra"
+                  label="Nombre / Dirección de la Obra (*)"
                   sizeParam="small"
                 />
               </Grid>
@@ -312,7 +301,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                 <RHFSelect
                   fullWidth
                   name="region_id"
-                  label="Región"
+                  label="Región (*)"
                   options={regions || []}
                   sizeParam="small"
                 />
@@ -323,7 +312,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                 <RHFSelect
                   fullWidth
                   name="city_id"
-                  label="Ciudad"
+                  label="Ciudad (*)"
                   options={cities || []}
                   sizeParam="small"
                 />
@@ -334,7 +323,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                 <RHFSelect
                   fullWidth
                   name="commune_id"
-                  label="Comuna"
+                  label="Comuna (*)"
                   options={communes || []}
                   sizeParam="small"
                 />
@@ -349,7 +338,7 @@ export default function QuotationRequestClientCreateView({ isPublic = true }) {
                   multiline
                   rows={4}
                   name="service_description"
-                  label="Descripción del servicio"
+                  label="Descripción del servicio (*)"
                   sizeParam="small"
                 />
               </Grid>

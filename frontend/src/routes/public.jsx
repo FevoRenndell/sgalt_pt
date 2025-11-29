@@ -1,20 +1,17 @@
 import { lazy, Suspense } from 'react';
-import {  GuestGuard } from '../features/auth/components';
 import PublicLayout from '../layouts/layout-public';
  
-
 // ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
-const QuotationRequestClientCreatePage = lazy(() => import('../features/quotationRequest/pages/QuotationRequestClientCreatePage'));
-
+const QuotationRequestClientCreatePage = lazy(() => import('../features/quotation/pages/QuotationRequestClientCreatePage'));
+const QuotationClientPage = lazy(() => import('../features/quotation/pages/QuotationClientPage'));
 export const Public = [
   {
     path: 'public',
-    element: <GuestGuard>
-                <PublicLayout />
-             </GuestGuard>,
+    element:  <PublicLayout />,
+             
     children: [
-      { path: '/public/solicitud-cotizacion'     , element: <QuotationRequestClientCreatePage /> },
-
+      { path: '/public/solicitud-cotizacion'   , element: <QuotationRequestClientCreatePage /> },
+      { path: '/public/cotizacion/:id'         , element: <QuotationClientPage /> },
     ],
   },
 ];

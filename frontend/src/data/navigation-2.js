@@ -85,7 +85,7 @@ export const navigation = [
       },
       {
         name: 'Estado de mi cotización',
-        path: '/public/mis-cotizaciones',
+        path: '/public//public/cotizacion/:id',
       },
     ],
   },

@@ -9,7 +9,9 @@ import listEndpoints from 'express-list-endpoints';
 import initRoutes from './routes/init-routes.js';
 import { errorHandler } from './error/errorHandler.js';
 import bcrypt from 'bcryptjs';
- 
+import { verifyMailer } from './config/mailer.js';
+
+
 const app = express();
 const port =  4000;
 
@@ -31,7 +33,7 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 );
-
+verifyMailer().catch(() => {});
 // Limitador de tasa
 const limiter = rateLimit({
   windowMs: 15 * 60 * 50000,

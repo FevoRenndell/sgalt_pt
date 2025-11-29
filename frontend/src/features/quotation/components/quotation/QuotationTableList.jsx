@@ -94,6 +94,11 @@ export default function QuotationTableList({ details }) {
       Nueva Cotización
     </Button>;
 
+  const handleView = useCallback(quotation => {
+    console.log(quotation.id)
+    navigate(paths.quotation_created(quotation.id));
+  }, [navigate]);
+
   return <div className="pt-2 pb-4">
     <Card>
 
@@ -109,7 +114,7 @@ export default function QuotationTableList({ details }) {
           <Table>
             <TableHeadCustom order={order} orderBy={orderBy} numSelected={selected.length} rowCount={filteredQuotationRequests.length} onRequestSort={handleRequestSort} onSelectAllRows={handleSelectAllRows(allQuotationRequestIds)} headCells={TABLE_HEAD} />
             <TableBody>
-              { paginatedQuotationRequests.length === 0 ? <TableDataNotFound /> : paginatedQuotationRequests.map(quotationRequest => <QuotationTableRow handleView={null} key={quotationRequest.id} quotationRequest={quotationRequest}   />)}
+              { paginatedQuotationRequests.length === 0 ? <TableDataNotFound /> : paginatedQuotationRequests.map(quotationRequest => <QuotationTableRow handleView={handleView} key={quotationRequest.id} quotationRequest={quotationRequest}   />)}
             </TableBody>
           </Table>
         </Scrollbar>

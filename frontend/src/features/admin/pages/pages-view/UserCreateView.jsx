@@ -7,10 +7,10 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import { Box, CardContent, CardHeader, Snackbar } from '@mui/material';
+import { Box, CardContent } from '@mui/material';
 
 // CUSTOM
-import { FormProvider, RHFSelect, RHFSwitch, RHFTextField } from '../../../../shared/components/hook-form';
+import { FormProvider, RHFSelect, RHFTextField } from '../../../../shared/components/hook-form';
 import { userValidationCreateSchema, userValidationUpdateSchema } from '../../validations/usersValidations';
 import { paths } from '../../../../routes/paths';
 import {

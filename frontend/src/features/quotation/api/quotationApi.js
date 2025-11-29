@@ -27,12 +27,24 @@ export const quotationApi = baseApi.injectEndpoints({
         { type: 'Quotation', id: 'SELECTS' },
       ],
     }),
-  }),
+    sendQuotationEmail: builder.mutation({
+      query: (body) => ({
+        url: `/quotation/send_email`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: [
+        { type: 'Quotation', id: 'LIST' },
+        { type: 'Quotation', id: 'SELECTS' },
+      ],
+     }),
+    }),
   overrideExisting: false,
 });
 
 export const {
   useFetchQuotationsQuery,
   useFetchQuotationByIdQuery,
-  useCreateQuotationMutation
+  useCreateQuotationMutation,
+  useSendQuotationEmailMutation,
 } = quotationApi;

@@ -20,10 +20,11 @@ export const paths = {
   quotation_list : '/quotation/list',
   quotation_create: '/quotation/create',
   quotation_create_from_request: (id) => `/quotation/${id}/quotation_create`,
-  // Clientes
-  clientes: '/dashboard/clientes',
-  clientesCrear: '/dashboard/clientes/crear',
-  clientesHistorial: '/dashboard/clientes/historial',
+  quotation_created: (id) => `/quotation/${id}/quotation_created`,
+
+  clients_list: '/clients',
+  client_create: '/clients/create',
+  client_edit: (id) => `/clients/edit/${id}`,
 
   // Cuenta
   perfil: '/dashboard/profile',
@@ -32,6 +33,6 @@ export const paths = {
 
 export const public_paths = {
   solicitud: '/public/solicitud-cotizacion',
-  estado: '/public/mis-cotizaciones',
+  estado: '/public//public/cotizacion/:id',
   quote_request_view: '/public/quote-request/view',
 };

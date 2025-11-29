@@ -12,7 +12,7 @@ export default function ClientInputs( { blocked = false } ) {
                 <Grid size={{ sm: 12, xs: 12 }}>
                     <RHFTextField
                         name="company_name"
-                        label="Razón Social"
+                        label="Razón Social (*)"
                         fullWidth
                         sizeParam="small"
                         disabled={blocked}

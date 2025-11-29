@@ -6,8 +6,8 @@ import { LoadingProgress } from '../shared/components/loader';
 import { useSettings } from '../shared/hooks/useSettings';
 
 // ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
-const QuotationRequestPage = lazy(() => import('../features/quotationRequest/pages/QuotationRequestPage'));
-const QuotationRequestCreatePage = lazy(() => import('../features/quotationRequest/pages/QuotationRequestCreatePage'));
+const QuotationRequestPage = lazy(() => import('../features/quotation/pages/QuotationRequestPage'));
+const QuotationRequestCreatePage = lazy(() => import('../features/quotation/pages/QuotationRequestCreatePage'));
 
 const ActiveLayout = () => {
   const { settings } = useSettings();

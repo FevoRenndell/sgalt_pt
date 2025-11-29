@@ -102,7 +102,7 @@ export default function QuotationServiceTableList({ addItem, selectTab, setSelec
     setSelectedItems(prev => {
       const next = { ...prev };
       if (isChecked) {
-        next[data.id] = { ...data };      
+        next[data.id] = { ...data,  quantity: 1 };      
       } else {
         delete next[data.id];           
       }
@@ -165,13 +165,6 @@ useEffect(() => {
       <TableContainer>
         <Scrollbar>
           <Table sx={{ minWidth: 1024 }}>
-            <QuotationServiceTableHead
-              order={order}
-              orderBy={orderBy}
-              numSelected={selected.length}
-              rowCount={filteredServices.length}
-              onRequestSort={handleRequestSort}
-            />
             <TableBody>
               {filteredServices.length === 0 ? (<TableDataNotFound />) :
                 filteredServices.map(service => {

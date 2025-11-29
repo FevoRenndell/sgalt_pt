@@ -28,11 +28,8 @@ export async function updateQuotation(quotationRequestId, updateData) {
     throw new AppError('QuotationRequest not found', 400);
   }
  
-  if(quotationRequest.dataValues?.status === 'PENDIENTE'){ // si estan pendiente se evalua el estado
-     return await quotationRequest.update({...updateData, status: evaluateQuotationReview(updateData)});
-  }
+  return await quotationRequest.update({...updateData, status: evaluateQuotationReview(updateData)});
 
-  return await quotationRequest.update(updateData);
 }
 
 export async function removeQuotation(quotationRequestId) {

@@ -7,14 +7,7 @@ const DRAFT_STORAGE_KEY = 'quotationDraft';
 const defaultDraft = {
   request_id : null,
   discount: 0,
-  items: [
-    {
-      service_id: null,
-      quantity: 0,
-      unit_price: 0,
-      total: 0,
-    },
-  ],
+  items: [],
 };
 
 // carga los datos desde el storage del navegador

@@ -40,4 +40,15 @@ function verifyToken(token) {
     }
 }
 
-export { authenticate, verifyToken, generateToken };
+function signUrlToken(quotationId, email) {
+  return jwt.sign(
+    {
+      qid: quotationId,   
+      email,           
+    },
+    env.jwt.secret,
+    { expiresIn: '48h' } 
+  );
+}
+
+export { authenticate, verifyToken, generateToken, signUrlToken };

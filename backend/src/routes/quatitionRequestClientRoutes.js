@@ -5,13 +5,13 @@ import {
     getCitiesFilter,
     getRegionsFilter,
     getCommunesFilter,
+    fetchQuotationClient,
     createQuotationByClient,
     AcceptQuotationRequestByClient,
+    RejectQuotationRequestByClient,
 } from '../controllers/quoatationRequestClientController.js';
 
 import {
-
-
     cityIdParamsSchema,
     regionIdParamsSchema,
     quotationRequestAcceptSchema,
@@ -22,6 +22,7 @@ import {
     validateData,
     validateParams,
 } from '../middlewares/validateData.js';
+
 import { clientRutParamsSchema } from '../validations/clientValidations.js';
 import { fetchClientByRut } from '../controllers/clientController.js';
 
@@ -49,11 +50,25 @@ router.post(
   createQuotationByClient
 );
 
+// Aceptar cotización por clienteº
+router.get(
+    '/quotation/:id',
+    /*validateData(quotationRequestAcceptSchema),*/
+    fetchQuotationClient
+);
+
 // Aceptar cotización por cliente
 router.post(
-    '/accept_quotation',
-    validateData(quotationRequestAcceptSchema),
+    '/quotation/accept',
+   // validateData(quotationRequestAcceptSchema),
     AcceptQuotationRequestByClient
+);
+
+// Rechazar cotización por cliente
+router.post(
+    '/quotation/reject',
+    //validateData(quotationRequestAcceptSchema),
+    RejectQuotationRequestByClient
 );
 
 // GET /sgal_pt/clients/:rut

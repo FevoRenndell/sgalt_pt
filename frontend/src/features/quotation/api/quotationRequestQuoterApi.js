@@ -1,4 +1,4 @@
-// src/features/quotationRequest/api/quotationRequestApi.js
+// src/features/quotationapi/quotationRequestApi.js
 import { baseApi } from '@/app/api/baseApi';
 
 export const quotationRequestApi = baseApi.injectEndpoints({

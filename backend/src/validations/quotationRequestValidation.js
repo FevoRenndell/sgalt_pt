@@ -29,7 +29,6 @@ export const quotationRequestCreateSchema = Joi.object({
   requester_full_name: Joi.string()
     .trim()
     .max(255)
-    .pattern(nameRegex)
     .required()
     .messages({
       'any.required': 'El nombre del contacto es obligatorio',

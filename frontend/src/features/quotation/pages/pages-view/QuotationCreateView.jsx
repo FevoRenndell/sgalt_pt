@@ -1,5 +1,5 @@
-import { use, useCallback, useEffect, useMemo, useState } from 'react';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import {  useCallback, useEffect, useMemo, useState } from 'react';
+import {  useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -7,14 +7,14 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import { Box, CardActions, CardContent, Fab, Tab } from '@mui/material';
+import { Box,  CardContent,  Tab } from '@mui/material';
 
 // CUSTOM
 import { FormProvider } from '../../../../shared/components/hook-form';
 
 import {
-  quotationValidationCreateSchema
-} from '../../validations/quotationValidationCreateSchema';
+  quotationValidationSchema
+} from '../../validations/quotationValidationSchema';
 
 import { paths } from '../../../../routes/paths';
 import {
@@ -50,11 +50,7 @@ export default function QuotationCreateView() {
   //objeto que sera el borradfor de la cotización
   const draft = useSelector((state) => state.quotation.draft);
 
-  const defaultValues = useMemo(() => draft, [draft]);
-
   const confirm = useConfirmDialog();
-
-  const isEdit = location.pathname.includes('quotation_create');
 
   useEffect(() => {
     if (id) {
@@ -68,60 +64,24 @@ export default function QuotationCreateView() {
 
   const [createQuotation, { isLoading: isCreating, error: createError }] = useCreateQuotationMutation();
 
-  const methods = useForm({
-    defaultValues,
-    resolver: yupResolver(quotationValidationCreateSchema),
-  });
-
-  const {
-    handleSubmit,
-    reset,
-    watch,
-    trigger,
-    control,
-    formState: { isSubmitting, isValid },
-  } = methods;
-
-  const {
-    fields,
-    append,
-    remove
-  } = useFieldArray({ // manejar arreglos de campos dinámicos
-    name: 'items',
-    control
-  });
-
-
-  useEffect(() => {
-    const subscription = watch((value) => {
+  const onSubmit = async() => { 
  
-    });
-
-    console.log(subscription)
-  }, [watch]);
-
-  const onSubmit = handleSubmit(async (values) => {
-
-    console.log()
-
-    const isValidForm = await trigger();
-
-    console.log(isValidForm)
-
-    if (!isValidForm) {
-      enqueueSnackbar('Por favor completa los campos requeridos', { variant: 'error' });
+    if(draft.items.length === 0){
+      enqueueSnackbar('La cotización debe tener al menos un servicio seleccionado', {
+        variant: 'error',
+        autoHideDuration: 3000,
+      });
       return;
     }
 
     try {
+
       const ok = await confirm({
-        title: isEdit ? 'Confirmar actualización' : 'Confirmar creación',
-        description: `¿Deseas ${isEdit ? `actualizar los cambios de  la cotización ${'id de la cotizacion'} ` : `crear y asignar esta nueva cotización a la solicitud de cotización  ${id}`}?`,
-        confirmText: isEdit ? 'Actualizar' : 'Crear',
+        title:  'Confirmar creación',
+        description: `¿Deseas crear y asignar esta nueva cotización a la solicitud de cotización  ${id}?`,
+        confirmText: 'Crear',
         cancelText: 'Cancelar',
       });
-
-
 
       if (!ok) {
         return;
@@ -132,30 +92,23 @@ export default function QuotationCreateView() {
         request_id: parseInt(id),
       }
 
+      const create = await createQuotation(data).unwrap();  
 
-
-      // f (isEdit) {
-      await createQuotation(data).unwrap();
-      /*} else {
-        await updateQuotation({ id, ...data }).unwrap();
-      }*/
+      if(create){
+        cleanDraft();
+        navigate(paths.quotation_created(create.id));
+        enqueueSnackbar(`Cotización creada exitosamente`, {
+          variant: 'success',
+          autoHideDuration: 3000,
+        });
+      }
+      
     } catch (error) {
       handleApiError(error, enqueueSnackbar);
     }
 
-    /*      enqueueSnackbar(
-        isEdit ? `Usuario actualizado ${values.first_name}` : 'Usuario creado',
-        {
-          variant: 'success',
-          autoHideDuration: 1500,
-          onExited: () => {
-            navigate(paths.quotationRequests_list);
-          }
-        }
-      ); */
 
-
-  });
+  }
 
   const handleChangeTab = useCallback((_, newTab) => {
     setSelectTab(newTab);
@@ -176,9 +129,13 @@ export default function QuotationCreateView() {
     if (!ok) {
       return;
     }
-
-    dispatch(resetQuotationDraft(defaultValues));
+    cleanDraft();
+   
   };
+
+  const cleanDraft = () => {
+    dispatch(resetQuotationDraft());
+  }
 
   const addItemToSlice = (items) => {
     const itemArray = Object.values(items);
@@ -194,13 +151,11 @@ export default function QuotationCreateView() {
       discount,
     }));
   }
-
-
-
+  
   const buttons = (<Grid container spacing={3} sx={{ pt: 3 }}>
     <Grid size={{ sm: 8, xs: 12 }}>
       <Button
-        type="submit"
+        onClick={onSubmit}
         startIcon={<SaveIcon />}
         variant="outlined"
         color="success"
@@ -225,11 +180,10 @@ export default function QuotationCreateView() {
     </Grid>
   </Grid>);
 
-
   const quotationSymmary = <QuotationSummary draft={draft} handleDiscount={handleDiscount} buttons={buttons} />;
-    console.log("DRAFT:", draft)
+
   return (
-    <FormProvider methods={methods} onSubmit={onSubmit}>
+ 
       <div className="pt-2 pb-4">
         <TabContext value={selectTab}>
           <HeadingWrapper>
@@ -281,6 +235,6 @@ export default function QuotationCreateView() {
 
         </TabContext>
       </div>
-    </FormProvider>
+ 
   );
 }
