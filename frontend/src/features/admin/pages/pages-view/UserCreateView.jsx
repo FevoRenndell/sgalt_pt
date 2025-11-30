@@ -98,6 +98,8 @@ export default function UserCreateView() {
       role_id: role?.id,   // aquí ya metes solo el id
     };
 
+    delete data.repeat_password;
+
     try {
 
       const ok = await confirm({

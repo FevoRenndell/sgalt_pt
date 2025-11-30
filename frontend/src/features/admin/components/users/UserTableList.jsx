@@ -20,6 +20,7 @@ import Add from '../../../../shared/icons/Add';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteUserMutation } from '../../api/userApi.js';
+import { paths } from '../../../../routes/paths.js';
  
 export default function UserTableList({ details }) {
 
@@ -118,7 +119,7 @@ export default function UserTableList({ details }) {
   const allUserIds     = useMemo(() => filteredUsers.map(row => row.id), [filteredUsers]);
 
   const addButton =
-    <Button variant="outlined" color='success' startIcon={<Add />} size='small' onClick={() => navigate('/admin/users/create')}>
+    <Button variant="outlined" color='success' startIcon={<Add />} size='small' onClick={() => navigate(paths.users_create)}>
       Agregar nuevo usuario
     </Button>;
 

@@ -6,8 +6,8 @@ import { LoadingProgress } from '../shared/components/loader';
 import { useSettings } from '../shared/hooks/useSettings';
 
 // ÚNICA PÁGINA DE DASHBOARD QUE QUEDA
-const UserPage = lazy(() => import('../features/admin/pages/UserPage'));
-const UserCreatePage = lazy(() => import('../features/admin/pages/CreateUserPage'));
+const RolePage = lazy(() => import('../features/roles/pages/RolesPage'));
+const RoleCreatePage = lazy(() => import('../features/roles/pages/RolesCreatePage'));
 
 const ActiveLayout = () => {
   const { settings } = useSettings();
@@ -21,14 +21,14 @@ const ActiveLayout = () => {
   );
 };
 
-export const UserRoutes = [
+export const RolesRoutes = [
   {
-    path: 'users',
+    path: 'roles',
     element: <ActiveLayout />,
     children: [
-      { path: '/users/list'     , element: <UserPage       /> },
-      { path: '/users/create'   , element: <UserCreatePage /> },
-      { path: '/users/:id/edit' , element: <UserCreatePage /> },
+      { path: '/roles/list'     , element: <RolePage       /> },
+      { path: '/roles/create'   , element: <RoleCreatePage /> },
+      { path: '/roles/:id/edit' , element: <RoleCreatePage /> },
     ],
   },
 ];

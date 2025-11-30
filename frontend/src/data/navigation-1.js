@@ -6,20 +6,19 @@ export const navigations = [
   {
     type: 'label',
     label: 'Administración interna',
+    roles: [1, 3], // admin + cotizador
   },
 
   // --- ADMINISTRADOR: USUARIOS ---
   {
     name: 'Usuarios',
-    icon: duotone.UserList, // o el icono que prefieras
+    icon: duotone.UserList,
+    roles: [1], // solo admin
     children: [
       {
         name: 'Adm. Usuarios',
-        path: '/admin/users/list',
-      },
-      {
-        name: 'Roles y permisos',
-        path: '/admin/users/roles',
+        path: '/users/list',
+        roles: [1],
       },
     ],
   },
@@ -27,27 +26,32 @@ export const navigations = [
   // --- ADMINISTRADOR / COTIZADOR: COTIZACIONES ---
   {
     name: 'Cotizaciones',
-    icon: duotone.Invoice, // reutilizo el de Invoice que ya traía el template
+    icon: duotone.Invoice,
+    roles: [1, 3], // admin + cotizador
     children: [
       {
         name: 'Adm. Cotizaciones',
         path: '/quotation/list',
+        roles: [1, 3],
       },
       {
         name: 'Solicitudes de Cotizaciones',
         path: '/quotation_request/list',
+        roles: [1, 3],
       },
     ],
   },
 
-  // --- ADMINISTRADOR: CLIENTES ---
+  // --- ADMINISTRADOR / COTIZADOR: CLIENTES ---
   {
     name: 'Clientes',
-    icon: duotone.UserProfile, // similar a perfil / clientes
+    icon: duotone.UserProfile,
+    roles: [1, 3], // admin + cotizador
     children: [
       {
         name: 'Adm. Clientes',
         path: '/clients/list',
+        roles: [1, 3],
       },
     ],
   },
@@ -56,13 +60,12 @@ export const navigations = [
   {
     type: 'label',
     label: 'Portal Cliente',
+    roles: [1, 2, 3], // admin + cliente (si quieres agregas 3)
   },
   {
     name: 'Solicitud de cotización',
-    icon: duotone.Inbox, // o un icono de formulario/correo
+    icon: duotone.Inbox,
     path: '/public/solicitud-cotizacion',
+    roles: [1, 2, 3], // admin + cliente
   },
- 
-
- 
 ];

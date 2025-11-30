@@ -8,6 +8,7 @@ import { PublicRoutes } from './public';
 import { QuotationRequest } from './quotationRequest';
 import { QuotationRoutes } from './quotation';
 import { ClientRoutes } from './client';
+import { RolesRoutes } from './roles';
  
 export const routes = () => {
     return [
@@ -18,6 +19,7 @@ export const routes = () => {
 
     ...AuthRoutes,
     ...UserRoutes,
+    ...RolesRoutes,
     ...PublicRoutes,
     ...ClientRoutes,
     ...QuotationRoutes,

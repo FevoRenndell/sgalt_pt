@@ -8,10 +8,10 @@ export const paths = {
   login : '/login',
 
   // Usuarios
-  users_list:   '/admin/users/list',
-  user_edit: (id) => `/admin/users/${id}/edit`,
-  users_create: '/admin/users/create',
-  users_roles:  '/admin/users/roles',
+  users_list:   '/users/list',
+  user_edit: (id) => `/users/${id}/edit`,
+  users_create: '/users/create',
+  users_roles:  '/users/roles',
 
   // Cotizaciones
   quotation_request_list: '/quotation_request/list',
