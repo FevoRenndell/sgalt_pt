@@ -1,33 +1,19 @@
-// src/features/clients/pages-view/ClientCreateView.jsx
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-
-// MUI
-import Card from '@mui/material/Card';
-import Grid from '@mui/material/Grid';
-import Button from '@mui/material/Button';
-import { Box, CardContent } from '@mui/material';
-
-import { FormProvider, RHFTextField } from '../../../shared/components/hook-form';
-import {
-  clientValidationCreateSchema,
-  clientValidationUpdateSchema,
-} from '../validations/clientValidations';
-import { paths } from '../../../routes/paths';
-import {
-  useCreateClientMutation,
-  useUpdateClientMutation,
-  useFetchClientByIdQuery,
-} from '../api/clientApi';
-import { enqueueSnackbar } from 'notistack';
-import { handleApiError } from '../../../shared/utils/handleApiError';
-import { useConfirmDialog } from '../../../contexts/ConfirmDialogContext';
-import HeadingArea from '../../../shared/components/heading-area/HeadingArea';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useConfirmDialog } from "../../../../contexts/ConfirmDialogContext";
+import { useCreateClientMutation, useFetchClientByIdQuery, useUpdateClientMutation } from "../../api/clientApi";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { clientValidationCreateSchema } from "../../validations/clientValidations";
+import { useEffect } from "react";
+import { FormProvider, RHFTextField } from "../../../../shared/components/hook-form";
+import { Box, Button, Card, CardContent, Grid } from "@mui/material";
+import HeadingArea from "../../../../shared/components/heading-area/HeadingArea";
 import SendIcon from '@mui/icons-material/Send';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { paths } from "../../../../routes/paths";
+import { handleApiError } from "../../../../shared/utils/handleApiError";
+import { enqueueSnackbar } from "notistack";
 
 export default function ClientCreateView() {
   const { id } = useParams();
@@ -57,7 +43,7 @@ export default function ClientCreateView() {
   const methods = useForm({
     defaultValues: initialValues,
     resolver: yupResolver(
-      isEdit ? clientValidationUpdateSchema : clientValidationCreateSchema
+     clientValidationCreateSchema
     ),
   });
 

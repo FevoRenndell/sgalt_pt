@@ -5,6 +5,7 @@ import {
     createClient,
     getClientById,
     getClientByRut,
+    softDeleteClient
 } from '../services/clientService.js';
 
 export const fetchClients = async (req, res) => {
@@ -48,7 +49,7 @@ export const modifyClient = async (req, res) => {
 
 export const removeClient = async (req, res, next) => {
     try {
-        const deletedClient = await deleteClient(req.params.id);
+        const deletedClient = await softDeleteClient(req.params.id);
         res.status(200).json(deletedClient);
     } catch (error) {
         next(error);

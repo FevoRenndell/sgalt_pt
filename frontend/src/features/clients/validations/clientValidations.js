@@ -21,22 +21,20 @@ export const clientValidationCreateSchema = yup.object({
     .string()
     .trim()
     .max(255, 'Máximo 255 caracteres')
-    .nullable(),
+    .required('El contacto de la empresa es obligatorio'),
 
   contact_email: yup
     .string()
     .trim()
     .email('Correo electrónico inválido')
     .max(255, 'Máximo 255 caracteres')
-    .nullable()
-    .notRequired(),
+    .required('El correo de la empresa es obligatorio'),
 
   contact_phone: yup
     .string()
     .trim()
     .max(50, 'Máximo 50 caracteres')
-    .nullable()
-    .notRequired(),
+    .required('El teléfono de la empresa es obligatorio'),
 });
 
 export const clientValidationUpdateSchema = clientValidationCreateSchema;

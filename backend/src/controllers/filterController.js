@@ -1,5 +1,6 @@
 import { 
     getUserFilters,
+    getRolesFilters,
     getQuotationFilters
  } from "../services/filterService.js";
 
@@ -24,4 +25,13 @@ export const fetchQuotationFilters = async (req, res) => {
     }
 };
 
+export const fetchRolesFilters = async (req, res) => {
+    try {
+        const roles = await getRolesFilters();  
+        res.status(200).json(roles);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error fetching roles filters', error });
+    }
+};
  

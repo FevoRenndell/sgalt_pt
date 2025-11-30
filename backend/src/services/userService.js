@@ -22,6 +22,9 @@ export async function getUsers() {
           as: 'role',
         },
       ],
+      where : {
+        soft_delete: false
+      }
     });
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -78,3 +81,18 @@ export async function deleteUser(userId) {
   }
 }
 
+ 
+export async function softDeleteUser(userId) {
+ 
+    const user = await db.models.User.findByPk(userId); 
+
+    if (!user) {
+      throw new AppError('User not found', 400);
+    }
+
+    user.soft_delete = true;
+    await user.save();
+
+    return user;
+ 
+}

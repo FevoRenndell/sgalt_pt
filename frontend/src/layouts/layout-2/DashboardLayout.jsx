@@ -3,7 +3,7 @@ import { Outlet } from 'react-router';
 import LayoutSideBar from './components/DashboardSidebar';
 import DashboardHeader from './components/DashboardHeader';
 import LayoutBodyWrapper from './components/LayoutBodyWrapper';
-import LayoutSetting from '@/layouts/layout-parts/LayoutSetting';
+import LayoutSetting from '../layout-parts/LayoutSetting';
 // DASHBOARD LAYOUT BASED CONTEXT PROVIDER
 import LayoutProvider from './context/layoutContext';
 export default function DashboardLayoutV2() {

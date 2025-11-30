@@ -1,7 +1,8 @@
 // src/features/clients/pages-view/ClientListView.jsx
 import { Container, Card, CardContent, Box } from '@mui/material';
-import ClientTableList from '../components/clients/ClientTableList';
-import { useFetchClientsQuery } from '../api/clientApi';
+ 
+import { useFetchClientsQuery } from '../../api/clientApi';
+import ClientTableList from '../../component/ClientTableList';
 
 export default function ClientListView() {
   const { data: clientsData, isLoading } = useFetchClientsQuery();

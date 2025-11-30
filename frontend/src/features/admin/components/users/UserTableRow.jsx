@@ -76,8 +76,8 @@ export default function UserTableRow({
     <TableRow hover>
       <TableCell padding="normal">
         <TableMoreMenu open={openMenuEl} handleOpen={handleOpenMenu} handleClose={handleCloseOpenMenu}>
-          <TableMoreMenuItem Icon={Edit} title="Edit" handleClick={handleEdit} />
-          <TableMoreMenuItem Icon={DeleteOutline} title="Delete" handleClick={handleDelete} />
+          <TableMoreMenuItem Icon={Edit} title="Editar" handleClick={handleEdit} />
+          <TableMoreMenuItem Icon={DeleteOutline} title="Eliminar" handleClick={handleDelete} />
         </TableMoreMenu>
       </TableCell>
       <TableCell padding="normal" >{id} </TableCell>

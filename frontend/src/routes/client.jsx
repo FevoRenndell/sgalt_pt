@@ -6,7 +6,7 @@ import { LoadingProgress } from '../shared/components/loader';
 import { useSettings } from '../shared/hooks/useSettings';
 
 // Lazy pages
-const ClientListPage   = lazy(() => import('../features/clients/pages/ClientListPage'));
+const ClientPage   = lazy(() => import('../features/clients/pages/ClientPage'));
 const ClientCreatePage = lazy(() => import('../features/clients/pages/CreateClientPage'));
 const ClientEditPage   = lazy(() => import('../features/clients/pages/CreateClientPage')); // reutiliza la misma
 
@@ -23,12 +23,12 @@ const ActiveLayout = () => {
   );
 };
 
-export const Client = [
+export const ClientRoutes = [
   {
     path: 'clients',
     element: <ActiveLayout />,
     children: [
-      { path: '/clients/list', element: <ClientListPage /> },
+      { path: '/clients/list', element: <ClientPage /> },
       { path: '/clients/create', element: <ClientCreatePage /> },
       { path: '/clients/edit/:id', element: <ClientEditPage /> },
     ],

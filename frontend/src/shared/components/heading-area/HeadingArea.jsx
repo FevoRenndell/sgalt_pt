@@ -45,7 +45,8 @@ export default function HeadingArea({
   addButton,
   icon,
   title,
-  tab_active = false
+  tab_active = false,
+  headingWrapper
 }) {  
   return <FlexBetween flexWrap="wrap" gap={1}>
       <FlexBox alignItems="center" gap={1.5}>
@@ -60,12 +61,7 @@ export default function HeadingArea({
       {tab_active && (
         
       <TabContext value={value} >
-        <TabListWrapper variant="scrollable"  onChange={changeTab}  >
-          <Tab disableRipple label="All Users" value={0} />
-          <Tab disableRipple label="Administradores" value={1} />
-          <Tab disableRipple label="Clientes" value={2} />
-          <Tab disableRipple label="Cotizadores" value={3} />
-        </TabListWrapper>
+          {headingWrapper}
       </TabContext>
       )}
       { addButton }

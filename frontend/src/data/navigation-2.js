@@ -61,16 +61,8 @@ export const navigation = [
     children: [
       {
         name: 'Administrar clientes',
-        path: '/dashboard/clientes',
-      },
-      {
-        name: 'Crear cliente',
-        path: '/dashboard/clientes/crear',
-      },
-      {
-        name: 'Historial de clientes',
-        path: '/dashboard/clientes/historial',
-      },
+        path: '/clients/list',
+      }
     ],
   },
 
@@ -83,22 +75,9 @@ export const navigation = [
         name: 'Solicitud de cotización',
         path: '/public/solicitud-cotizacion',
       },
-      {
-        name: 'Estado de mi cotización',
-        path: '/public//public/cotizacion/:id',
-      },
+ 
     ],
   },
 
-  // --- OPCIONES DE CUENTA GENERALES ---
-  {
-    name: 'Profile',
-    Icon: duotone.UserProfile,
-    path: '/dashboard/profile',
-  },
-  {
-    name: 'Account',
-    Icon: duotone.Accounts,
-    path: '/dashboard/account',
-  },
+ 
 ];

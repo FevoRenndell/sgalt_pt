@@ -22,7 +22,7 @@ const ActiveLayout = () => {
   );
 };
 
-export const Quotation = [
+export const QuotationRoutes = [
   {
     path: 'quotation',
     element: <ActiveLayout />,

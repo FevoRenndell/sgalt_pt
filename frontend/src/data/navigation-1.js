@@ -47,7 +47,7 @@ export const navigations = [
     children: [
       {
         name: 'Adm. Clientes',
-        path: '/dashboard/clientes',
+        path: '/clients/list',
       },
     ],
   },
@@ -62,20 +62,7 @@ export const navigations = [
     icon: duotone.Inbox, // o un icono de formulario/correo
     path: '/public/solicitud-cotizacion',
   },
-  {
-    name: 'Estado de mi cotización',
-    icon: duotone.DataTable,
-    path: '/public/cotizacion/:id',
-  },
+ 
 
-  // --- OTROS (SI QUIERES MANTENER SECCIONES GENERALES) ---
-  {
-    type: 'label',
-    label: 'Cuenta',
-  },
-  {
-    name: 'Mi perfil',
-    icon: duotone.Accounts,
-    path: '/dashboard/profile',
-  },
+ 
 ];

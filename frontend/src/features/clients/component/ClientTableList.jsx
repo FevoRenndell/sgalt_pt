@@ -1,31 +1,33 @@
-// src/features/clients/components/clients/ClientTableList.jsx
-import { useCallback, useEffect, useMemo, useState } from 'react';
-// MUI
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
-import { Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDeleteClientMutation } from "../api/clientApi";
+import { getComparator, stableSort, useMuiTable } from "../../../shared/hooks/useMuiTable";
+import { Box, Button, Card, Container, Tab, Table, TableBody, TableContainer, TablePagination } from "@mui/material";
+import HeadingArea from "../../../shared/components/heading-area/HeadingArea";
+import { TableDataNotFound, TableToolbar } from "../../../shared/components/table";
+import { Scrollbar } from "../../../shared/components/scrollbar";
+import TableHeadCCustom from "../../../shared/components/table/TableHeadCustom";
+import ClientTableRow from "./ClientTableRow";
+import Add from "../../../shared/icons/Add";
+import { paths } from "../../../routes/paths";
+import TabContext from "@mui/lab/TabContext";
+import { HeadingWrapper } from "../../../shared/components/heading-wrapper/HeadingWrapper";
+import TabList from "@mui/lab/TabList";
+import ClientActions from "../../admin/components/clients/ClientActions";
 
-// CUSTOM
-import { Scrollbar } from '../../../../shared/components/scrollbar';
-import { TableDataNotFound, TableToolbar } from '../../../../shared/components/table';
-import HeadingArea from '../../../../shared/components/heading-area/HeadingArea';
-import TableHeadCustom from '../../../../shared/components/table/TableHeadCustom.jsx';
-import { useMuiTable, getComparator, stableSort } from '../../../../shared/hooks/useMuiTable';
-import Add from '../../../../shared/icons/Add';
-import { fDateLogic } from '../../../../shared/utils/formatTime';
-import ClientTableRow from './ClientTableRow';
-import { useDeleteClientMutation } from '../../api/clientApi';
-import { paths } from '../../../../routes/paths';
+
 
 export default function ClientTableList({ details }) {
+
   const navigate = useNavigate();
-  const [clients, setClients] = useState([]);
+
   const [deleteClient] = useDeleteClientMutation();
+
+  const [clients, setClients] = useState([]);
+  const [selectTab, setSelectTab] = useState('');
+  const [serviceFilters, setServiceFilters] = useState({
+    search: '',
+  });
 
   useEffect(() => {
     setClients(details);
@@ -33,6 +35,7 @@ export default function ClientTableList({ details }) {
 
   const [clientFilter, setClientFilter] = useState({
     search: '',
+    rut: ''
   });
 
   const TABLE_HEAD = [
@@ -74,13 +77,6 @@ export default function ClientTableList({ details }) {
     }));
   }, []);
 
-  const handleSearchChange = useCallback(
-    (e) => {
-      handleChangeFilter('search', e.target.value);
-    },
-    [handleChangeFilter]
-  );
-
   const handleDeleteClient = useCallback(
     async (id) => {
       try {
@@ -96,25 +92,43 @@ export default function ClientTableList({ details }) {
   );
 
   const filteredClients = useMemo(() => {
-    const sorted = stableSort(clients, getComparator(order, orderBy));
+    const sortedClients = stableSort(clients, getComparator(order, orderBy));
+    const { search, rut } = clientFilter;
 
-    return sorted.filter((item) => {
-      const { search } = clientFilter;
-      if (!search) return true;
+    const normalizedSearch = search?.trim().toLowerCase();
+    const normalizedRut = rut?.trim().toLowerCase();
 
-      const term = search.toLowerCase();
+    return sortedClients.filter((item) => {
+      // Filtro por nombre
+      const matchesSearch = !normalizedSearch
+        ? true
+        : item.company_name?.trim().toLowerCase().includes(normalizedSearch);
 
-      return (
-        item.company_rut?.toLowerCase().includes(term) ||
-        item.company_name?.toLowerCase().includes(term) ||
-        item.contact_name?.toLowerCase().includes(term) ||
-        item.contact_email?.toLowerCase().includes(term)
-      );
+      if (!matchesSearch) return false;
+
+      // Filtro por RUT
+      const matchesRut = !normalizedRut
+        ? true
+        : item.company_rut?.trim().toLowerCase().includes(normalizedRut);
+
+      if (!matchesRut) return false;
+
+      return true;
     });
-  }, [clients, order, orderBy, clientFilter]);
+  }, [
+    clients,
+    order,
+    orderBy,
+    clientFilter.search,
+    clientFilter.rut,   // 👈 faltaba esto
+  ]);
 
   const paginatedClients = useMemo(
-    () => filteredClients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    () =>
+      filteredClients.slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage
+      ),
     [filteredClients, page, rowsPerPage]
   );
 
@@ -125,71 +139,79 @@ export default function ClientTableList({ details }) {
       variant="outlined"
       color="success"
       startIcon={<Add />}
-      size="small"
+      size="mdeium"
       onClick={() => navigate(paths.client_create)}
     >
       Agregar cliente
     </Button>
   );
 
+  const handleCleanFilter = useCallback(() => {
+    setSelectTab('');
+    setClientFilter({
+      search: '',
+      rut: ''
+    });
+  }, []);
+
   return (
     <div className="pt-2 pb-4">
-      <Card>
-        <Box px={2} pt={2} mb={1}>
-          <HeadingArea title="Listado de Clientes" addButton={addButton} icon={null} />
-        </Box>
+      <Container>
+        <Card>
+         
+            <HeadingArea title="Listado de Clientes" addButton={addButton} icon={null} tab_active={false} />
+           
 
-        <Box px={2} pb={2}>
-          <TableToolbar
-            searchPlaceholder="Buscar por RUT, empresa, contacto o correo"
-            searchValue={clientFilter.search}
-            onSearchChange={handleSearchChange}
+          <ClientActions
+            filter={clientFilter}
+            handleChangeFilter={handleChangeFilter}
+            handleCleanFilter={handleCleanFilter}
           />
-        </Box>
 
-        <TableContainer>
-          <Scrollbar autoHide={false}>
-            <Table>
-              <TableHeadCustom
-                order={order}
-                orderBy={orderBy}
-                numSelected={selected.length}
-                rowCount={filteredClients.length}
-                onRequestSort={handleRequestSort}
-                onSelectAllRows={handleSelectAllRows(allClientIds)}
-                headCells={TABLE_HEAD}
-              />
-              <TableBody>
-                {paginatedClients.length === 0 ? (
-                  <TableDataNotFound />
-                ) : (
-                  paginatedClients.map((client) => (
-                    <ClientTableRow
-                      key={client.id}
-                      client={client}
-                      handleDeleteClient={handleDeleteClient}
-                    />
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </Scrollbar>
-        </TableContainer>
+          <TableContainer>
+            <Scrollbar autoHide={false}>
+              <Table>
+                <TableHeadCCustom
+                  order={order}
+                  orderBy={orderBy}
+                  numSelected={selected.length}
+                  rowCount={filteredClients.length}
+                  onRequestSort={handleRequestSort}
+                  onSelectAllRows={handleSelectAllRows(allClientIds)}
+                  headCells={TABLE_HEAD}
+                />
+                <TableBody>
+                  {paginatedClients.length === 0 ? (
+                    <TableDataNotFound />
+                  ) : (
+                    paginatedClients.map((client) => (
+                      <ClientTableRow
+                        key={client.id}
+                        client={client}
+                        handleDeleteClient={handleDeleteClient}
+                      />
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Scrollbar>
+          </TableContainer>
 
-        <Box padding={1}>
-          <TablePagination
-            page={page}
-            component="div"
-            rowsPerPage={rowsPerPage}
-            count={filteredClients.length}
-            onPageChange={handleChangePage}
-            rowsPerPageOptions={[5, 10, 25]}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            showFirstButton
-            showLastButton
-          />
-        </Box>
-      </Card>
+          <Box padding={1}>
+            <TablePagination
+              page={page}
+              component="div"
+              rowsPerPage={rowsPerPage}
+              count={filteredClients.length}
+              onPageChange={handleChangePage}
+              rowsPerPageOptions={[5, 10, 25]}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        </Card>
+      </Container>
     </div>
   );
 }

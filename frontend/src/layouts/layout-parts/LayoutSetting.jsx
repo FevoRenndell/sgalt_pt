@@ -93,7 +93,7 @@ export default function LayoutSetting() {
       <CustomDrawer open={open} anchor="right" variant="persistent">
         <FlexBox alignItems="center" justifyContent="space-between" px={2} py={1}>
           <Typography variant="body2" fontWeight={500}>
-            Available Layouts
+            Layouts Disponible
           </Typography>
 
           <IconButton size="small" onClick={toggleDrawer}>

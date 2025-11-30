@@ -85,3 +85,10 @@ export async function getQuotationFilters() {
 export async function getServices() {
     return await db.models.Service.findAll({});
 }
+
+export async function getRolesFilters() {
+    return null;
+}
+
+
+// filtro client

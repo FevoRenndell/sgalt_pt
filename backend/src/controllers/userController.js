@@ -4,6 +4,7 @@ import {
     deleteUser,
     createUser,
     getUserById,
+    softDeleteUser
 } from '../services/userService.js';
 
 export const fetchUsers = async (req, res) => {
@@ -47,10 +48,11 @@ export const modifyUser = async (req, res) => {
 
 export const removeUser = async (req, res) => {
     try {
-        const deletedUser = await deleteUser(req.params.id);
+        const deletedUser = await softDeleteUser(req.params.id);
         res.status(200).json(deletedUser);
     } catch (error) {
         next(error);
     }
 };
 
+ 

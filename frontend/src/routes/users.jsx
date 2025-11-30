@@ -21,7 +21,7 @@ const ActiveLayout = () => {
   );
 };
 
-export const Users = [
+export const UserRoutes = [
   {
     path: 'admin',
     element: <ActiveLayout />,

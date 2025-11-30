@@ -22,7 +22,7 @@ export const paths = {
   quotation_create_from_request: (id) => `/quotation/${id}/quotation_create`,
   quotation_created: (id) => `/quotation/${id}/quotation_created`,
 
-  clients_list: '/clients',
+  clients_list: '/clients/list',
   client_create: '/clients/create',
   client_edit: (id) => `/clients/edit/${id}`,
 
