@@ -30,38 +30,37 @@ export function useAuthState() {
 
  const [me] = useMeMutation();
 
-
- console.log("error en verificar token, no es un error pero recordatorio ")
- /* error 
-  useEffect(() => {
-    async function verifyToken() {
-      // No hay token -> no autenticado
-      if (!token) {
-        setInitialized(true);
-        return;
-      }
-
-      try {
-        const { user: meUser } = await me().unwrap(); // { user }
-
-        // Actualiza solo la info del usuario, conserva el token actual
-        dispatch(
-          setCredentials({
-            token,
-            user: meUser,
-          })
-        );
-      } catch (error) {
-        console.log('Error en /auth/me', error);
-        // Si el backend devuelve 401, aquí se dispara
-        dispatch(logout());
-      } finally {
-        setInitialized(true);
-      }
+useEffect(() => {
+  async function verifyToken() {
+    if (!token) {
+      setInitialized(true);
+      return;
     }
 
-    verifyToken();
-  }, [token, me, dispatch]);*/
+    try {
+      const { user: meUser } = await me().unwrap();
+      dispatch(
+        setCredentials({
+          token : token,
+          user: meUser,
+        })
+      );
+    } catch (error) {
+     if (error?.status === 401 || error?.status === 403) {
+        dispatch(logout());
+     }
+    } finally {
+      setInitialized(true);
+    }
+  }
+
+  verifyToken();
+}, [
+  token,   
+  me,        
+  dispatch,  
+  setInitialized,
+]);
 
   return {
     token,

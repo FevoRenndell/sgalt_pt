@@ -11,6 +11,7 @@ export default (sequelize) => {
       issue_date: { type: DataTypes.DATEONLY, allowNull: true },
       request_summary: { type: DataTypes.TEXT, allowNull: true },
       discount : { type: DataTypes.DECIMAL(12, 2), defaultValue: 0 },
+      quotation_token: { type: DataTypes.TEXT, allowNull: true },
       status: { type: DataTypes.STRING(20), defaultValue  : 'CREADA' },
       subtotal: { type: DataTypes.DECIMAL(12, 2), allowNull: false },
       total: { type: DataTypes.DECIMAL(12, 2), allowNull: false },

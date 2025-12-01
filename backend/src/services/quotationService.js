@@ -1,7 +1,9 @@
+import { quotationCreatedTemplate } from '../email/quotationEmailClient.js';
 import { AppError } from '../error/AppError.js';
 import db from '../models/index.js';
 import { signUrlToken } from './authService.js';
 import { sendEmail } from './emailService.js';
+ 
 
 
 export async function getQuotations() {
@@ -161,62 +163,70 @@ export async function deleteQuotation(userId) {
   }
 }
 
-
 export async function sendQuotationEmail({ quotation_id = null, request_id }) {
 
   const transaction = await db.sequelize.transaction();
-  console.log( " la od son " , quotation_id , 
-request_id)
-  try {
 
+  try {
     const quotationByID = await getQuotationById(quotation_id, false);
+
+    if(!quotationByID){
+      throw new AppError('Cotización no encontrada', 404);
+    }
 
     const quotation = await destructureQuotationData(quotationByID);
 
+    const cotID = quotation.quotation.id;
+    const requesterEmail = quotation.request.requester_email;
+
+    const token = signUrlToken(cotID, requesterEmail);
+    
     const updatedRequest = await db.models.QuotationRequest.update(
-      { status: 'FINALIZADA' },
-      { raw: true, where: { id: request_id } },
-      { transaction }
+      { status: 'FINALIZADA',},
+      {
+        where: { id: request_id },
+        transaction,
+        raw: true,
+      }
     );
 
     if (updatedRequest[0] !== 1) {
       throw new AppError('No se pudo actualizar el estado de la solicitud de cotización', 500);
     }
 
-    const updateQuotation = await db.models.Quotation.update(
-      { status: 'ENVIADA' },
-      { where: { id: quotation_id } },
-      { transaction }
+    await db.models.Quotation.update(
+      { status: 'ENVIADA', quotation_token: token },
+      {
+        where: { id: quotation_id },
+        transaction,
+      }
     );
 
-    const cotID = quotation.quotation.id;
-
-    const requesterEmail = quotation.request.requester_email;
-
-    const token = signUrlToken(cotID, requesterEmail);
-
     const url = `http://localhost:5173/public/cotizacion/${cotID}?token=${token}`;
+
+    const html = quotationCreatedTemplate({
+      recipientName: quotation.request.requester_full_name,
+      url,
+      quotation,
+    });
 
     await sendEmail({
       to: requesterEmail,
       subject: 'Su cotización ha sido creada',
-      template: '<>Hola</>',
-      text: `Puede ver su cotización en el siguiente enlace: ${url}`,
+      html,                     
+      text: `Puede ver su cotización en el siguiente enlace: ${url}`,  
     });
 
     await transaction.commit();
 
-    return {
-      quotation,
-      token,
-      url
-    };
+    return { quotation, token, url };
 
   } catch (error) {
     await transaction.rollback();
     throw error;
   }
 }
+
 
 
 async function destructureQuotationData(quotationInstance) {

@@ -9,9 +9,13 @@ import User from './users.js';
 import Service from './service.js';
 import Quotation from './quotation.js';
 import QuotationItem from './quotation_item.js';
+import NotificationStatus from './notification_status.js';
+import NotificationMessageType from './notification_entity_type.js';
+import NotificationEntityType from './notification_entity_type.js';
+import Notification from './notification.js';
 
 export function initModels(sequelize) {
-    
+
   // Instanciar modelos
   const RegionModel = Region(sequelize);
   const CityModel = City(sequelize);
@@ -23,7 +27,10 @@ export function initModels(sequelize) {
   const ServiceModel = Service(sequelize);
   const QuotationModel = Quotation(sequelize);
   const QuotationItemModel = QuotationItem(sequelize);
-
+  const NotificationStatusModel = NotificationStatus(sequelize);
+  const NotificationMessageTypeModel = NotificationMessageType(sequelize);
+  const NotificationEntityTypeModel = NotificationEntityType(sequelize);
+  const NotificationModel = Notification(sequelize);
   // ----- RELACIONES GEOGRÁFICAS -----
 
   // Region 1 - N Cities
@@ -142,6 +149,50 @@ export function initModels(sequelize) {
     as: 'service',
   });
 
+  // ======================
+  // RELACIONES NOTIFICACIONES
+  // ======================
+
+  // Catálogo de estado (UNREAD / READ)
+  NotificationStatusModel.hasMany(NotificationModel, {
+    foreignKey: 'status_id',
+    as: 'notifications',
+  });
+  NotificationModel.belongsTo(NotificationStatusModel, {
+    foreignKey: 'status_id',
+    as: 'status',
+  });
+
+  // Catálogo de tipo de mensaje (QUOTATION_CREATED, etc.)
+  NotificationMessageTypeModel.hasMany(NotificationModel, {
+    foreignKey: 'message_type_id',
+    as: 'notifications',
+  });
+  NotificationModel.belongsTo(NotificationMessageTypeModel, {
+    foreignKey: 'message_type_id',
+    as: 'messageType',
+  });
+
+  // Catálogo de tipo de entidad (QUOTATION_REQUEST, QUOTATION, ...)
+  NotificationEntityTypeModel.hasMany(NotificationModel, {
+    foreignKey: 'entity_type_id',
+    as: 'notifications',
+  });
+  NotificationModel.belongsTo(NotificationEntityTypeModel, {
+    foreignKey: 'entity_type_id',
+    as: 'entityType',
+  });
+
+  // Usuario destinatario de la notificación
+  UserModel.hasMany(NotificationModel, {
+    foreignKey: 'recipient_id',
+    as: 'notifications',
+  });
+  NotificationModel.belongsTo(UserModel, {
+    foreignKey: 'recipient_id',
+    as: 'recipient',
+  });
+
   return {
     Region: RegionModel,
     City: CityModel,
@@ -153,6 +204,10 @@ export function initModels(sequelize) {
     Service: ServiceModel,
     Quotation: QuotationModel,
     QuotationItem: QuotationItemModel,
+    NotificationStatus: NotificationStatusModel,
+    NotificationMessageType: NotificationMessageTypeModel,
+    NotificationEntityType: NotificationEntityTypeModel,
+    Notification: NotificationModel,
   };
 }
 

@@ -7,14 +7,17 @@ import { useFetchQuotationsQuery } from '../../api/quotationApi';
  
 export default function QuotationListView({ }) {
 
-    const { data: quotationRequestsData, isLoading } = useFetchQuotationsQuery();
+
+    const { data } = useFetchQuotationsQuery(null, {
+        pollingInterval: 3_000,
+    });
 
     return (
         <Container>
             <Box sx={{ mt: 4, mb: 4 }}>
                 <Card>
                     <CardContent>
-                        <QuotationTableList details={quotationRequestsData || []} />
+                        <QuotationTableList details={data || []} />
                     </CardContent>
                 </Card>
             </Box>

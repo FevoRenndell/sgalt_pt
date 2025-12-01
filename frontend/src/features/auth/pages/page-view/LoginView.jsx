@@ -70,7 +70,7 @@ export default function LoginPageView() {
         setCredentials({
           token: data.token,
           user: data.user || null,
-          remember: arg.remember,
+         //  remember: arg.remember,
         }),
       );
 

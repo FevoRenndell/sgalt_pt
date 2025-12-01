@@ -54,6 +54,17 @@ export async function getUserById(userId) {
   }
 }
 
+export async function getUserByEmail(email) {
+  try {
+    return await db.models.User.findOne({
+      where: { email }
+    });
+  } catch (error) {
+    console.error('error al obtener usuario por email :', error);
+    throw new AppError('Error fetching user by email', 500);
+  }
+}
+
 export async function updateUser(userId, updateData) {
   try {
     const user = await db.models.User.findByPk(userId);

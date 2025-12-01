@@ -33,20 +33,6 @@ export const authApi = baseApi.injectEndpoints({
         method: 'POST',
         body: { email, password_hash },
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled; // { token, user? }
-          dispatch(
-            setCredentials({
-              token: data.token,
-              user: data.user || null,
-              remember: arg.remember,
-            }),
-          );
-        } catch {
-          // lo maneja el componente
-        }
-      },
     }),
     me: builder.mutation({
       query: () => ({

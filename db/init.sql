@@ -1,60 +1,20 @@
--- =========================================================
--- SGALT - Esquema base (PostgreSQL)
--- Fecha: YYYY-MM-DD
--- =========================================================
-
--- Opcional las funciones crypto/uuid
--- CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 BEGIN;
 
--- 1) Tablas que dependen de otras
 DROP TABLE IF EXISTS quotation_items CASCADE;
 DROP TABLE IF EXISTS quotations CASCADE;
 DROP TABLE IF EXISTS quotation_request CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
-
--- 2) Tablas maestras del sistema
 DROP TABLE IF EXISTS services CASCADE;
 DROP TABLE IF EXISTS roles CASCADE;
 DROP TABLE IF EXISTS clients CASCADE;
-
--- 3) Ubicación geográfica (dependencias)
 DROP TABLE IF EXISTS communes CASCADE;
 DROP TABLE IF EXISTS cities CASCADE;
 DROP TABLE IF EXISTS regions CASCADE;
--- =========================================================
--- Tablas maestras: regiones, ciudades, comunas, roles
--- (Catálogos jerárquicos para ubicar obras/solicitudes y
---  controlar perfiles de usuario)
--- Relaciones clave:
---   regions(1) ──< cities(*) ──< communes(*)
---   roles es independiente y se referenciará desde users.role
--- =========================================================
-
-
--- ==========================================
---  DROP TABLES (ORDEN CORRECTO POR FKs)
--- ==========================================
-
--- 1) Tablas que dependen de otras
-DROP TABLE IF EXISTS quotation_items CASCADE;
-DROP TABLE IF EXISTS quotations CASCADE;
-DROP TABLE IF EXISTS quotation_request CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-
--- 2) Tablas maestras del sistema
-DROP TABLE IF EXISTS services CASCADE;
-DROP TABLE IF EXISTS roles CASCADE;
-DROP TABLE IF EXISTS clients CASCADE;
-
--- 3) Ubicación geográfica (dependencias)
-DROP TABLE IF EXISTS communes CASCADE;
-DROP TABLE IF EXISTS cities CASCADE;
-DROP TABLE IF EXISTS regions CASCADE;
-
-
-
+DROP TABLE IF EXISTS notifications CASCADE;
+DROP TABLE IF EXISTS notification_status CASCADE;
+DROP TABLE IF EXISTS notification_message_type CASCADE;
+DROP TABLE IF EXISTS notification_entity_type CASCADE;
 -- Crea la tabla de regiones administrativas del país (nivel 1)
 CREATE TABLE IF NOT EXISTS regions (            -- Si no existe, la crea; evita error en re-ejecuciones
   id            INTEGER PRIMARY KEY,  -- PK entera autoincremental moderna (IDENTITY)
@@ -195,30 +155,27 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_users_email ON users (LOWER(email));
 -- Restricción de unicidad sobre el campo 'email' sin distinguir mayúsculas/minúsculas.
 -- Evita duplicar correos con variaciones como 'Usuario@...' y 'usuario@...'.
 
-INSERT INTO users (first_name, last_name_1, last_name_2, email, password_hash, role_id, is_active, created_at, updated_at) VALUES
-('Lupita', 'Lopez', 'XD', 'lupita@gmail.com',
- '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
- 2, TRUE, NOW(), NOW()),
+ 
+INSERT INTO users (id, first_name, last_name_1, last_name_2, email, password_hash, role_id, is_active, created_at, updated_at) VALUES
+(1, 'Cristóbal', 'Larraín', 'Errázuriz', 'clarra.in@empresa.cl',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze', 1, TRUE, NOW(), NOW()),
 
-('Luisito', 'Comunica', 'Nada', 'lcomunica@gmail.com',
- '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
- 2, TRUE, NOW(), NOW()),
+(2, 'Daniela', 'Gutiérrez', 'Moreno', 'dgutierrez@empresa.cl',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze', 1, TRUE, NOW(), NOW()),
 
-('Willian', 'Lupin', 'Perez', 'wlp@gmail.com',
- '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
- 1, TRUE, NOW(), NOW()),
+(3, 'Javiera', 'Oyarzún', 'Torrealba', 'j.oyarzun@empresa.cl',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze', 2, TRUE, NOW(), NOW()),
 
-('Luis', 'Franco', 'Wine', 'lfranco@gmail.com',
- '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
- 1, TRUE, NOW(), NOW()),
+(4, 'Kevin', 'Albornoz', 'Pérez', 'kevin.albornoz@empresa.cl',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze', 2, TRUE, NOW(), NOW()),
 
-('Luisito', 'Comunica', 'Nada', 'wlp2@gmail.com',
- '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
- 2, TRUE, NOW(), NOW()),
+(5, 'Paula', 'Muñoz', NULL, 'paula.munoz@empresa.cl',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze', 2, TRUE, NOW(), NOW()),
 
-('emundo', 'Perez', NULL, 'wlp50@gmail.com',
- '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze',
- 2, TRUE, NOW(), NOW());
+(6, 'Brian', 'Cortés', 'Saavedra', 'bcortes@empresa.cl',
+ '$2b$10$j3m2v4yai0YOTn6lM0tsrubmDJbPgWPL1rXgdScQsg8EvIBDCGZze', 2, TRUE, NOW(), NOW());
+
+
  
 
 -- =========================================================
@@ -525,7 +482,7 @@ CREATE TABLE IF NOT EXISTS quotations (                      -- Crea la tabla si
   -- Clave foránea hacia 'users.id'.
   -- Identifica al usuario (vendedor, secretaria o encargado técnico)
   -- que elaboró la cotización.
-
+   quotation_token text null,
   request_summary  TEXT NULL,
   -- Resumen del contenido o alcance de la solicitud que dio origen a la cotización.
   -- Este campo se rellena al momento de emitirla, describiendo brevemente los servicios ofrecidos.
@@ -1181,7 +1138,7 @@ END $$;                                   -- Fin del bloque DO anónimo
 -- =========================================================
 -- 3️⃣ Confirmación de cambios
 -- =========================================================
-COMMIT;
+
 -- Asegura que todas las operaciones (creación de la función y triggers)
 -- se guarden de forma permanente en la base de datos.
 -- En entornos Docker, este COMMIT marca el final del script de inicialización.
@@ -1310,3 +1267,473 @@ VALUES
 
 (17, 'Retiro de muestras en terreno', 'Logística', '-', 'visita',
  'Retiro y traslado de muestras desde obra al laboratorio.', 15000);
+
+
+-- ============================================
+-- SEED: QUOTATIONS + QUOTATION_ITEMS
+-- FECHA: 2025-11-30
+-- AUTOR: SEBASTIÁN
+-- ============================================
+
+-- ================================================================
+-- 2) QUOTATIONS (8 REGISTROS / 2 CREADAS, 2 RECHAZADAS,
+--                2 ACEPTADAS, 2 ENVIADAS)
+-- ================================================================
+
+-- ===========================
+-- 2.1) CREADAS (2)
+-- ===========================
+
+-- QUOTATION 1 - request_id = 2 / Cotizadora Javiera (user_id = 3)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(1, 1001, 2, 3, 'Solicitud de revisión estructural aérea', '2025-11-30',
+ 'CREADA', 0, 18000, 18000, NOW(), NOW(), false);
+
+-- QUOTATION 2 - request_id = 3 / Cotizadora Javiera (user_id = 3)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(2, 1002, 3, 3, 'Inspección de hangar', '2025-11-30',
+ 'CREADA', 0, 22000, 22000, NOW(), NOW(), false);
+
+
+-- ===========================
+-- 2.2) RECHAZADAS (2)
+-- ===========================
+
+-- QUOTATION 3 - request_id = 4 / Cotizador Kevin (user_id = 4)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(3, 1003, 4, 4, 'Revisión instalaciones eléctricas', '2025-11-29',
+ 'RECHAZADA', 0, 15000, 15000, NOW(), NOW(), false);
+
+-- QUOTATION 4 - request_id = 5 / Cotizador Kevin (user_id = 4)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(4, 1004, 5, 4, 'Instalación eléctrica en planta', '2025-11-29',
+ 'RECHAZADA', 0, 28000, 28000, NOW(), NOW(), false);
+
+
+-- ===========================
+-- 2.3) ACEPTADAS (2)
+-- ===========================
+
+-- QUOTATION 5 - request_id = 6 / Cotizadora Paula (user_id = 5)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(5, 1005, 6, 5, 'Evaluación riesgos industriales', '2025-11-29',
+ 'ACEPTADA', 0, 35000, 35000, NOW(), NOW(), false);
+
+-- QUOTATION 6 - request_id = 7 / Cotizadora Paula (user_id = 5)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(6, 1006, 7, 5, 'Inspección mina subterránea', '2025-11-30',
+ 'ACEPTADA', 0, 45000, 45000, NOW(), NOW(), false);
+
+
+-- ===========================
+-- 2.4) ENVIADAS (2)
+-- ===========================
+
+-- QUOTATION 7 - request_id = 8 / Cotizador Brian (user_id = 6)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(7, 1007, 8, 6, 'Ensayo de resistencia hormigón', '2025-11-30',
+ 'ENVIADA', 0, 60000, 60000, NOW(), NOW(), false);
+
+-- QUOTATION 8 - request_id = 9 / Cotizador Brian (user_id = 6)
+INSERT INTO quotations (
+  id, quote_number, request_id, user_id, request_summary, issue_date,
+  status, discount, subtotal, total, created_at, updated_at, soft_delete
+) VALUES
+(8, 1008, 9, 6, 'Módulo, curado de muestras', '2025-11-30',
+ 'ENVIADA', 0, 45000, 45000, NOW(), NOW(), false);
+
+
+-- ================================================================
+-- 3) QUOTATION_ITEMS (ORDEN ESTRUCTURA)
+--     (id, quotation_id, service_id, quantity, unit,
+--      unit_price, subtotal, created_at, updated_at)
+-- ================================================================
+
+-- ===========================
+-- 3.1) CREADAS
+-- ===========================
+INSERT INTO quotation_items VALUES
+(1, 1, 1, 1, 'muestra', 18000, 18000, NOW(), NOW());
+
+INSERT INTO quotation_items VALUES
+(2, 2, 2, 1, 'muestra', 22000, 22000, NOW(), NOW());
+
+
+-- ===========================
+-- 3.2) RECHAZADAS
+-- ===========================
+INSERT INTO quotation_items VALUES
+(3, 3, 3, 1, 'muestra', 15000, 15000, NOW(), NOW());
+
+INSERT INTO quotation_items VALUES
+(4, 4, 4, 1, 'muestra', 28000, 28000, NOW(), NOW());
+
+
+-- ===========================
+-- 3.3) ACEPTADAS
+-- ===========================
+INSERT INTO quotation_items VALUES
+(5, 5, 3, 1, 'muestra', 35000, 35000, NOW(), NOW());
+
+INSERT INTO quotation_items VALUES
+(6, 6, 4, 1, 'muestra', 45000, 45000, NOW(), NOW());
+
+
+-- ===========================
+-- 3.4) ENVIADAS
+-- ===========================
+INSERT INTO quotation_items VALUES
+(7, 7, 9, 1, 'unidad', 60000, 60000, NOW(), NOW());
+
+INSERT INTO quotation_items VALUES
+(8, 8, 10, 1, 'unidad', 45000, 45000, NOW(), NOW());
+
+-- ============================================
+-- FIN DEL ARCHIVO
+-- ============================================
+
+
+
+-- ============================
+-- 1) CATÁLOGO DE ESTADOS
+-- ============================
+CREATE TABLE IF NOT EXISTS notification_status (
+  id      smallint PRIMARY KEY,
+  code    varchar(30) NOT NULL UNIQUE,  -- 'UNREAD', 'READ'
+  name    varchar(50) NOT NULL          -- 'No leída', 'Leída'
+);
+
+INSERT INTO notification_status (id, code, name) VALUES
+  (1, 'UNREAD', 'No leída'),
+  (2, 'READ',   'Leída')
+ON CONFLICT (id) DO NOTHING;
+
+-- =================================
+-- 2) CATÁLOGO DE TIPOS DE MENSAJE
+-- =================================
+CREATE TABLE IF NOT EXISTS notification_message_type (
+  id              smallint PRIMARY KEY,
+  code            varchar(50) NOT NULL UNIQUE,   -- 'QUOTATION_CREATED', 'QUOTATION_STATUS_CHANGED', etc.
+  name            varchar(100) NOT NULL,         -- Nombre legible
+  default_title   varchar(150),                  -- Título por defecto
+  default_message text,                          -- Mensaje base opcional
+  icon_name       varchar(50),                   -- Nombre del ícono MUI (para el front)
+  chip_color      varchar(30)                    -- Color del Chip MUI: 'primary', 'success', etc.
+);
+
+INSERT INTO notification_message_type
+  (id, code, name, default_title, default_message, icon_name, chip_color)
+VALUES
+  (
+    1,
+    'QUOTATION_CREATED',
+    'Nueva Solicitud de Cotización',
+    'Nueva Solicitud de Cotización',
+    NULL,
+    'PersonAddAlt1',
+    'primary'
+  ),
+  (
+    2,
+    'QUOTATION_STATUS_CHANGED',
+    'Actualización de estado de cotización',
+    'Actualización de estado de la cotización',
+    NULL,
+    'ChangeCircle',
+    'success'
+  )
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================
+-- 3) CATÁLOGO DE TIPOS DE ENTIDAD
+-- ================================
+CREATE TABLE IF NOT EXISTS notification_entity_type (
+  id         smallint PRIMARY KEY,
+  code       varchar(50) NOT NULL UNIQUE,  -- 'QUOTATION_REQUEST', 'QUOTATION', etc.
+  name       varchar(100) NOT NULL,        -- Descripción legible
+  table_name varchar(100) NOT NULL         -- Nombre de la tabla de negocio
+);
+
+INSERT INTO notification_entity_type (id, code, name, table_name) VALUES
+  (1, 'QUOTATION_REQUEST', 'Solicitud de cotización', 'quotation_request'),
+  (2, 'QUOTATION',         'Cotización',              'quotations')
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================
+-- 4) TABLA PRINCIPAL DE NOTIFICACIONES
+-- ================================
+CREATE TABLE IF NOT EXISTS notifications (
+  id               serial PRIMARY KEY,
+
+  message_type_id  smallint NOT NULL
+    REFERENCES notification_message_type(id),
+
+  entity_type_id   smallint NOT NULL
+    REFERENCES notification_entity_type(id),
+
+  entity_id        int NOT NULL,                -- PK de la entidad (quotation_request.id, quotations.id, etc.)
+
+  recipient_id     int NOT NULL                 -- Usuario destinatario
+    REFERENCES users(id),
+
+  status_id        smallint NOT NULL DEFAULT 1  -- 1 = UNREAD
+    REFERENCES notification_status(id),
+
+  custom_title     varchar(150),                -- Permite sobreescribir el título por defecto
+  custom_message   text,                        -- Permite sobreescribir el mensaje por defecto
+
+  created_at       timestamp(6) NOT NULL DEFAULT now(),
+  read_at          timestamp(6),
+
+  payload          jsonb                        -- Datos extra (estado antes/después, resumen, etc.)
+);
+
+-- ================================
+-- 5) ÍNDICES RECOMENDADOS
+-- ================================
+-- Búsqueda rápida por usuario + estado
+CREATE INDEX IF NOT EXISTS idx_notifications_recipient_status
+  ON notifications (recipient_id, status_id, created_at DESC);
+
+-- Búsqueda por entidad (para traer todas las notificaciones de una solicitud/cotización)
+CREATE INDEX IF NOT EXISTS idx_notifications_entity
+  ON notifications (entity_type_id, entity_id);
+
+  INSERT INTO notifications 
+(message_type_id, entity_type_id, entity_id, recipient_id, status_id, custom_title, custom_message, payload, created_at, read_at)
+VALUES
+-- solicitud 2
+(1, 1, 2, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Pedro Soto', jsonb_build_object('status','PENDIENTE'), now(), now()),
+
+-- solicitud 3
+(1, 1, 3, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Ana Martínez', jsonb_build_object('status','PENDIENTE'), now(), now()),
+
+-- solicitud 4
+(1, 1, 4, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Juan Herrera', jsonb_build_object('status','PENDIENTE'), now(), now()),
+
+-- solicitud 5
+(1, 1, 5, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Daniela Vergara', jsonb_build_object('status','PENDIENTE'), now(), now()),
+
+-- solicitud 6
+(1, 1, 6, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Ricardo Silva', jsonb_build_object('status','PENDIENTE'), now(), now()),
+
+-- solicitud 7
+(1, 1, 7, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Claudio Muñoz', jsonb_build_object('status','PENDIENTE'), now(), now()),
+
+-- solicitud 8
+(1, 1, 8, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Sofía Reyes', jsonb_build_object('status','PENDIENTE'), now(), now()),
+
+-- solicitud 9
+(1, 1, 9, 1, 2, 'Nueva Solicitud de Cotización',
+ 'Cotizante: Marcelo Pinto', jsonb_build_object('status','PENDIENTE'), now(), now());
+
+-- ================================================================
+-- NOTIFICACIONES PARA CADA COTIZACIÓN (TODAS EN ESTADO READ)
+-- ================================================================
+ -- ===================================================================
+-- NOTIFICACIONES PARA LAS 8 COTIZACIONES (TODAS UNREAD)
+-- ===================================================================
+
+INSERT INTO notifications (
+  message_type_id,
+  entity_type_id,
+  entity_id,
+  recipient_id,
+  status_id,
+  custom_title,
+  custom_message,
+  payload,
+  created_at
+)
+VALUES
+-- =========================
+-- COTIZACIÓN 1001 (CREADA)
+-- =========================
+(2, 2, 1, 3, 1,
+ 'Estado de cotización #1001',
+ 'La cotización #1001 (Solicitud de revisión estructural aérea) fue CREADA.',
+ '{"quotation_id":1,"quote_number":1001,"status":"CREADA","request_summary":"Solicitud de revisión estructural aérea"}',
+ NOW()),
+
+-- =========================
+-- COTIZACIÓN 1002 (CREADA)
+-- =========================
+(2, 2, 2, 3, 1,
+ 'Estado de cotización #1002',
+ 'La cotización #1002 (Inspección de hangar) fue CREADA.',
+ '{"quotation_id":2,"quote_number":1002,"status":"CREADA","request_summary":"Inspección de hangar"}',
+ NOW()),
+
+-- =========================
+-- COTIZACIÓN 1003 (RECHAZADA)
+-- =========================
+(2, 2, 3, 4, 1,
+ 'Estado de cotización #1003',
+ 'La cotización #1003 (Revisión instalaciones eléctricas) fue RECHAZADA.',
+ '{"quotation_id":3,"quote_number":1003,"status":"RECHAZADA","request_summary":"Revisión instalaciones eléctricas"}',
+ NOW()),
+
+-- =========================
+-- COTIZACIÓN 1004 (RECHAZADA)
+-- =========================
+(2, 2, 4, 4, 1,
+ 'Estado de cotización #1004',
+ 'La cotización #1004 (Instalación eléctrica en planta) fue RECHAZADA.',
+ '{"quotation_id":4,"quote_number":1004,"status":"RECHAZADA","request_summary":"Instalación eléctrica en planta"}',
+ NOW()),
+
+-- =========================
+-- COTIZACIÓN 1005 (ACEPTADA)
+-- =========================
+(2, 2, 5, 5, 1,
+ 'Estado de cotización #1005',
+ 'La cotización #1005 (Evaluación riesgos industriales) fue ACEPTADA.',
+ '{"quotation_id":5,"quote_number":1005,"status":"ACEPTADA","request_summary":"Evaluación riesgos industriales"}',
+ NOW()),
+
+-- =========================
+-- COTIZACIÓN 1006 (ACEPTADA)
+-- =========================
+(2, 2, 6, 5, 1,
+ 'Estado de cotización #1006',
+ 'La cotización #1006 (Inspección mina subterránea) fue ACEPTADA.',
+ '{"quotation_id":6,"quote_number":1006,"status":"ACEPTADA","request_summary":"Inspección mina subterránea"}',
+ NOW()),
+
+-- =========================
+-- COTIZACIÓN 1007 (ENVIADA)
+-- =========================
+(2, 2, 7, 6, 1,
+ 'Estado de cotización #1007',
+ 'La cotización #1007 (Ensayo de resistencia hormigón) fue ENVIADA.',
+ '{"quotation_id":7,"quote_number":1007,"status":"ENVIADA","request_summary":"Ensayo de resistencia hormigón"}',
+ NOW()),
+
+-- =========================
+-- COTIZACIÓN 1008 (ENVIADA)
+-- =========================
+(2, 2, 8, 6, 1,
+ 'Estado de cotización #1008',
+ 'La cotización #1008 (Módulo, curado de muestras) fue ENVIADA.',
+ '{"quotation_id":8,"quote_number":1008,"status":"ENVIADA","request_summary":"Módulo, curado de muestras"}',
+ NOW());
+ 
+SELECT setval(
+  pg_get_serial_sequence('quotations', 'quote_number'),
+  (SELECT COALESCE(MAX(quote_number), 1) FROM quotations)
+);
+
+-- QUOTATIONS
+SELECT setval(
+  pg_get_serial_sequence('quotations', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM quotations)
+);
+
+-- QUOTATION_ITEMS
+SELECT setval(
+  pg_get_serial_sequence('quotation_items', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM quotation_items)
+);
+
+-- QUOTATION_REQUEST
+SELECT setval(
+  pg_get_serial_sequence('quotation_request', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM quotation_request)
+);
+
+-- USERS
+SELECT setval(
+  pg_get_serial_sequence('users', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM users)
+);
+
+-- SERVICES
+SELECT setval(
+  pg_get_serial_sequence('services', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM services)
+);
+
+-- ROLES
+SELECT setval(
+  pg_get_serial_sequence('roles', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM roles)
+);
+
+-- CLIENTS
+SELECT setval(
+  pg_get_serial_sequence('clients', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM clients)
+);
+
+-- COMMUNES
+SELECT setval(
+  pg_get_serial_sequence('communes', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM communes)
+);
+
+-- CITIES
+SELECT setval(
+  pg_get_serial_sequence('cities', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM cities)
+);
+
+-- REGIONS
+SELECT setval(
+  pg_get_serial_sequence('regions', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM regions)
+);
+
+-- NOTIFICATIONS
+SELECT setval(
+  pg_get_serial_sequence('notifications', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notifications)
+);
+
+-- NOTIFICATION_STATUS
+SELECT setval(
+  pg_get_serial_sequence('notification_status', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notification_status)
+);
+
+-- NOTIFICATION_MESSAGE_TYPE
+SELECT setval(
+  pg_get_serial_sequence('notification_message_type', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notification_message_type)
+);
+
+-- NOTIFICATION_ENTITY_TYPE
+SELECT setval(
+  pg_get_serial_sequence('notification_entity_type', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notification_entity_type)
+);
+
+
+COMMIT;

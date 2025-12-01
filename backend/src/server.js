@@ -29,15 +29,16 @@ app.use(
       'http://localhost:5173',
       'http://172.18.0.4:5173/'
     ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 );
 verifyMailer().catch(() => {});
 // Limitador de tasa
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 50000,
-  max: 1000,
+  windowMs: 15 * 60 * 500000,
+  max: 1000000,
   standardHeaders: true,
   legacyHeaders: false,
 });

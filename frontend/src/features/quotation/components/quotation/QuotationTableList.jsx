@@ -38,6 +38,7 @@ export default function QuotationTableList({ details }) {
   });
 
   const TABLE_HEAD = [
+    { id: 'blink', label: '', numeric: true, disablePadding: false },
     { id: '', label: '', numeric: true, disablePadding: false },
 
     { id: 'solicitud_num', label: 'N° Solic.', align: 'left', minWidth: '120px' },

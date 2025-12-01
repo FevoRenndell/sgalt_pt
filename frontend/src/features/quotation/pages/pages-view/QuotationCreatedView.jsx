@@ -135,12 +135,12 @@ export default function QuotationCreatedView({ }) {
     const getStatusChipColor = getStatusChipColorRequestQuotation;
 
     const onSubmitSendEmail = async () => {
-        try {
+        try {   console.log(quotation)
 
             // Desea enviar la cotización #${quotation.quotation.id} al correo ${quotation.client.contact_email} 
             const ok = await confirm({
                 title: 'Enviar Cotización por Correo',
-                description: `¿?`,
+                description: `¿Desea enviar la cotización #${quotation.quote_number} al correo ${quotation.client.contact_email} (${quotation.client.company_name})?`,
                 confirmText: 'Enviar Correo',
                 cancelText: 'Cancelar',
             });
@@ -177,7 +177,7 @@ export default function QuotationCreatedView({ }) {
         return;
     }
 
-    console.log
+ 
     return (
         <Container>
 
@@ -185,7 +185,7 @@ export default function QuotationCreatedView({ }) {
                 <Card className="p-3">
                     <Box pt={1} mb={3}>
                         <HeadingArea title={`Detalle Cotización # ${id}`} addButton={<Box sx={{ gap: 1, display: 'flex' }}>
-                            <Button variant="outlined" color='primary' size="small" onClick={() => { }}>Atras</Button>
+                            <Button variant="outlined" color='primary' size="small" onClick={() => navigate(paths.quotation_list)}>Atras</Button>
                             {sendEmail}
                         </Box>} icon={<GradingIcon className="icon" />} />
                     </Box>

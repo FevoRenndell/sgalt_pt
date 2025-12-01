@@ -22,13 +22,12 @@ async function authenticate(email, password_hash) {
 }
 
 function generateToken(user) {
-    return jwt.sign({
-        user,
-        iat: Math.floor(Date.now() / 1000),  // Tiempo de emisión
-        exp: Math.floor(Date.now() / 1000) + (82000)  // Expiración (casi 23 horas)
-    },
-        env.jwt.secret
-    );
+    console.log(env.jwt.expiresIn)
+  return jwt.sign(
+    { user },
+    env.jwt.secret,
+    { expiresIn: env.jwt.expiresIn }   
+  );
 }
 
 function verifyToken(token) {
