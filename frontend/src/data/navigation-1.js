@@ -2,6 +2,19 @@
 import duotone from '../shared/icons/duotone';
 
 export const navigations = [
+
+  {
+    name: 'Dashboard',
+    icon: duotone.Dashboard,
+    roles: [1, 3], // solo admin
+    children: [
+      {
+        name: 'Rendimiento General',
+        path: '/dashboard/general_performance',
+        roles: [1,3 ],
+      },
+    ],
+  },
   // --- LABEL PRINCIPAL ---
   {
     type: 'label',

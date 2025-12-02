@@ -3,7 +3,7 @@
  
 
 export const paths = {
-  root: '/dashboard',
+  root: '/dashboard/general_performance',
 
   login : '/login',
 

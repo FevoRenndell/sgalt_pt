@@ -28,7 +28,7 @@ export function getNotificationIcon(status) {
       return { Icon: AccessTimeIcon, color: 'warning.main' };
 
     case 'VENCIDA':
-      return { Icon: AlarmOffIcon, color: 'error.main' };
+      return { Icon: AlarmOffIcon, color: 'info.main' };
 
     case 'CREADA':
       return { Icon: PendingIcon, color: 'secondary.main' };

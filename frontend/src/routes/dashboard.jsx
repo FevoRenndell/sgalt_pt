@@ -20,15 +20,14 @@ const ActiveLayout = () => {
   );
 };
 
+
 export const DashboardRoutes = [
   {
+    
     path: 'dashboard',
     element: <ActiveLayout />,
     children: [
-      {
-        index: true,
-        element: <DashboardPage />,
-      },
+      { path: '/dashboard/general_performance', element: <DashboardPage /> },
     ],
   },
 ];
