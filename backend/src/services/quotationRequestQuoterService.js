@@ -7,7 +7,7 @@ export async function getQuotationRequests() {
       as : 'client',
       model : db.models.Client
     }],
-    order: [['updated_at', 'DESC']],
+    order: [['created_at', 'DESC']],
   });
 }
 

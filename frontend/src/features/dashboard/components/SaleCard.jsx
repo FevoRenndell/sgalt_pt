@@ -4,6 +4,10 @@ import Typography from '@mui/material/Typography';
 import { alpha, styled } from '@mui/material/styles';
 // CUSTOM UTILS METHOD
 import { formatK } from '@/shared/utils/currency';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+ 
 
 // STYLED COMPONENTS
 const StyledRoot = styled(Card)(({
@@ -45,39 +49,57 @@ const IconWrapper = styled('div')(({ theme, color }) => ({
   }),
 }));
 
-// ==============================================================
 
-// ==============================================================
+const styleQuotationTotal = [
+  {
+    Icon: CheckCircleOutlineIcon,
+    title: 'Cotizaciones Aceptadas',
+    color: 'success',
+    key: 'ACEPTADA'
+  },
+  {
+    Icon: AccessTimeIcon,
+    title: 'Cotizaciones por Vencer',
+    color: 'warning',
+    key: 'POR VENCER'
+  },
+  {
+    Icon: HighlightOffIcon,
+    title: 'Cotizaciones Rechazadas',
+    color: 'error',
+    key: 'RECHAZADA'
+  },
+];
 
-export default function SalesCard({
-  list
-}) {
+
+export default function SalesCard({ quotation = {} }) {
   return <Grid container spacing={3}>
-      {list.map(({
+    {styleQuotationTotal.map(({
       Icon,
       amount,
       color,
       id,
+      key,
       title
     }) => <Grid size={{
       sm: 4,
       xs: 12
     }} key={id}>
-          <StyledRoot>
-            <IconWrapper color={color}>
-              <Icon color="inherit" />
-            </IconWrapper>
+        <StyledRoot>
+          <IconWrapper color={color}>
+            <Icon color="inherit" />
+          </IconWrapper>
 
-            <div className="content">
-              <Typography noWrap variant="body2" color="text.secondary" fontWeight={500}>
-                {title}
-              </Typography>
+          <div className="content">
+            <Typography noWrap variant="body2" color="text.secondary" fontWeight={500}>
+              {title}
+            </Typography>
 
-              <Typography variant="h6" fontWeight={700} color={color}>
-                {formatK(amount)}
-              </Typography>
-            </div>
-          </StyledRoot>
-        </Grid>)}
-    </Grid>;
+            <Typography variant="h6" fontWeight={700} color={color}>
+              {formatK(quotation[key]) }
+            </Typography>
+          </div>
+        </StyledRoot>
+      </Grid>)}
+  </Grid>;
 }

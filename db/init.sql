@@ -1,5 +1,7 @@
 
 BEGIN;
+SET TIMEZONE TO 'America/Santiago';
+-- ===================================
 
 DROP TABLE IF EXISTS quotation_items CASCADE;
 DROP TABLE IF EXISTS quotations CASCADE;
@@ -1645,8 +1647,551 @@ VALUES
  'La cotización #1008 (Módulo, curado de muestras) fue ENVIADA.',
  '{"quotation_id":8,"quote_number":1008,"status":"ENVIADA","request_summary":"Módulo, curado de muestras"}',
  NOW());
+
+
+/*
+  data dashboard
+*/
+
+
+INSERT INTO quotation_request (
+  id, client_id, requester_full_name, requester_email, requester_phone,
+  service_description, obra_direccion, commune_id, city_id, region_id,
+  competence_capacity, need_subcontracting_services, independence_issue,
+  status, reviewed_by, reviewed_at, review_notes,
+  received_at, created_at, soft_delete, updated_at
+) VALUES
+-- CLIENTE 1 - LATAM
+(22, 1, 'Contacto LATAM 1', 'contacto11@example.com', '+56 2 20101000',
+ 'Servicio de ingeniería para LATAM Airlines Group S.A.',
+ 'Dirección referencia LATAM Airlines Group S.A.', 23, 7, 7,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-01 09:15:00', TIMESTAMP '2025-11-01 09:15:00', FALSE, TIMESTAMP '2025-11-01 09:15:00'),
+
+(23, 1, 'Contacto LATAM 2', 'contacto12@example.com', '+56 2 20102000',
+ 'Servicio de ingeniería para LATAM Airlines Group S.A.',
+ 'Dirección referencia LATAM Airlines Group S.A.', 23, 7, 7,
+ 'A1', 'NO', 'NO', 'ACEPTADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-02 10:25:00', TIMESTAMP '2025-11-02 10:25:00', FALSE, TIMESTAMP '2025-11-02 10:25:00'),
+
+(24, 1, 'Contacto LATAM 3', 'contacto13@example.com', '+56 2 20103000',
+ 'Servicio de ingeniería para LATAM Airlines Group S.A.',
+ 'Dirección referencia LATAM Airlines Group S.A.', 23, 7, 7,
+ 'A1', 'NO', 'NO', 'RECHAZADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-03 11:35:00', TIMESTAMP '2025-11-03 11:35:00', FALSE, TIMESTAMP '2025-11-03 11:35:00'),
+
+-- CLIENTE 2 - Empresa CMPC S.A.
+(25, 2, 'Contacto CMPC 1', 'contacto21@example.com', '+56 2 20201000',
+ 'Servicio de ingeniería para Empresa CMPC S.A.',
+ 'Dirección referencia Empresa CMPC S.A.', 98, 10, 10,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-04 12:45:00', TIMESTAMP '2025-11-04 12:45:00', FALSE, TIMESTAMP '2025-11-04 12:45:00'),
+
+(26, 2, 'Contacto CMPC 2', 'contacto22@example.com', '+56 2 20202000',
+ 'Servicio de ingeniería para Empresa CMPC S.A.',
+ 'Dirección referencia Empresa CMPC S.A.', 98, 10, 10,
+ 'A1', 'NO', 'NO', 'ACEPTADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-05 13:15:00', TIMESTAMP '2025-11-05 13:15:00', FALSE, TIMESTAMP '2025-11-05 13:15:00'),
+
+(27, 2, 'Contacto CMPC 3', 'contacto23@example.com', '+56 2 20203000',
+ 'Servicio de ingeniería para Empresa CMPC S.A.',
+ 'Dirección referencia Empresa CMPC S.A.', 98, 10, 10,
+ 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-06 14:25:00', TIMESTAMP '2025-11-06 14:25:00', FALSE, TIMESTAMP '2025-11-06 14:25:00'),
+
+-- CLIENTE 3 - CODELCO
+(28, 3, 'Contacto CODELCO 1', 'contacto31@example.com', '+56 2 20301000',
+ 'Servicio de ingeniería para Corporación Nacional del Cobre de Chile',
+ 'Dirección referencia CODELCO', 63, 3, 3,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-07 15:35:00', TIMESTAMP '2025-11-07 15:35:00', FALSE, TIMESTAMP '2025-11-07 15:35:00'),
+
+(29, 3, 'Contacto CODELCO 2', 'contacto32@example.com', '+56 2 20302000',
+ 'Servicio de ingeniería para Corporación Nacional del Cobre de Chile',
+ 'Dirección referencia CODELCO', 63, 3, 3,
+ 'A1', 'NO', 'NO', 'RECHAZADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-08 16:45:00', TIMESTAMP '2025-11-08 16:45:00', FALSE, TIMESTAMP '2025-11-08 16:45:00'),
+
+(30, 3, 'Contacto CODELCO 3', 'contacto33@example.com', '+56 2 20303000',
+ 'Servicio de ingeniería para Corporación Nacional del Cobre de Chile',
+ 'Dirección referencia CODELCO', 63, 3, 3,
+ 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-09 09:15:00', TIMESTAMP '2025-11-09 09:15:00', FALSE, TIMESTAMP '2025-11-09 09:15:00'),
+
+-- CLIENTE 4 - Banco de Chile
+(31, 4, 'Contacto Banco de Chile 1', 'contacto41@example.com', '+56 2 20401000',
+ 'Servicio de ingeniería para Banco de Chile',
+ 'Dirección referencia Banco de Chile', 1, 7, 7,
+ 'A1', 'NO', 'NO', 'ACEPTADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-10 10:25:00', TIMESTAMP '2025-11-10 10:25:00', FALSE, TIMESTAMP '2025-11-10 10:25:00'),
+
+(32, 4, 'Contacto Banco de Chile 2', 'contacto42@example.com', '+56 2 20402000',
+ 'Servicio de ingeniería para Banco de Chile',
+ 'Dirección referencia Banco de Chile', 1, 7, 7,
+ 'A1', 'NO', 'NO', 'ACEPTADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-11 11:35:00', TIMESTAMP '2025-11-11 11:35:00', FALSE, TIMESTAMP '2025-11-11 11:35:00'),
+
+(33, 4, 'Contacto Banco de Chile 3', 'contacto43@example.com', '+56 2 20403000',
+ 'Servicio de ingeniería para Banco de Chile',
+ 'Dirección referencia Banco de Chile', 1, 7, 7,
+ 'A1', 'NO', 'NO', 'RECHAZADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-12 12:45:00', TIMESTAMP '2025-11-12 12:45:00', FALSE, TIMESTAMP '2025-11-12 12:45:00'),
+
+-- CLIENTE 5 - Falabella
+(34, 5, 'Contacto Falabella 1', 'contacto51@example.com', '+56 2 20501000',
+ 'Servicio de ingeniería para Falabella S.A.',
+ 'Dirección referencia Falabella S.A.', 14, 7, 7,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-13 13:15:00', TIMESTAMP '2025-11-13 13:15:00', FALSE, TIMESTAMP '2025-11-13 13:15:00'),
+
+(35, 5, 'Contacto Falabella 2', 'contacto52@example.com', '+56 2 20502000',
+ 'Servicio de ingeniería para Falabella S.A.',
+ 'Dirección referencia Falabella S.A.', 14, 7, 7,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-14 14:25:00', TIMESTAMP '2025-11-14 14:25:00', FALSE, TIMESTAMP '2025-11-14 14:25:00'),
+
+(36, 5, 'Contacto Falabella 3', 'contacto53@example.com', '+56 2 20503000',
+ 'Servicio de ingeniería para Falabella S.A.',
+ 'Dirección referencia Falabella S.A.', 14, 7, 7,
+ 'A1', 'NO', 'NO', 'ACEPTADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-15 15:35:00', TIMESTAMP '2025-11-15 15:35:00', FALSE, TIMESTAMP '2025-11-15 15:35:00'),
+
+-- CLIENTE 6 - ENAP
+(37, 6, 'Contacto ENAP 1', 'contacto61@example.com', '+56 2 20601000',
+ 'Servicio de ingeniería para Empresa Nacional del Petróleo',
+ 'Dirección referencia ENAP', 78, 6, 6,
+ 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-16 16:45:00', TIMESTAMP '2025-11-16 16:45:00', FALSE, TIMESTAMP '2025-11-16 16:45:00'),
+
+(38, 6, 'Contacto ENAP 2', 'contacto62@example.com', '+56 2 20602000',
+ 'Servicio de ingeniería para Empresa Nacional del Petróleo',
+ 'Dirección referencia ENAP', 78, 6, 6,
+ 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-17 09:15:00', TIMESTAMP '2025-11-17 09:15:00', FALSE, TIMESTAMP '2025-11-17 09:15:00'),
+
+(39, 6, 'Contacto ENAP 3', 'contacto63@example.com', '+56 2 20603000',
+ 'Servicio de ingeniería para Empresa Nacional del Petróleo',
+ 'Dirección referencia ENAP', 78, 6, 6,
+ 'A1', 'NO', 'NO', 'RECHAZADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-18 10:25:00', TIMESTAMP '2025-11-18 10:25:00', FALSE, TIMESTAMP '2025-11-18 10:25:00'),
+
+-- CLIENTE 7 - Copec
+(40, 7, 'Contacto Copec 1', 'contacto71@example.com', '+56 2 20701000',
+ 'Servicio de ingeniería para Copec S.A.',
+ 'Dirección referencia Copec S.A.', 24, 7, 7,
+ 'A1', 'NO', 'NO', 'RECHAZADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-19 11:35:00', TIMESTAMP '2025-11-19 11:35:00', FALSE, TIMESTAMP '2025-11-19 11:35:00'),
+
+(41, 7, 'Contacto Copec 2', 'contacto72@example.com', '+56 2 20702000',
+ 'Servicio de ingeniería para Copec S.A.',
+ 'Dirección referencia Copec S.A.', 24, 7, 7,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-20 12:45:00', TIMESTAMP '2025-11-20 12:45:00', FALSE, TIMESTAMP '2025-11-20 12:45:00'),
+
+(42, 7, 'Contacto Copec 3', 'contacto73@example.com', '+56 2 20703000',
+ 'Servicio de ingeniería para Copec S.A.',
+ 'Dirección referencia Copec S.A.', 24, 7, 7,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-21 13:15:00', TIMESTAMP '2025-11-21 13:15:00', FALSE, TIMESTAMP '2025-11-21 13:15:00'),
+
+-- CLIENTE 8 - SQM
+(43, 8, 'Contacto SQM 1', 'contacto81@example.com', '+56 2 20801000',
+ 'Servicio de ingeniería para SQM S.A.',
+ 'Dirección referencia SQM S.A.', 58, 2, 2,
+ 'A1', 'NO', 'NO', 'ACEPTADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-22 14:25:00', TIMESTAMP '2025-11-22 14:25:00', FALSE, TIMESTAMP '2025-11-22 14:25:00'),
+
+(44, 8, 'Contacto SQM 2', 'contacto82@example.com', '+56 2 20802000',
+ 'Servicio de ingeniería para SQM S.A.',
+ 'Dirección referencia SQM S.A.', 58, 2, 2,
+ 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-23 15:35:00', TIMESTAMP '2025-11-23 15:35:00', FALSE, TIMESTAMP '2025-11-23 15:35:00'),
+
+(45, 8, 'Contacto SQM 3', 'contacto83@example.com', '+56 2 20803000',
+ 'Servicio de ingeniería para SQM S.A.',
+ 'Dirección referencia SQM S.A.', 58, 2, 2,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-24 16:45:00', TIMESTAMP '2025-11-24 16:45:00', FALSE, TIMESTAMP '2025-11-24 16:45:00'),
+
+-- CLIENTE 9 - CMPC Celulosa
+(46, 9, 'Contacto CMPC Celulosa 1', 'contacto91@example.com', '+56 2 20901000',
+ 'Servicio de ingeniería para CMPC Celulosa S.A.',
+ 'Dirección referencia CMPC Celulosa S.A.', 99, 10, 10,
+ 'A1', 'NO', 'NO', 'RECHAZADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-25 09:15:00', TIMESTAMP '2025-11-25 09:15:00', FALSE, TIMESTAMP '2025-11-25 09:15:00'),
+
+(47, 9, 'Contacto CMPC Celulosa 2', 'contacto92@example.com', '+56 2 20902000',
+ 'Servicio de ingeniería para CMPC Celulosa S.A.',
+ 'Dirección referencia CMPC Celulosa S.A.', 99, 10, 10,
+ 'A1', 'NO', 'NO', 'ACEPTADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-26 10:25:00', TIMESTAMP '2025-11-26 10:25:00', FALSE, TIMESTAMP '2025-11-26 10:25:00'),
+
+(48, 9, 'Contacto CMPC Celulosa 3', 'contacto93@example.com', '+56 2 20903000',
+ 'Servicio de ingeniería para CMPC Celulosa S.A.',
+ 'Dirección referencia CMPC Celulosa S.A.', 99, 10, 10,
+ 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-27 11:35:00', TIMESTAMP '2025-11-27 11:35:00', FALSE, TIMESTAMP '2025-11-27 11:35:00'),
+
+-- CLIENTE 10 - Entel
+(49, 10, 'Contacto Entel 1', 'contacto101@example.com', '+56 2 21001000',
+ 'Servicio de ingeniería para Entel Chile S.A.',
+ 'Dirección referencia Entel Chile S.A.', 20, 7, 7,
+ 'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-28 12:45:00', TIMESTAMP '2025-11-28 12:45:00', FALSE, TIMESTAMP '2025-11-28 12:45:00'),
  
+(50, 10, 'Contacto Entel 3', 'contacto103@example.com', '+56 2 21003000',
+ 'Servicio de ingeniería para Entel Chile S.A.',
+ 'Dirección referencia Entel Chile S.A.', 20, 7, 7,
+ 'A1', 'NO', 'NO', 'RECHAZADA', NULL, NULL, NULL,
+ TIMESTAMP '2025-11-30 14:25:00', TIMESTAMP '2025-11-30 14:25:00', FALSE, TIMESTAMP '2025-11-30 14:25:00');
+ 
+
 SELECT setval(
+  pg_get_serial_sequence('quotations', 'quote_number'),
+  (SELECT COALESCE(MAX(quote_number), 1) FROM quotations)
+);
+
+-- QUOTATIONS
+SELECT setval(
+  pg_get_serial_sequence('quotations', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM quotations)
+);
+
+-- QUOTATION_ITEMS
+SELECT setval(
+  pg_get_serial_sequence('quotation_items', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM quotation_items)
+);
+
+-- QUOTATION_REQUEST
+SELECT setval(
+  pg_get_serial_sequence('quotation_request', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM quotation_request)
+);
+
+-- USERS
+SELECT setval(
+  pg_get_serial_sequence('users', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM users)
+);
+
+-- SERVICES
+SELECT setval(
+  pg_get_serial_sequence('services', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM services)
+);
+
+-- ROLES
+SELECT setval(
+  pg_get_serial_sequence('roles', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM roles)
+);
+
+-- CLIENTS
+SELECT setval(
+  pg_get_serial_sequence('clients', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM clients)
+);
+
+-- COMMUNES
+SELECT setval(
+  pg_get_serial_sequence('communes', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM communes)
+);
+
+-- CITIES
+SELECT setval(
+  pg_get_serial_sequence('cities', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM cities)
+);
+
+-- REGIONS
+SELECT setval(
+  pg_get_serial_sequence('regions', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM regions)
+);
+
+-- NOTIFICATIONS
+SELECT setval(
+  pg_get_serial_sequence('notifications', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notifications)
+);
+
+-- NOTIFICATION_STATUS
+SELECT setval(
+  pg_get_serial_sequence('notification_status', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notification_status)
+);
+
+-- NOTIFICATION_MESSAGE_TYPE
+SELECT setval(
+  pg_get_serial_sequence('notification_message_type', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notification_message_type)
+);
+
+-- NOTIFICATION_ENTITY_TYPE
+SELECT setval(
+  pg_get_serial_sequence('notification_entity_type', 'id'),
+  (SELECT COALESCE(MAX(id), 1) FROM notification_entity_type)
+);
+
+
+WITH svc AS (
+  -- Servicios disponibles para los items
+  SELECT *
+  FROM (
+    VALUES
+      (1,  'muestra', 18000.00),
+      (2,  'muestra', 22000.00),
+      (3,  'muestra', 35000.00),
+      (4,  'unidad',  28000.00),
+      (5,  'unidad',  32000.00),
+      (6,  'muestra', 48000.00),
+      (7,  'unidad',   4500.00),
+      (8,  'unidad',   6500.00),
+      (9,  'unidad',   6000.00),
+      (10, 'unidad',   9000.00),
+      (11, 'muestra', 45000.00),
+      (12, 'muestra', 42000.00),
+      (13, 'muestra', 55000.00),
+      (14, 'unidad', 120000.00),
+      (15, 'unidad', 25000.00),
+      (16, 'visita',  45000.00),
+      (17, 'visita',  15000.00)
+  ) AS v(service_id, unit, unit_price)
+),
+base_quote AS (
+  -- Punto de partida para los nuevos quote_number
+  SELECT COALESCE(MAX(quote_number), 1000)::bigint AS base_qn
+  FROM quotations
+),
+new_requests AS (
+  -- 20 NUEVAS SOLICITUDES (todas en noviembre 2025)
+  INSERT INTO quotation_request (
+    client_id,
+    requester_full_name,
+    requester_email,
+    requester_phone,
+    service_description,
+    obra_direccion,
+    commune_id,
+    city_id,
+    region_id,
+    competence_capacity,
+    need_subcontracting_services,
+    independence_issue,
+    status,
+    reviewed_by,
+    reviewed_at,
+    review_notes,
+    received_at,
+    created_at,
+    soft_delete,
+    updated_at
+  )
+  VALUES
+    (1,  'María Torres 2', 'm.torres2@latam.com',      '+56 9 4455 2200',
+     'Revisión de sistemas eléctricos secundarios en bodega LATAM',
+     'Av. Américo Vespucio 901, Bodega 2', 24, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-10 09:00:00', TIMESTAMP '2025-11-10 09:00:00', FALSE, TIMESTAMP '2025-11-10 09:00:00'),
+
+    (1,  'Pedro Soto 2',   'p.soto2@latam.com',        '+56 9 8899 3300',
+     'Inspección estructural de pasarelas de embarque',
+     'Av. Departamental 2100', 29, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-11 10:00:00', TIMESTAMP '2025-11-11 10:00:00', FALSE, TIMESTAMP '2025-11-11 10:00:00'),
+
+    (2,  'Juan Herrera 2', 'j.herrera2@cmpc.cl',       '+56 9 8811 6600',
+     'Evaluación de fundaciones en planta CMPC',
+     'Camino a Laja 200', 103, 11, 11,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-12 11:00:00', TIMESTAMP '2025-11-12 11:00:00', FALSE, TIMESTAMP '2025-11-12 11:00:00'),
+
+    (2,  'Daniela Vergara 2', 'd.vergara2@cmpc.cl',    '+56 9 6611 4433',
+     'Control de compactación en ampliación de bodegas',
+     'Ruta S-40 KM 14', 104, 11, 11,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-13 09:30:00', TIMESTAMP '2025-11-13 09:30:00', FALSE, TIMESTAMP '2025-11-13 09:30:00'),
+
+    (3,  'Claudio Muñoz 2', 'c.munoz2@codelco.cl',     '+56 9 9911 6644',
+     'Ensayos de laboratorio para mejoramiento de caminos interiores',
+     'Sector Chuquicamata Acceso 2', 63, 3, 3,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-14 08:45:00', TIMESTAMP '2025-11-14 08:45:00', FALSE, TIMESTAMP '2025-11-14 08:45:00'),
+
+    (3,  'Sofía Reyes 2',   's.reyes2@codelco.cl',     '+56 9 8222 3355',
+     'Control de compactación en botaderos de ripio',
+     'Av. Minería 140', 64, 3, 3,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-15 10:15:00', TIMESTAMP '2025-11-15 10:15:00', FALSE, TIMESTAMP '2025-11-15 10:15:00'),
+
+    (4,  'Marcelo Pinto 2', 'm.pinto2@bancochile.cl',  '+56 9 5511 8855',
+     'Revisión estructural de sucursal regional',
+     'Paseo Ahumada 300', 1, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-16 09:20:00', TIMESTAMP '2025-11-16 09:20:00', FALSE, TIMESTAMP '2025-11-16 09:20:00'),
+
+    (4,  'Valentina Araya 2', 'v.araya2@bancochile.cl','+56 9 6611 9911',
+     'Inspección de losas de estacionamientos subterráneos',
+     'Av. Apoquindo 1500', 14, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-17 11:10:00', TIMESTAMP '2025-11-17 11:10:00', FALSE, TIMESTAMP '2025-11-17 11:10:00'),
+
+    (5,  'Camila López 2',  'c.lopez2@falabella.cl',   '+56 9 4411 0044',
+     'Control de compactación en ampliación de estacionamientos',
+     'Av. Kennedy 9100', 14, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-18 09:50:00', TIMESTAMP '2025-11-18 09:50:00', FALSE, TIMESTAMP '2025-11-18 09:50:00'),
+
+    (5,  'Hernán Pino 2',   'h.pino2@falabella.cl',    '+56 9 8811 3344',
+     'Ensayos de hormigón en bodegas de despacho',
+     'Av. Vicuña Mackenna 350', 20, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-19 10:40:00', TIMESTAMP '2025-11-19 10:40:00', FALSE, TIMESTAMP '2025-11-19 10:40:00'),
+
+    (6,  'Andrea Ruiz 2',   'a.ruiz2@enap.cl',         '+56 9 7722 6677',
+     'Placa de carga en fundaciones de estanques',
+     'Ruta 5 Sur KM 18', 78, 6, 6,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-20 09:15:00', TIMESTAMP '2025-11-20 09:15:00', FALSE, TIMESTAMP '2025-11-20 09:15:00'),
+
+    (6,  'Sebastián Parra 2','s.parra2@enap.cl',       '+56 9 5511 7788',
+     'Control de densidad nuclear en caminos internos',
+     'Camino a Refinería 250', 80, 6, 6,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-21 10:25:00', TIMESTAMP '2025-11-21 10:25:00', FALSE, TIMESTAMP '2025-11-21 10:25:00'),
+
+    (7,  'Jorge Contreras 2','j.contreras2@copec.cl',  '+56 9 8811 1188',
+     'Control de compactación en isla de servicio nueva',
+     'Av. Matta 600', 19, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-22 09:35:00', TIMESTAMP '2025-11-22 09:35:00', FALSE, TIMESTAMP '2025-11-22 09:35:00'),
+
+    (7,  'Patricia Díaz 2', 'p.diaz2@copec.cl',        '+56 9 7711 5522',
+     'Ensayos Marshall en ampliación de pavimentos',
+     'Av. Grecia 2101', 10, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-23 10:05:00', TIMESTAMP '2025-11-23 10:05:00', FALSE, TIMESTAMP '2025-11-23 10:05:00'),
+
+    (8,  'Tomás Villarroel 2','t.villarroel2@sqm.com', '+56 9 6611 7766',
+     'Control de compactación en caminos de acceso a pilas',
+     'Ruta B-355 KM 30', 65, 3, 3,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-24 09:10:00', TIMESTAMP '2025-11-24 09:10:00', FALSE, TIMESTAMP '2025-11-24 09:10:00'),
+
+    (8,  'Fernanda Morales 2','f.morales2@sqm.com',    '+56 9 7711 2200',
+     'Ensayos de mezclas asfálticas en caminos internos',
+     'Av. Los Volcanes 150', 63, 3, 3,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-25 11:20:00', TIMESTAMP '2025-11-25 11:20:00', FALSE, TIMESTAMP '2025-11-25 11:20:00'),
+
+    (9,  'Eduardo Campos 2','e.campos2@cmpc.cl',       '+56 9 9911 2211',
+     'Control de compactación en patios de acopio',
+     'Camino Central 200', 104, 11, 11,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-26 09:55:00', TIMESTAMP '2025-11-26 09:55:00', FALSE, TIMESTAMP '2025-11-26 09:55:00'),
+
+    (9,  'María Soto',      'm.soto@cmpc.cl',          '+56 9 6611 8844',
+     'Ensayos de densidad “in situ” en caminos internos',
+     'Camino Central 210', 104, 11, 11,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-27 10:30:00', TIMESTAMP '2025-11-27 10:30:00', FALSE, TIMESTAMP '2025-11-27 10:30:00'),
+
+    (10, 'Gabriel Hidalgo 2','g.hidalgo2@entel.cl',    '+56 9 8811 6677',
+     'Ensayos de hormigón en sala de servidores',
+     'Av. Providencia 150', 23, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-28 09:40:00', TIMESTAMP '2025-11-28 09:40:00', FALSE, TIMESTAMP '2025-11-28 09:40:00'),
+
+    (10, 'Monserrat Jara 2', 'm.jara2@entel.cl',       '+56 9 7711 9988',
+     'Placa de carga en ampliación de sala de antenas',
+     'Camino Antena Norte 120', 36, 7, 7,
+     'A1', 'NO', 'NO', 'PENDIENTE', NULL, NULL, NULL,
+     TIMESTAMP '2025-11-29 11:05:00', TIMESTAMP '2025-11-29 11:05:00', FALSE, TIMESTAMP '2025-11-29 11:05:00')
+  RETURNING id, service_description, received_at, status
+),
+new_quotes AS (
+  -- 20 NUEVAS COTIZACIONES para esas solicitudes
+  INSERT INTO quotations (
+    quote_number,
+    request_id,
+    user_id,
+    quotation_token,
+    request_summary,
+    issue_date,
+    status,
+    discount,
+    subtotal,
+    total,
+    pdf_url,
+    created_at,
+    updated_at,
+    soft_delete
+  )
+  SELECT
+    base_quote.base_qn + ROW_NUMBER() OVER (ORDER BY r.id) AS quote_number,
+    r.id                                                    AS request_id,
+
+    -- Distribución NO pareja de usuarios (3,4,5,6)
+    CASE
+      WHEN ROW_NUMBER() OVER (ORDER BY r.id) BETWEEN  1 AND  8 THEN 3  -- Javiera
+      WHEN ROW_NUMBER() OVER (ORDER BY r.id) BETWEEN  9 AND 13 THEN 4  -- Kevin
+      WHEN ROW_NUMBER() OVER (ORDER BY r.id) BETWEEN 14 AND 17 THEN 5  -- Paula
+      ELSE 6                                                           -- Brian (18–20)
+    END AS user_id,
+
+    NULL                                   AS quotation_token,
+    r.service_description                  AS request_summary,
+    r.received_at::date                    AS issue_date,
+
+    -- En cotización no existe PENDIENTE: lo dejamos como CREADA
+    CASE r.status
+      WHEN 'PENDIENTE' THEN 'CREADA'
+      ELSE r.status
+    END                                     AS status,
+
+    0.00::numeric                          AS discount,
+    (120000 + r.id * 3000)::numeric        AS subtotal,
+    (120000 + r.id * 3000)::numeric        AS total,
+    NULL                                   AS pdf_url,
+    r.received_at                          AS created_at,
+    r.received_at                          AS updated_at,
+    FALSE                                  AS soft_delete
+  FROM new_requests r
+  CROSS JOIN base_quote
+  RETURNING id AS quotation_id, request_id
+)
+-- ITEMS: mínimo 3 y máximo 7 por cada nueva cotización
+INSERT INTO quotation_items (
+  quotation_id,
+  service_id,
+  quantity,
+  unit,
+  unit_price,
+  subtotal,
+  created_at,
+  updated_at
+)
+SELECT
+  q.quotation_id,
+  s.service_id,
+  1 AS quantity,
+  s.unit,
+  s.unit_price,
+  s.unit_price,
+  NOW(),         -- fecha de creación de items
+  NOW()
+FROM new_quotes q
+JOIN LATERAL (
+  SELECT service_id, unit, unit_price
+  FROM svc
+  WHERE service_id >= ((q.quotation_id - 1) % 10) + 1
+  ORDER BY service_id
+  LIMIT (3 + ((q.quotation_id - 1) % 5))   -- entre 3 y 7 items
+) AS s ON TRUE;
+
+ SELECT setval(
   pg_get_serial_sequence('quotations', 'quote_number'),
   (SELECT COALESCE(MAX(quote_number), 1) FROM quotations)
 );

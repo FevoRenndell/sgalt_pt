@@ -13,6 +13,8 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TopRequestStatus from '../../components/TopRequestStatus';
 import TopQuotationServiceAccept from '../../components/TopQuotationServiceAccept';
 
+import { useFetchDashboard1Query } from '../../api/dashboardApi';
+
 const LIST_2 = [
 
     { id: 2, status: 'ENVIADA', count: 30 },
@@ -28,38 +30,20 @@ const LIST_3 = [
  
 ];
 
-export const QUOTATION_AMOUNT_LIST = [
-    {
-        id: 1,
-        amount: 12500000,              // total $ aceptadas
-        Icon: CheckCircleOutlineIcon,
-        title: 'Cotizaciones Aceptadas',
-        color: 'success',
-    },
-    {
-        id: 2,
-        amount: 4800000,               // total $ por vencer
-        Icon: AccessTimeIcon,
-        title: 'Cotizaciones por Vencer',
-        color: 'warning',
-    },
-    {
-        id: 3,
-        amount: 3100000,               // total $ rechazadas
-        Icon: HighlightOffIcon,
-        title: 'Cotizaciones Rechazadas',
-        color: 'error',
-    },
-];
 
 
 
 export default function CrmTwoPageView() {
+
+    const { data: fetchDashboard1 } = useFetchDashboard1Query();
+
+    console.log('DASHBOARD DATA:', fetchDashboard1);
+
     return <div className="pt-2 pb-4">
         <Grid container spacing={3}>
             {/* LEADS CONVERTED CARD */}
             <Grid size={{ md: 12,xs: 12  }}>
-                <SalesCard list={QUOTATION_AMOUNT_LIST} />
+                <SalesCard quotation={fetchDashboard1?.quotation} />
             </Grid>
 
 

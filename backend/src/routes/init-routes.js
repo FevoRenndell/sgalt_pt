@@ -8,6 +8,7 @@ import quatitionRequestClientRoutes from './quatitionRequestClientRoutes.js';
 import quatitionRequestQuoterRoutes from './quatitionRequestQuoterRoutes.js';
 import quotationRoutes from './quotationRoutes.js';
 import notificationRoutes from './notificationsRoutes.js';
+import dashboardRoutes from './dashboardRoutes.js';
 
 import { errorHandler } from '../middlewares/errorHandler.js';
 
@@ -25,6 +26,7 @@ const initRoutes = (apiName, app) =>  {
   app.use(`/${apiName}/users`  , middlewares, userRoutes  );
   app.use(`/${apiName}/clients`, middlewares, clientRoutes);
   app.use(`/${apiName}/filters`, middlewares, filterRoutes);
+  app.use(`/${apiName}/dashboard`, middlewares, dashboardRoutes);
   app.use(`/${apiName}/quotation`, middlewares, quotationRoutes);
   app.use(`/${apiName}/notifications`, middlewares, notificationRoutes);
   app.use(`/${apiName}/quotation_requests`, middlewares, quatitionRequestQuoterRoutes);

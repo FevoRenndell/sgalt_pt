@@ -14,7 +14,7 @@ export function GuestGuard({ children }) {
 
   const locationState = state;
   const redirectPath =   '/dashboard/general_performance';
-  alert(redirectPath)
+ 
   if (isAuthenticated) {
     return <Navigate replace to={redirectPath} />;
   }
