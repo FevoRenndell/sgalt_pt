@@ -8,6 +8,16 @@ import { getNotificationIcon } from '../../../shared/utils/notificationIcon';
 
 // ========================= STYLES =========================
 
+
+const list = [
+
+    { id: 2, status: 'ENVIADA', count: 30 },
+    { id: 3, status: 'POR VENCER', count: 10 },
+    { id: 4, status: 'ACEPTADA', count: 20 },
+    { id: 5, status: 'RECHAZADA', count: 12 },
+    { id: 6, status: 'VENCIDA', count: 8 },
+];
+
 const StyledStack = styled(Stack)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     alignItems: 'flex-start',
@@ -42,8 +52,8 @@ const LisItemIcon = styled('div', {
 
 // ========================= COMPONENT =========================
 
-export default function LongCard({ list }) {
-  
+export default function LongCard({ data }) {
+  console.log(data)
   return (
     <Card className="p-3 h-full">
       <StyledStack
@@ -54,7 +64,7 @@ export default function LongCard({ list }) {
         direction={{ sm: 'row', xs: 'column' }}
         divider={<Divider flexItem orientation="vertical" />}
       >
-        {list.map(({ id, status, count }) => {
+        {list.map(({ id, status = '', count }) => {
           const { Icon, color } = getNotificationIcon(status);
 
           const paletteKey = color.includes('.') ? color : `${color}.main`;
@@ -77,7 +87,7 @@ export default function LongCard({ list }) {
                   lineHeight={1.4}
                   color={paletteKey}
                 >
-                  {count}
+                  {data[status] || 0}
                 </Typography>
               </div>
             </ListItem>

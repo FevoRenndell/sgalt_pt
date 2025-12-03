@@ -1527,7 +1527,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_entity
 VALUES
 -- solicitud 2
 (1, 1, 2, 1, 2, 'Nueva Solicitud de Cotización',
- 'Cotizante: Pedro Soto', jsonb_build_object('status','PENDIENTE'), now(), now()),
+ 'Cotizante: Pedro Soto', jsonb_build_object('status','REVISADA'), now(), now()),
 
 -- solicitud 3
 (1, 1, 3, 1, 2, 'Nueva Solicitud de Cotización',
@@ -1696,7 +1696,7 @@ INSERT INTO quotation_request (
 (27, 2, 'Contacto CMPC 3', 'contacto23@example.com', '+56 2 20203000',
  'Servicio de ingeniería para Empresa CMPC S.A.',
  'Dirección referencia Empresa CMPC S.A.', 98, 10, 10,
- 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ 'A1', 'NO', 'NO', 'ENVIADA', NULL, NULL, NULL,
  TIMESTAMP '2025-11-06 14:25:00', TIMESTAMP '2025-11-06 14:25:00', FALSE, TIMESTAMP '2025-11-06 14:25:00'),
 
 -- CLIENTE 3 - CODELCO
@@ -1715,7 +1715,7 @@ INSERT INTO quotation_request (
 (30, 3, 'Contacto CODELCO 3', 'contacto33@example.com', '+56 2 20303000',
  'Servicio de ingeniería para Corporación Nacional del Cobre de Chile',
  'Dirección referencia CODELCO', 63, 3, 3,
- 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ 'A1', 'NO', 'NO', 'ENVIADA', NULL, NULL, NULL,
  TIMESTAMP '2025-11-09 09:15:00', TIMESTAMP '2025-11-09 09:15:00', FALSE, TIMESTAMP '2025-11-09 09:15:00'),
 
 -- CLIENTE 4 - Banco de Chile
@@ -1760,13 +1760,13 @@ INSERT INTO quotation_request (
 (37, 6, 'Contacto ENAP 1', 'contacto61@example.com', '+56 2 20601000',
  'Servicio de ingeniería para Empresa Nacional del Petróleo',
  'Dirección referencia ENAP', 78, 6, 6,
- 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ 'A1', 'NO', 'NO', 'ENVIADA', NULL, NULL, NULL,
  TIMESTAMP '2025-11-16 16:45:00', TIMESTAMP '2025-11-16 16:45:00', FALSE, TIMESTAMP '2025-11-16 16:45:00'),
 
 (38, 6, 'Contacto ENAP 2', 'contacto62@example.com', '+56 2 20602000',
  'Servicio de ingeniería para Empresa Nacional del Petróleo',
  'Dirección referencia ENAP', 78, 6, 6,
- 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ 'A1', 'NO', 'NO', 'ENVIADA', NULL, NULL, NULL,
  TIMESTAMP '2025-11-17 09:15:00', TIMESTAMP '2025-11-17 09:15:00', FALSE, TIMESTAMP '2025-11-17 09:15:00'),
 
 (39, 6, 'Contacto ENAP 3', 'contacto63@example.com', '+56 2 20603000',
@@ -1804,7 +1804,7 @@ INSERT INTO quotation_request (
 (44, 8, 'Contacto SQM 2', 'contacto82@example.com', '+56 2 20802000',
  'Servicio de ingeniería para SQM S.A.',
  'Dirección referencia SQM S.A.', 58, 2, 2,
- 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ 'A1', 'NO', 'NO', 'ENVIADA', NULL, NULL, NULL,
  TIMESTAMP '2025-11-23 15:35:00', TIMESTAMP '2025-11-23 15:35:00', FALSE, TIMESTAMP '2025-11-23 15:35:00'),
 
 (45, 8, 'Contacto SQM 3', 'contacto83@example.com', '+56 2 20803000',
@@ -1829,7 +1829,7 @@ INSERT INTO quotation_request (
 (48, 9, 'Contacto CMPC Celulosa 3', 'contacto93@example.com', '+56 2 20903000',
  'Servicio de ingeniería para CMPC Celulosa S.A.',
  'Dirección referencia CMPC Celulosa S.A.', 99, 10, 10,
- 'A1', 'NO', 'NO', 'VENCIDA', NULL, NULL, NULL,
+ 'A1', 'NO', 'NO', 'ENVIADA', NULL, NULL, NULL,
  TIMESTAMP '2025-11-27 11:35:00', TIMESTAMP '2025-11-27 11:35:00', FALSE, TIMESTAMP '2025-11-27 11:35:00'),
 
 -- CLIENTE 10 - Entel

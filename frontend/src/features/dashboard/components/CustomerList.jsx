@@ -45,7 +45,7 @@ const CUSTOMERS = [{
   name: 'Natalie Dormer',
   email: 'Uilib@gmail.com',
   username: 'natalie-dormer',
-  avatar: '/static/user/user-11.png'
+  avatar: ' '
 }, {
   id: 2,
   role: 'Developer',

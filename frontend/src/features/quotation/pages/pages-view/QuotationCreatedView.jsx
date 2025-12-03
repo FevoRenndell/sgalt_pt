@@ -162,12 +162,18 @@ export default function QuotationCreatedView({ }) {
     };
 
     const renderEmailButton = () => {  
-      if ( quotation.status === 'CREADA' && quotation.request.status==='REVISADA' ) {
-        return (
-          <Button variant="outlined" color='info' size="small" onClick={() => onSubmitSendEmail() }>
-            Enviar Correo
-          </Button>);
-      }
+        if ( quotation.status === 'CREADA' && quotation.request.status==='REVISADA' ) {
+            return (
+            <Button variant="outlined" color='info' size="small" onClick={() => onSubmitSendEmail() }>
+                Enviar Correo
+            </Button>);
+        }
+        if ( quotation.status === 'ENVIADA' && quotation.request.status==='FINALIZADA' ) {
+            return (
+            <Button variant="outlined" color='info' size="small" onClick={() => onSubmitSendEmail() }>
+                Reenviar Correo
+            </Button>);
+        }
     }
 
     const sendEmail = renderEmailButton();

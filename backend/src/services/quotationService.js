@@ -3,8 +3,6 @@ import { AppError } from '../error/AppError.js';
 import db from '../models/index.js';
 import { signUrlToken } from './authService.js';
 import { sendEmail } from './emailService.js';
- 
-
 
 export async function getQuotations() {
 
@@ -20,7 +18,9 @@ export async function getQuotations() {
           },
         ],
       },
+ 
     ],
+    order : [['created_at', 'DESC']]
   });
 }
 

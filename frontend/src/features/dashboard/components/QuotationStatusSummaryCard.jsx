@@ -14,11 +14,12 @@ import { Divider } from '@mui/material';
 // ----------------------------------------------------------------------
 
 export const QUOTATION_STATUS_SUMMARY = [
-  { id: 2, status: 'ENVIADA',   percentage: 25.0, delta: -1.3 },
+  { id: 2, status: 'ENVIADA', percentage: 25.0, delta: -1.3 },
   { id: 3, status: 'POR VENCER', percentage: 10.0, delta: 2.0 },
-  { id: 4, status: 'ACEPTADA',  percentage: 20.0, delta: 0.8 },
+  { id: 4, status: 'ACEPTADA', percentage: 20.0, delta: 0.8 },
   { id: 5, status: 'RECHAZADA', percentage: 10.0, delta: -3.1 },
-  { id: 6, status: 'VENCIDA',   percentage: 5.0,  delta: 1.1 },
+  { id: 6, status: 'VENCIDA', percentage: 5.0, delta: 1.1 },
+  { id: 6, status: 'CREADA', percentage: 5.0, delta: 1.1 },
 ];
 
 function ListItem({ IconNode, title, subTitle, titleStyle = {} }) {
@@ -72,7 +73,7 @@ export default function QuotationStatusSummaryCard({
   title = 'Estado de Cotizaciones',
 }) {
   const theme = useTheme();
-    const data = QUOTATION_STATUS_SUMMARY;
+  const data = QUOTATION_STATUS_SUMMARY;
   const safeData = data.length ? data : [];
 
   const labels = safeData.map((item) => item.status);
@@ -99,7 +100,7 @@ export default function QuotationStatusSummaryCard({
           labels: {
             show: true,
             total: {
-              show: true,
+              show: false,
               showAlways: true,
               label: 'Total',
               fontSize: '14px',
@@ -121,6 +122,7 @@ export default function QuotationStatusSummaryCard({
         },
       },
     },
+
     tooltip: {
       style: {
         fontSize: '14px',
@@ -201,7 +203,7 @@ export default function QuotationStatusSummaryCard({
                       {percentage}%
                     </Typography>
                   </div>
-                  
+
                 </FlexBetween>
               );
             })}

@@ -2,7 +2,7 @@ import {
     getDashboard1
  } from "../services/dashboardService.js";
 
- export const dashboard = async (req, res) => {
+ export const dashboard = async (req, res, next) => {
      try {
          const data = await getDashboard1();
          res.status(200).json(data);

@@ -97,7 +97,7 @@ export function useChartOptions(options = {}) {
           dataPointIndex,
           w
         }) {
-          return `${w.globals.categoryLabels[dataPointIndex]} : ${val}`;
+          // return `${w.globals.categoryLabels[dataPointIndex]} : ${val}`;
         }
       }
     },

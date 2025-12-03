@@ -90,15 +90,10 @@ export default function LoginPageView() {
         sm: 30,
         xs: 25
       }}>
-        Sign In
+        Autenticación de Usuario
       </Typography>
 
-      <Typography variant="body2" fontWeight={500} mt={1} mb={6} color="text.secondary">
-        New user?{' '}
-        <Box fontWeight={500} component={Link} href="/register">
-          Create an Account
-        </Box>
-      </Typography>
+ 
 
       {serverError && (
         <Box
@@ -120,14 +115,14 @@ export default function LoginPageView() {
         <Grid container spacing={2}>
           <Grid size={12}>
             <Typography variant="body1" fontSize={16} mb={1.5}>
-              Login with your email id
+              Ingrese su correo electrónico
             </Typography>
 
-            <RHFTextField fullWidth name="email" placeholder="Enter your work email" />
+            <RHFTextField fullWidth name="email" placeholder="Ingrese su correo electrónico de trabajo" />
           </Grid>
 
           <Grid size={12}>
-            <RHFTextField fullWidth placeholder="Password" type={showPassword ? 'text' : 'password'} name="password_hash" slotProps={{
+            <RHFTextField fullWidth placeholder="Contraseña" type={showPassword ? 'text' : 'password'} name="password_hash" slotProps={{
               input: {
                 endAdornment: <ButtonBase disableRipple disableTouchRipple onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
@@ -141,19 +136,17 @@ export default function LoginPageView() {
                   p: 0
                 }} name="remember" checked={watch('remember')} onChange={e => setValue('remember', e.target.checked)} />
                 <Typography variant="body2" fontWeight={500}>
-                  Remember me
+                  Recuérdame
                 </Typography>
               </FlexBox>
 
-              <Box fontSize={13} component={Link} fontWeight={500} color="error.500" href="/forget-password">
-                Forget Password?
-              </Box>
+        
             </FlexBetween>
           </Grid>
 
           <Grid size={12}>
             <Button fullWidth type="submit" variant="contained" disabled={!isValid} loading={isSubmitting}>
-              Sign In
+              Iniciar Sesión
             </Button>
           </Grid>
         </Grid>
